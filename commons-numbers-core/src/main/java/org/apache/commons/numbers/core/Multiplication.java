@@ -22,6 +22,7 @@ package org.apache.commons.numbers.core;
  * @param <T> Type of elements.
  */
 public interface Multiplication<T> {
+
     /**
      * Binary multiplication.
      *
@@ -59,6 +60,6 @@ public interface Multiplication<T> {
      * @since 1.2
      */
     default boolean isOne() {
-        return this.equals(one());
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

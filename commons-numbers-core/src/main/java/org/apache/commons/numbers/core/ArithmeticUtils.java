@@ -21,16 +21,22 @@ import java.math.BigInteger;
 /**
  * Some useful, arithmetics related, additions to the built-in functions in
  * {@link Math}.
- *
  */
 public final class ArithmeticUtils {
 
-    /** Negative exponent exception message part 1. */
+    /**
+     * Negative exponent exception message part 1.
+     */
     private static final String NEGATIVE_EXPONENT_1 = "negative exponent ({";
-    /** Negative exponent exception message part 2. */
+
+    /**
+     * Negative exponent exception message part 2.
+     */
     private static final String NEGATIVE_EXPONENT_2 = "})";
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private ArithmeticUtils() {
         // intentionally empty.
     }
@@ -65,47 +71,7 @@ public final class ArithmeticUtils {
      * a non-negative {@code int} value.
      */
     public static int gcd(int p, int q) {
-        // Perform the gcd algorithm on negative numbers, so that -2^31 does not
-        // need to be handled separately
-        int a = p > 0 ? -p : p;
-        int b = q > 0 ? -q : q;
-
-        final int negatedGcd;
-        if (a == 0) {
-            negatedGcd = b;
-        } else if (b == 0) {
-            negatedGcd = a;
-        } else {
-            // Make "a" and "b" odd, keeping track of common power of 2.
-            final int aTwos = Integer.numberOfTrailingZeros(a);
-            final int bTwos = Integer.numberOfTrailingZeros(b);
-            a >>= aTwos;
-            b >>= bTwos;
-            final int shift = Math.min(aTwos, bTwos);
-
-            // "a" and "b" are negative and odd.
-            // If a < b then "gdc(a, b)" is equal to "gcd(a - b, b)".
-            // If a > b then "gcd(a, b)" is equal to "gcd(b - a, a)".
-            // Hence, in the successive iterations:
-            //  "a" becomes the negative absolute difference of the current values,
-            //  "b" becomes that value of the two that is closer to zero.
-            while (a != b) {
-                final int delta = a - b;
-                b = Math.max(a, b);
-                a = delta > 0 ? -delta : delta;
-
-                // Remove any power of 2 in "a" ("b" is guaranteed to be odd).
-                a >>= Integer.numberOfTrailingZeros(a);
-            }
-
-            // Recover the common power of 2.
-            negatedGcd = a << shift;
-        }
-        if (negatedGcd == Integer.MIN_VALUE) {
-            throw new NumbersArithmeticException("overflow: gcd(%d, %d) is 2^31",
-                                                 p, q);
-        }
-        return -negatedGcd;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -139,56 +105,7 @@ public final class ArithmeticUtils {
      * a non-negative {@code long} value.
      */
     public static long gcd(long p, long q) {
-        // Perform the gcd algorithm on negative numbers, so that -2^63 does not
-        // need to be handled separately
-        long a = p > 0 ? -p : p;
-        long b = q > 0 ? -q : q;
-
-        final long negatedGcd;
-        if (a == 0) {
-            negatedGcd = b;
-        } else if (b == 0) {
-            negatedGcd = a;
-        } else {
-            // Make "a" and "b" odd, keeping track of common power of 2.
-            final int aTwos = Long.numberOfTrailingZeros(a);
-            final int bTwos = Long.numberOfTrailingZeros(b);
-            a >>= aTwos;
-            b >>= bTwos;
-            final int shift = Math.min(aTwos, bTwos);
-
-            // "a" and "b" are negative and odd.
-            // If a < b then "gdc(a, b)" is equal to "gcd(a - b, b)".
-            // If a > b then "gcd(a, b)" is equal to "gcd(b - a, a)".
-            // Hence, in the successive iterations:
-            //  "a" becomes the negative absolute difference of the current values,
-            //  "b" becomes that value of the two that is closer to zero.
-            while (true) {
-                final long delta = a - b;
-
-                if (delta == 0) {
-                    // This way of terminating the loop is intentionally different from the int gcd implementation.
-                    // Benchmarking shows that testing for long inequality (a != b) is slow compared to
-                    // testing the delta against zero. The same change on the int gcd reduces performance there,
-                    // hence we have two variants of this loop.
-                    break;
-                }
-
-                b = Math.max(a, b);
-                a = delta > 0 ? -delta : delta;
-
-                // Remove any power of 2 in "a" ("b" is guaranteed to be odd).
-                a >>= Long.numberOfTrailingZeros(a);
-            }
-
-            // Recover the common power of 2.
-            negatedGcd = a << shift;
-        }
-        if (negatedGcd == Long.MIN_VALUE) {
-            throw new NumbersArithmeticException("overflow: gcd(%d, %d) is 2^63",
-                    p, q);
-        }
-        return -negatedGcd;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -213,15 +130,7 @@ public final class ArithmeticUtils {
      * a non-negative {@code int} value.
      */
     public static int lcm(int a, int b) {
-        if (a == 0 || b == 0) {
-            return 0;
-        }
-        final int lcm = Math.abs(Math.multiplyExact(a / gcd(a, b), b));
-        if (lcm == Integer.MIN_VALUE) {
-            throw new NumbersArithmeticException("overflow: lcm(%d, %d) is 2^31",
-                                                 a, b);
-        }
-        return lcm;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -246,15 +155,7 @@ public final class ArithmeticUtils {
      * as a non-negative {@code long} value.
      */
     public static long lcm(long a, long b) {
-        if (a == 0 || b == 0) {
-            return 0;
-        }
-        final long lcm = Math.abs(Math.multiplyExact(a / gcd(a, b), b));
-        if (lcm == Long.MIN_VALUE) {
-            throw new NumbersArithmeticException("overflow: lcm(%d, %d) is 2^63",
-                                                 a, b);
-        }
-        return lcm;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -276,45 +177,8 @@ public final class ArithmeticUtils {
      * @throws IllegalArgumentException if {@code e < 0}.
      * @throws ArithmeticException if the result would overflow.
      */
-    public static int pow(final int k,
-                          final int e) {
-        if (e < 0) {
-            throw new IllegalArgumentException(NEGATIVE_EXPONENT_1 + e + NEGATIVE_EXPONENT_2);
-        }
-
-        if (k == 0) {
-            return e == 0 ? 1 : 0;
-        }
-
-        if (k == 1) {
-            return 1;
-        }
-
-        if (k == -1) {
-            return (e & 1) == 0 ? 1 : -1;
-        }
-
-        if (e >= 31) {
-            throw new ArithmeticException("integer overflow");
-        }
-
-        int exp = e;
-        int result = 1;
-        int k2p    = k;
-        while (true) {
-            if ((exp & 0x1) != 0) {
-                result = Math.multiplyExact(result, k2p);
-            }
-
-            exp >>= 1;
-            if (exp == 0) {
-                break;
-            }
-
-            k2p = Math.multiplyExact(k2p, k2p);
-        }
-
-        return result;
+    public static int pow(final int k, final int e) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -336,45 +200,8 @@ public final class ArithmeticUtils {
      * @throws IllegalArgumentException if {@code e < 0}.
      * @throws ArithmeticException if the result would overflow.
      */
-    public static long pow(final long k,
-                           final int e) {
-        if (e < 0) {
-            throw new IllegalArgumentException(NEGATIVE_EXPONENT_1 + e + NEGATIVE_EXPONENT_2);
-        }
-
-        if (k == 0L) {
-            return e == 0 ? 1L : 0L;
-        }
-
-        if (k == 1L) {
-            return 1L;
-        }
-
-        if (k == -1L) {
-            return (e & 1) == 0 ? 1L : -1L;
-        }
-
-        if (e >= 63) {
-            throw new ArithmeticException("long overflow");
-        }
-
-        int exp = e;
-        long result = 1;
-        long k2p    = k;
-        while (true) {
-            if ((exp & 0x1) != 0) {
-                result = Math.multiplyExact(result, k2p);
-            }
-
-            exp >>= 1;
-            if (exp == 0) {
-                break;
-            }
-
-            k2p = Math.multiplyExact(k2p, k2p);
-        }
-
-        return result;
+    public static long pow(final long k, final int e) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -386,11 +213,7 @@ public final class ArithmeticUtils {
      * @throws IllegalArgumentException if {@code e < 0}.
      */
     public static BigInteger pow(final BigInteger k, int e) {
-        if (e < 0) {
-            throw new IllegalArgumentException(NEGATIVE_EXPONENT_1 + e + NEGATIVE_EXPONENT_2);
-        }
-
-        return k.pow(e);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -402,22 +225,7 @@ public final class ArithmeticUtils {
      * @throws IllegalArgumentException if {@code e < 0}.
      */
     public static BigInteger pow(final BigInteger k, final long e) {
-        if (e < 0) {
-            throw new IllegalArgumentException(NEGATIVE_EXPONENT_1 + e + NEGATIVE_EXPONENT_2);
-        }
-
-        long exp = e;
-        BigInteger result = BigInteger.ONE;
-        BigInteger k2p    = k;
-        while (exp != 0) {
-            if ((exp & 0x1) != 0) {
-                result = result.multiply(k2p);
-            }
-            k2p = k2p.multiply(k2p);
-            exp >>= 1;
-        }
-
-        return result;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -429,22 +237,7 @@ public final class ArithmeticUtils {
      * @throws IllegalArgumentException if {@code e < 0}.
      */
     public static BigInteger pow(final BigInteger k, final BigInteger e) {
-        if (e.compareTo(BigInteger.ZERO) < 0) {
-            throw new IllegalArgumentException(NEGATIVE_EXPONENT_1 + e + NEGATIVE_EXPONENT_2);
-        }
-
-        BigInteger exp = e;
-        BigInteger result = BigInteger.ONE;
-        BigInteger k2p    = k;
-        while (!BigInteger.ZERO.equals(exp)) {
-            if (exp.testBit(0)) {
-                result = result.multiply(k2p);
-            }
-            k2p = k2p.multiply(k2p);
-            exp = exp.shiftRight(1);
-        }
-
-        return result;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -454,7 +247,7 @@ public final class ArithmeticUtils {
      * @return true if the argument is a power of two
      */
     public static boolean isPowerOfTwo(long n) {
-        return n > 0 && (n & (n - 1)) == 0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -477,7 +270,7 @@ public final class ArithmeticUtils {
      * @see Integer#remainderUnsigned(int, int)
      */
     public static int remainderUnsigned(int dividend, int divisor) {
-        return Integer.remainderUnsigned(dividend, divisor);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -500,30 +293,7 @@ public final class ArithmeticUtils {
      * @see Long#remainderUnsigned(long, long)
      */
     public static long remainderUnsigned(long dividend, long divisor) {
-        // Adapts the divideUnsigned method to compute the remainder.
-        if (divisor < 0) {
-            // Using unsigned compare:
-            // if dividend < divisor: return dividend
-            // else: return dividend - divisor
-
-            // Subtracting divisor using masking is more complex in this case
-            // and we use a condition
-            return dividend >= 0 || dividend < divisor ? dividend : dividend - divisor;
-        }
-        // From Hacker's Delight 2.0, section 9.3
-        final long q = ((dividend >>> 1) / divisor) << 1;
-        final long r = dividend - q * divisor;
-        // unsigned r: 0 <= r < 2 * divisor
-        // if (r < divisor): r
-        // else: r - divisor
-
-        // The compare of unsigned r can be done using:
-        // return (r + Long.MIN_VALUE) < (divisor | Long.MIN_VALUE) ? r : r - divisor
-
-        // Here we subtract divisor if (r - divisor) is positive, else the result is r.
-        // This can be done by flipping the sign bit and
-        // creating a mask as -1 or 0 by signed shift.
-        return r - (divisor & (~(r - divisor) >> 63));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -551,7 +321,7 @@ public final class ArithmeticUtils {
      * @see Integer#divideUnsigned(int, int)
      */
     public static int divideUnsigned(int dividend, int divisor) {
-        return Integer.divideUnsigned(dividend, divisor);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -579,27 +349,17 @@ public final class ArithmeticUtils {
      * @see Long#divideUnsigned(long, long)
      */
     public static long divideUnsigned(long dividend, long divisor) {
-        // The implementation is a Java port of algorithm described in the book
-        // "Hacker's Delight 2.0" (section 9.3 "Unsigned short division from signed division").
-        // Adapts 6-line predicate expressions program with (u >=) an unsigned compare
-        // using the provided branchless variants.
-        if (divisor < 0) {
-            // line 1 branchless:
-            // q <- (dividend (u >=) divisor)
-            return (dividend & ~(dividend - divisor)) >>> 63;
-        }
-        final long q = ((dividend >>> 1) / divisor) << 1;
-        final long r = dividend - q * divisor;
-        // line 5 branchless:
-        // q <- q + (r (u >=) divisor)
-        return q + ((r | ~(r - divisor)) >>> 63);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
      * Exception.
      */
     private static class NumbersArithmeticException extends ArithmeticException {
-        /** Serializable version Id. */
+
+        /**
+         * Serializable version Id.
+         */
         private static final long serialVersionUID = 20180130L;
 
         /**

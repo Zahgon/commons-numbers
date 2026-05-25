@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.arrays;
 
 /**
@@ -26,20 +25,34 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 final class ScanningKeyInterval implements SearchableInterval, SearchableInterval2 {
+
     // Note:
     // Using 4 markers into the data allows this class to return the same
     // performance as using a binary search within the data when n < 1600.
     // Benchmarked by searching once for next and previous from median points between k.
-
-    /** The ordered keys. */
+    /**
+     * The ordered keys.
+     */
     private final int[] keys;
-    /** The original number of keys. */
+
+    /**
+     * The original number of keys.
+     */
     private final int n;
-    /** Index into the keys (used for fast-forward). */
+
+    /**
+     * Index into the keys (used for fast-forward).
+     */
     private final int i1;
-    /** Index into the keys (used for fast-forward). */
+
+    /**
+     * Index into the keys (used for fast-forward).
+     */
     private final int i2;
-    /** Index into the keys (used for fast-forward). */
+
+    /**
+     * Index into the keys (used for fast-forward).
+     */
     private final int i3;
 
     /**
@@ -67,56 +80,32 @@ final class ScanningKeyInterval implements SearchableInterval, SearchableInterva
      * in the range {@code [0, 2^31-1)}; or {@code n <= 0}
      */
     static ScanningKeyInterval of(int[] indices, int n) {
-        // Check the indices are uniquely ordered
-        if (n <= 0) {
-            throw new IllegalArgumentException("No indices to define the range");
-        }
-        int p = indices[0];
-        for (int i = 0; ++i < n;) {
-            final int c = indices[i];
-            if (c <= p) {
-                throw new IllegalArgumentException("Indices are not unique and ordered");
-            }
-            p = c;
-        }
-        if (indices[0] < 0) {
-            throw new IllegalArgumentException("Unsupported min value: " + indices[0]);
-        }
-        if (indices[n - 1] == Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Unsupported max value: " + Integer.MAX_VALUE);
-        }
-        return new ScanningKeyInterval(indices, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int left() {
-        return keys[0];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int right() {
-        return keys[n - 1];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int previousIndex(int k) {
-        return keys[previous(k)];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int nextIndex(int k) {
-        return keys[next(k)];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int split(int ka, int kb, int[] upper) {
-        int i = next(kb + 1);
-        upper[0] = keys[i];
-        // Find the lower
-        do {
-            --i;
-        } while (keys[i] >= ka);
-        return keys[i];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -129,7 +118,6 @@ final class ScanningKeyInterval implements SearchableInterval, SearchableInterva
         // Scan the sorted keys from the end.
         // Assume left <= k <= right thus no index checks required.
         // IndexOutOfBoundsException indicates incorrect usage by the caller.
-
         // Attempt fast-forward
         int i;
         if (keys[i2] > k) {
@@ -153,7 +141,6 @@ final class ScanningKeyInterval implements SearchableInterval, SearchableInterva
         // Scan the sorted keys from the start.
         // Assume left <= k <= right thus no index checks required.
         // IndexOutOfBoundsException indicates incorrect usage by the caller.
-
         // Attempt fast-forward
         int i;
         if (keys[i2] < k) {
@@ -169,55 +156,31 @@ final class ScanningKeyInterval implements SearchableInterval, SearchableInterva
 
     @Override
     public int start() {
-        return 0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int end() {
-        return n - 1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int index(int i) {
-        return keys[i];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int previous(int i, int k) {
-        // index(start) <= k < index(i)
-        int j = i;
-        do {
-            --j;
-        } while (keys[j] > k);
-        return j;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int next(int i, int k) {
-        // index(i) < k <= index(end)
-        int j = i;
-        do {
-            ++j;
-        } while (keys[j] < k);
-        return j;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int split(int lo, int hi, int ka, int kb, int[] upper) {
-        // index(lo) < ka <= kb < index(hi)
-
-        // We could test if ka/kb is above or below the
-        // median (keys[lo] + keys[hi]) >>> 1 to pick the side to search
-
-        int j = hi;
-        do {
-            --j;
-        } while (keys[j] > kb);
-        upper[0] = j + 1;
-        // Find the lower
-        while (keys[j] >= ka) {
-            --j;
-        }
-        return j;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

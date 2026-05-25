@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.combinatorics;
 
 import org.apache.commons.numbers.core.ArithmeticUtils;
@@ -26,17 +25,28 @@ import org.apache.commons.numbers.core.ArithmeticUtils;
  * can be selected from an {@code n}-element set.
  */
 public final class BinomialCoefficient {
-    /** The maximum m that can be computed without overflow of a long.
-     * {@code C(68, 34) > 2^63}. */
+
+    /**
+     * The maximum m that can be computed without overflow of a long.
+     * {@code C(68, 34) > 2^63}.
+     */
     private static final int MAX_M = 33;
-    /** The maximum n that can be computed without intermediate overflow for any m.
-     * {@code C(61, 30) * 30 < 2^63}. */
+
+    /**
+     * The maximum n that can be computed without intermediate overflow for any m.
+     * {@code C(61, 30) * 30 < 2^63}.
+     */
     private static final int SMALL_N = 61;
-    /** The maximum n that can be computed without overflow of a long for any m.
-     * {@code C(66, 33) < 2^63}. */
+
+    /**
+     * The maximum n that can be computed without overflow of a long for any m.
+     * {@code C(66, 33) < 2^63}.
+     */
     private static final int LIMIT_N = 66;
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private BinomialCoefficient() {
         // intentionally empty.
     }
@@ -59,60 +69,7 @@ public final class BinomialCoefficient {
      * represented by a {@code long}.
      */
     public static long value(int n, int k) {
-        final int m = checkBinomial(n, k);
-
-        if (m == 0) {
-            return 1;
-        }
-        if (m == 1) {
-            return n;
-        }
-
-        // We use the formulae:
-        // (n choose m) = n! / (n-m)! / m!
-        // (n choose m) = ((n-m+1)*...*n) / (1*...*m)
-        // which can be written
-        // (n choose m) = (n-1 choose m-1) * n / m
-        long result = 1;
-        if (n <= SMALL_N) {
-            // For n <= 61, the naive implementation cannot overflow.
-            int i = n - m + 1;
-            for (int j = 1; j <= m; j++) {
-                result = result * i / j;
-                i++;
-            }
-        } else if (n <= LIMIT_N) {
-            // For n > 61 but n <= 66, the result cannot overflow,
-            // but we must take care not to overflow intermediate values.
-            int i = n - m + 1;
-            for (int j = 1; j <= m; j++) {
-                // We know that (result * i) is divisible by j,
-                // but (result * i) may overflow, so we split j:
-                // Filter out the gcd, d, so j/d and i/d are integer.
-                // result is divisible by (j/d) because (j/d)
-                // is relative prime to (i/d) and is a divisor of
-                // result * (i/d).
-                final long d = ArithmeticUtils.gcd(i, j);
-                result = (result / (j / d)) * (i / d);
-                ++i;
-            }
-        } else {
-            if (m > MAX_M) {
-                throw new ArithmeticException(n + " choose " + k);
-            }
-
-            // For n > 66, a result overflow might occur, so we check
-            // the multiplication, taking care to not overflow
-            // unnecessary.
-            int i = n - m + 1;
-            for (int j = 1; j <= m; j++) {
-                final long d = ArithmeticUtils.gcd(i, j);
-                result = Math.multiplyExact(result / (j / d), i / d);
-                ++i;
-            }
-        }
-
-        return result;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -128,20 +85,7 @@ public final class BinomialCoefficient {
      * @throws IllegalArgumentException if {@code n < 0}.
      * @throws IllegalArgumentException if {@code k > n} or {@code k < 0}.
      */
-    static int checkBinomial(int n,
-                             int k) {
-        // Combine all checks with a single branch:
-        // 0 <= n; 0 <= k <= n
-        // Note: If n >= 0 && k >= 0 && n - k < 0 then k > n.
-        final int m = n - k;
-        // Bitwise or will detect a negative sign bit in any of the numbers
-        if ((n | k | m) < 0) {
-            // Raise the correct exception
-            if (n < 0) {
-                throw new CombinatoricsException(CombinatoricsException.NEGATIVE, n);
-            }
-            throw new CombinatoricsException(CombinatoricsException.OUT_OF_RANGE, k, 0, n);
-        }
-        return m < k ? m : k;
+    static int checkBinomial(int n, int k) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

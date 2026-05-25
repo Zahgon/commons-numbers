@@ -32,19 +32,35 @@ package org.apache.commons.numbers.arrays;
  * @since 1.2
  */
 final class BitIndexUpdatingInterval implements UpdatingInterval {
-    /** All 64-bits bits set. */
+
+    /**
+     * All 64-bits bits set.
+     */
     private static final long LONG_MASK = -1L;
-    /** A bit shift to apply to an integer to divided by 64 (2^6). */
+
+    /**
+     * A bit shift to apply to an integer to divided by 64 (2^6).
+     */
     private static final int DIVIDE_BY_64 = 6;
 
-    /** Bit indexes. */
+    /**
+     * Bit indexes.
+     */
     private final long[] data;
 
-    /** Index offset. */
+    /**
+     * Index offset.
+     */
     private final int offset;
-    /** Left bound of the support. */
+
+    /**
+     * Left bound of the support.
+     */
     private int left;
-    /** Right bound of the support. */
+
+    /**
+     * Right bound of the support.
+     */
     private int right;
 
     /**
@@ -132,11 +148,7 @@ final class BitIndexUpdatingInterval implements UpdatingInterval {
      * @param bitIndex the bit index (assumed to be positive)
      */
     void set(int bitIndex) {
-        // WARNING: No range checks !!!
-        final int index = bitIndex - offset;
-        final int i = getLongIndex(index);
-        final long m = getLongBit(index);
-        data[i] |= m;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -151,14 +163,12 @@ final class BitIndexUpdatingInterval implements UpdatingInterval {
      */
     private int nextIndex(int k) {
         // left <= k <= right
-
         final int index = k - offset;
         int i = getLongIndex(index);
-
         // Mask bits after the bit index
         // mask = 11111000 = -1L << (index % 64)
         long bits = data[i] & (LONG_MASK << index);
-        for (;;) {
+        for (; ; ) {
             if (bits != 0) {
                 //(i+1)       i
                 // |    index |
@@ -185,14 +195,12 @@ final class BitIndexUpdatingInterval implements UpdatingInterval {
      */
     private int previousIndex(int k) {
         // left <= k <= right
-
         final int index = k - offset;
         int i = getLongIndex(index);
-
         // Mask bits before the bit index
         // mask = 00011111 = -1L >>> (64 - ((index + 1) % 64))
         long bits = data[i] & (LONG_MASK >>> -(index + 1));
-        for (;;) {
+        for (; ; ) {
             if (bits != 0) {
                 //(i+1)       i
                 // |  index   |
@@ -209,33 +217,26 @@ final class BitIndexUpdatingInterval implements UpdatingInterval {
 
     @Override
     public int left() {
-        return left;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int right() {
-        return right;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int updateLeft(int k) {
-        // Assume left < k= < right
-        left = nextIndex(k);
-        return left;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int updateRight(int k) {
-        // Assume left <= k < right
-        right = previousIndex(k);
-        return right;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public UpdatingInterval splitLeft(int ka, int kb) {
-        // Assume left < ka <= kb < right
-        final int lower = left;
-        left = nextIndex(kb + 1);
-        return new BitIndexUpdatingInterval(data, offset, lower, previousIndex(ka - 1));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

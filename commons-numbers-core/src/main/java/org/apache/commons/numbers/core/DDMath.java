@@ -25,10 +25,16 @@ package org.apache.commons.numbers.core;
  * @since 1.2
  */
 public final class DDMath {
-    /** 0.5. */
+
+    /**
+     * 0.5.
+     */
     private static final double HALF = 0.5;
-    /** The limit for safe multiplication of {@code x*y}, assuming values above 1.
-     * Used to maintain positive values during the power computation. */
+
+    /**
+     * The limit for safe multiplication of {@code x*y}, assuming values above 1.
+     * Used to maintain positive values during the power computation.
+     */
     private static final double SAFE_MULTIPLY = 0x1.0p500;
 
     /**
@@ -36,17 +42,29 @@ public final class DDMath {
      * This structure is used for the output argument during triple-double computations.
      */
     private static final class MDD {
-        /** The high part of the double-double number. */
+
+        /**
+         * The high part of the double-double number.
+         */
         private double x;
-        /** The low part of the double-double number. */
+
+        /**
+         * The low part of the double-double number.
+         */
         private double xx;
 
-        /** Package-private constructor. */
-        MDD() {}
+        /**
+         * Package-private constructor.
+         */
+        MDD() {
+        }
     }
 
-    /** No instances. */
-    private DDMath() {}
+    /**
+     * No instances.
+     */
+    private DDMath() {
+    }
 
     /**
      * Compute the number {@code x} raised to the power {@code n}.
@@ -84,33 +102,7 @@ public final class DDMath {
      * @see DD#frexp(int[])
      */
     public static DD pow(DD x, int n, long[] exp) {
-        // Edge cases.
-        if (n == 0) {
-            exp[0] = 1;
-            return DD.of(0.5);
-        }
-        // IEEE result for non-finite or zero
-        if (!Double.isFinite(x.hi()) || x.hi() == 0) {
-            exp[0] = 0;
-            return DD.of(Math.pow(x.hi(), n));
-        }
-        // Here the number is non-zero finite
-        final int[] ie = {0};
-        final DD f = x.frexp(ie);
-        final long b = ie[0];
-        // Handle exact powers of 2
-        if (Math.abs(f.hi()) == HALF && f.lo() == 0) {
-            // (f * 2^b)^n = (2f)^n * 2^(b-1)^n
-            // Use Math.pow to create the sign.
-            // Note the result must be scaled to the fractional representation
-            // by multiplication by 0.5 and addition of 1 to the exponent.
-            final double y0 = 0.5 * Math.pow(2 * f.hi(), n);
-            // Propagate sign change (y0*f.x) to the original zero (this.xx)
-            final double y1 = Math.copySign(0.0, y0 * f.hi() * x.lo());
-            exp[0] = 1 + (b - 1) * n;
-            return DD.of(y0, y1);
-        }
-        return computePowScaled(b, f.hi(), f.lo(), n, exp);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -129,7 +121,6 @@ public final class DDMath {
      */
     private static DD computePowScaled(long b, double x, double xx, int n, long[] exp) {
         // Same as DD.computePowScaled using a triple-double intermediate.
-
         // triple-double multiplication:
         // (a0, a1, a2) * (b0, b1, b2)
         // a x b ~ a0b0                 O(1) term
@@ -158,7 +149,6 @@ public final class DDMath {
         // Sum (2 * p01, q00) -> (s1, r2)                  Order(eps)
         // Sum (2 * p02, 2 * q01, p11, r2) -> (s2, r3b)    Order(eps^2)
         // Sum (2 * p12, 2 * q02, q11, r3b) -> s3          Order(eps^3)
-
         // Scale the input in [0.5, 1) to be above 1. Represented as 2^be * b.
         final long be = b - 1;
         final double b0 = x * 2;
@@ -168,13 +158,11 @@ public final class DDMath {
         final double b0l = b0 - b0h;
         final double b1h = DD.highPart(b1);
         final double b1l = b1 - b1h;
-
         // Initialise the result as x^1. Represented as 2^fe * f.
         long fe = be;
         double f0 = b0;
         double f1 = b1;
         double f2 = 0;
-
         // Shift the highest set bit off the top.
         // Any remaining bits are detected in the sign bit.
         final int an = Math.abs(n);
@@ -182,7 +170,6 @@ public final class DDMath {
         int bits = an << shift;
         DD t;
         final MDD m = new MDD();
-
         // Multiplication is done inline with some triple precision helper routines.
         // Process remaining bits below highest set bit.
         for (int i = 32 - shift; i != 0; i--, bits <<= 1) {
@@ -220,7 +207,6 @@ public final class DDMath {
             f0 = norm3(s0, s1, s2, s3, m);
             f1 = m.x;
             f2 = m.xx;
-
             // Rescale
             if (Math.abs(f0) > SAFE_MULTIPLY) {
                 // Scale back to the [1, 2) range. As safe multiply is 2^500
@@ -232,7 +218,6 @@ public final class DDMath {
                 f1 *= s;
                 f2 *= s;
             }
-
             if (bits < 0) {
                 // Multiply by b
                 fe += be;
@@ -277,12 +262,10 @@ public final class DDMath {
                 // Avoid rescale as x2 is in [1, 2)
             }
         }
-
         // Ensure (f0, f1) are 1 ulp exact
         final double u = f1 + f2;
         t = DD.fastTwoSum(f0, u);
-        final int[] e = {0};
-
+        final int[] e = { 0 };
         // If the power is negative, invert in triple precision
         if (n < 0) {
             // Require the round-off
@@ -294,7 +277,6 @@ public final class DDMath {
             exp[0] = e[0] - fe;
             return t;
         }
-
         t = t.frexp(e);
         exp[0] = fe + e[0];
         return t;

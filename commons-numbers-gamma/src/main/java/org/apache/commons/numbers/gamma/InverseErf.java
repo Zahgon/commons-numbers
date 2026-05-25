@@ -20,7 +20,10 @@ package org.apache.commons.numbers.gamma;
  * Inverse of the <a href="https://mathworld.wolfram.com/Erf.html">error function</a>.
  */
 public final class InverseErf {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private InverseErf() {
         // intentionally empty.
     }
@@ -41,6 +44,6 @@ public final class InverseErf {
      * @return t such that {@code x =} {@link Erf#value(double) Erf.value(t)}.
      */
     public static double value(final double x) {
-        return BoostErf.erfInv(x);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

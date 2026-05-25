@@ -27,13 +27,17 @@ import java.util.List;
  * </ul>
  */
 public final class Primes {
-    /** Exception message format when an argument is too small. */
+
+    /**
+     * Exception message format when an argument is too small.
+     */
     static final String NUMBER_TOO_SMALL = "%d is smaller than the minimum (%d)";
 
     /**
      * Utility class.
      */
-    private Primes() {}
+    private Primes() {
+    }
 
     /**
      * Primality test: tells if the argument {@code n} is a (provable) prime or not.
@@ -46,16 +50,7 @@ public final class Primes {
      * @return true if {@code n} is prime. All numbers {@code < 2} return false.
      */
     public static boolean isPrime(int n) {
-        if (n < 2) {
-            return false;
-        }
-
-        for (final int p : SmallPrimes.PRIMES) {
-            if (n % p == 0) {
-                return n == p;
-            }
-        }
-        return SmallPrimes.millerRabinPrimeTest(n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -66,36 +61,7 @@ public final class Primes {
      * @throws IllegalArgumentException if {@code n} is negative.
      */
     public static int nextPrime(int n) {
-        if (n < 0) {
-            throw new IllegalArgumentException(String.format(NUMBER_TOO_SMALL, n, 0));
-        }
-        if (n <= 2) {
-            return 2;
-        }
-        n |= 1; // make sure n is odd
-
-        if (isPrime(n)) {
-            return n;
-        }
-
-        // prepare entry in the +2, +4 loop:
-        // n should not be a multiple of 3
-        final int rem = n % 3;
-        if (rem == 0) { // if n % 3 == 0
-            n += 2; // n % 3 == 2
-        } else if (rem == 1) { // if n % 3 == 1
-            n += 4; // n % 3 == 2
-        }
-        while (true) { // this loop skips all multiple of 3
-            if (isPrime(n)) {
-                return n;
-            }
-            n += 2; // n % 3 == 1
-            if (isPrime(n)) {
-                return n;
-            }
-            n += 4; // n % 3 == 2
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -106,9 +72,6 @@ public final class Primes {
      * @throws IllegalArgumentException if n {@code < 2}.
      */
     public static List<Integer> primeFactors(int n) {
-        if (n < 2) {
-            throw new IllegalArgumentException(String.format(NUMBER_TOO_SMALL, n, 2));
-        }
-        return SmallPrimes.trialDivision(n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

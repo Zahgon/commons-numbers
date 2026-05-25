@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.core;
 
 import java.util.concurrent.TimeUnit;
 import java.util.function.DoubleBinaryOperator;
-
 import org.apache.commons.rng.UniformRandomProvider;
 import org.apache.commons.rng.simple.RandomSource;
 import org.openjdk.jmh.annotations.Benchmark;
@@ -50,20 +48,37 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-server", "-Xms512M", "-Xmx512M"})
+@Fork(value = 1, jvmArgs = { "-server", "-Xms512M", "-Xmx512M" })
 public class StickySumPerformance {
-    /** The mask for the sign bit and the mantissa. */
+
+    /**
+     * The mask for the sign bit and the mantissa.
+     */
     private static final long SIGN_MATISSA_MASK = 0x800f_ffff_ffff_ffffL;
 
-    /** Constant for no method. */
+    /**
+     * Constant for no method.
+     */
     private static final String NONE = "none";
-    /** Constant for branched method. */
+
+    /**
+     * Constant for branched method.
+     */
     private static final String BRANCHED = "branched";
-    /** Constant for branchless method. */
+
+    /**
+     * Constant for branchless method.
+     */
     private static final String BRANCHLESS = "branchless";
-    /** Constant for single branch method based on the low bit of the high part. */
+
+    /**
+     * Constant for single branch method based on the low bit of the high part.
+     */
     private static final String BRANCH_ON_HI = "branch_on_hi";
-    /** Constant for single branch method based on the low part. */
+
+    /**
+     * Constant for single branch method based on the low part.
+     */
     private static final String BRANCH_ON_LO = "branch_on_lo";
 
     /**
@@ -71,22 +86,27 @@ public class StickySumPerformance {
      */
     @State(Scope.Benchmark)
     public static class BiFactors {
-        /** The exponent for small numbers. */
+
+        /**
+         * The exponent for small numbers.
+         */
         private static final long EXP = Double.doubleToRawLongBits(1.0);
 
         /**
          * The count of sums.
          */
-        @Param({"10000"})
+        @Param({ "10000" })
         private int size;
 
         /**
          * The fraction of numbers that have a zero round-off.
          */
-        @Param({"0", "0.1"})
+        @Param({ "0", "0.1" })
         private double zeroRoundoff;
 
-        /** Factors. */
+        /**
+         * Factors.
+         */
         private double[] a;
 
         /**
@@ -95,7 +115,7 @@ public class StickySumPerformance {
          * @return Factors.
          */
         public double[] getFactors() {
-            return a;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -103,50 +123,7 @@ public class StickySumPerformance {
          */
         @Setup
         public void setup() {
-            final UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_1024_PP.create();
-            a = new double[size * 2];
-            // Report on the dataset
-            int nonZero = 0;
-            int unsetSticky = 0;
-            for (int i = 0; i < a.length; i += 2) {
-                // Create data similar to the summation of an expansion.
-                // E.g. Generate 2 numbers with large differences in exponents.
-                // Their sum should have a round-off term containing many bits.
-                final double x = nextDouble(rng);
-                // The round-off can conditionally be forced to zero.
-                final double y = (rng.nextDouble() < zeroRoundoff) ?
-                    0.0 :
-                    nextDouble(rng) * 0x1.0p52;
-
-                // Initial expansion
-                double e1 = x + y;
-                double e0 = DoublePrecision.twoSumLow(x, y, e1);
-
-                // Validate methods
-                final double expected = fastSumWithStickyBitBranched(e0, e1);
-                assertEqual(expected, fastSumWithStickyBitBranchless(e0, e1), BRANCHLESS);
-                assertEqual(expected, fastSumWithStickyBitBranchedOnHigh(e0, e1), BRANCH_ON_HI);
-                assertEqual(expected, fastSumWithStickyBitBranchedOnLow(e0, e1), BRANCH_ON_LO);
-
-                // Lower parts of expansion for use in sticky sum
-                a[i] = e0;
-                a[i + 1] = e1;
-
-                // Check the sum and round-off
-                final double sum = e1 + e0;
-                final double r = e0 - (sum - e1);
-                if (r != 0) {
-                    nonZero++;
-                }
-                if ((Double.doubleToRawLongBits(sum) & 0x1) == 0) {
-                    unsetSticky++;
-                }
-            }
-            // CHECKSTYLE: stop Regexp
-            System.out.printf("%n%nNon-zero %d/%d (%.3f) : Unset sticky %d/%d (%.3f)%n%n",
-                nonZero, size,
-                (double) nonZero / size, unsetSticky, size, (double) unsetSticky / size);
-            // CHECKSTYLE: resume Regexp
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -180,13 +157,16 @@ public class StickySumPerformance {
      */
     @State(Scope.Benchmark)
     public static class SumMethod {
+
         /**
          * The name of the method.
          */
-        @Param({NONE, BRANCHED, BRANCHLESS, BRANCH_ON_HI, BRANCH_ON_LO})
+        @Param({ NONE, BRANCHED, BRANCHLESS, BRANCH_ON_HI, BRANCH_ON_LO })
         private String name;
 
-        /** The function. */
+        /**
+         * The function.
+         */
         private DoubleBinaryOperator fun;
 
         /**
@@ -195,7 +175,7 @@ public class StickySumPerformance {
          * @return the function
          */
         public DoubleBinaryOperator getFunction() {
-            return fun;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -203,19 +183,7 @@ public class StickySumPerformance {
          */
         @Setup
         public void setup() {
-            if (NONE.equals(name)) {
-                fun = (a, b) -> a + b;
-            } else if (BRANCHED.equals(name)) {
-                fun = StickySumPerformance::fastSumWithStickyBitBranched;
-            } else if (BRANCHLESS.equals(name)) {
-                fun = StickySumPerformance::fastSumWithStickyBitBranchless;
-            } else if (BRANCH_ON_HI.equals(name)) {
-                fun = StickySumPerformance::fastSumWithStickyBitBranchedOnHigh;
-            } else if (BRANCH_ON_LO.equals(name)) {
-                fun = StickySumPerformance::fastSumWithStickyBitBranchedOnLow;
-            } else {
-                throw new IllegalStateException("Unknown sum method: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -240,7 +208,6 @@ public class StickySumPerformance {
         // bVirtual = sum - a
         // b - bVirtual == b round-off
         final double r = b - (sum - a);
-
         if (r != 0) {
             // Bits will be lost.
             // In floating-point arithmetic the sticky bit is the bit-wise OR
@@ -301,7 +268,6 @@ public class StickySumPerformance {
         // bVirtual = sum - a
         // b - bVirtual == b round-off
         final double r = b - (sum - a);
-
         // In floating-point arithmetic the sticky bit is the bit-wise OR
         // of the rest of the binary bits that cannot be stored in the
         // preliminary representation of the result:
@@ -327,7 +293,6 @@ public class StickySumPerformance {
         // One extra consideration: sum is already rounded. Since we are using the
         // last bit to store a sticky bit then if the final bit is 1 then this was
         // not created by a ties-to-even rounding and is already a sticky bit.
-
         // Compute the sticky bit addition:
         // sign sum   last bit sum    sign r    magnitude r      sticky
         // x          1               x         x                +0
@@ -343,37 +308,31 @@ public class StickySumPerformance {
         //
         // Magnitude of r is computed by bitwise OR of the 63-bits from exponent+mantissa
         // Sign of sum and r is the sign-bit of sum or r
-
         final long hi = Double.doubleToRawLongBits(sum);
-
         // Note: >50% of the time all code below here is redundant
         //if ((hi & 0x1) == 0x1) {
         //    // Already sticky
         //    return sum;
         //}
-
         final long lo = Double.doubleToRawLongBits(r);
-
         // OR compress least significant 63-bits into lowest bit
         long sticky = lo;
-        sticky |= sticky >>> 31; // Discard sign bit
+        // Discard sign bit
+        sticky |= sticky >>> 31;
         sticky |= sticky >>> 16;
         sticky |= sticky >>> 8;
         sticky |= sticky >>> 4;
         sticky |= sticky >>> 2;
-        sticky |= sticky >>> 1; // final sticky bit is in position 0
-
+        // final sticky bit is in position 0
+        sticky |= sticky >>> 1;
         // AND with the inverse of the trailing bit from hi to set it to zero
         // if the last bit in hi is 1 (already sticky).
         sticky = sticky & ~hi;
-
         // Clear the rest. Sticky is now 0 if r was 0.0; or 1 if r was non-zero.
         sticky = sticky & 0x1;
-
         // The sign bit is created as + or - using the XOR of hi and lo.
         // Signed shift will create a flag: -1 to negate, else 0.
         final long fNegate = (hi ^ lo) >> 63;
-
         // Conditionally negate a value without branching:
         // http://graphics.stanford.edu/~seander/bithacks.html#ConditionalNegate
         // (Logic updated since fNegate is already negative.)
@@ -382,7 +341,6 @@ public class StickySumPerformance {
         // (1 ^ -1) - -1 = -2 - -1 = -1
         // (0 ^ -1) - -1 = -1 - -1 =  0
         sticky = (sticky ^ fNegate) - fNegate;
-
         return Double.longBitsToDouble(hi + sticky);
     }
 
@@ -407,7 +365,6 @@ public class StickySumPerformance {
         // bVirtual = sum - a
         // b - bVirtual == b round-off
         final double r = b - (sum - a);
-
         // In floating-point arithmetic the sticky bit is the bit-wise OR
         // of the rest of the binary bits that cannot be stored in the
         // preliminary representation of the result:
@@ -433,7 +390,6 @@ public class StickySumPerformance {
         // One extra consideration: sum is already rounded. Since we are using the
         // last bit to store a sticky bit then if the final bit is 1 then this was
         // not created by a ties-to-even rounding and is already a sticky bit.
-
         // Compute the sticky bit addition:
         // sign sum   last bit sum    sign r    magnitude r      sticky
         // x          1               x         x                +0
@@ -449,35 +405,29 @@ public class StickySumPerformance {
         //
         // Magnitude of r is computed by bitwise OR of the 63-bits from exponent+mantissa
         // Sign of sum and r is the sign-bit of sum or r
-
         final long hi = Double.doubleToRawLongBits(sum);
-
         if ((hi & 0x1) == 0x1) {
             // Already sticky
             return sum;
         }
-
         final long lo = Double.doubleToRawLongBits(r);
-
         // OR compress least significant 63-bits into lowest bit
         long sticky = lo;
-        sticky |= sticky >>> 31; // Discard sign bit
+        // Discard sign bit
+        sticky |= sticky >>> 31;
         sticky |= sticky >>> 16;
         sticky |= sticky >>> 8;
         sticky |= sticky >>> 4;
         sticky |= sticky >>> 2;
-        sticky |= sticky >>> 1; // final sticky bit is in position 0
-
+        // final sticky bit is in position 0
+        sticky |= sticky >>> 1;
         // No requirement for AND with the inverse of the trailing bit from hi as we
         // have eliminated that condition.
-
         // Clear the rest. Sticky is now 0 if r was 0.0; or 1 if r was non-zero.
         sticky = sticky & 0x1;
-
         // The sign bit is created as + or - using the XOR of hi and lo.
         // Signed shift will create a flag: -1 to negate, else 0.
         final long fNegate = (hi ^ lo) >> 63;
-
         // Conditionally negate a value without branching:
         // http://graphics.stanford.edu/~seander/bithacks.html#ConditionalNegate
         // (Logic updated since fNegate is already negative.)
@@ -486,7 +436,6 @@ public class StickySumPerformance {
         // (1 ^ -1) - -1 = -2 - -1 = -1
         // (0 ^ -1) - -1 = -1 - -1 =  0
         sticky = (sticky ^ fNegate) - fNegate;
-
         return Double.longBitsToDouble(hi + sticky);
     }
 
@@ -511,7 +460,6 @@ public class StickySumPerformance {
         // bVirtual = sum - a
         // b - bVirtual == b round-off
         final double r = b - (sum - a);
-
         // In floating-point arithmetic the sticky bit is the bit-wise OR
         // of the rest of the binary bits that cannot be stored in the
         // preliminary representation of the result:
@@ -537,7 +485,6 @@ public class StickySumPerformance {
         // One extra consideration: sum is already rounded. Since we are using the
         // last bit to store a sticky bit then if the final bit is 1 then this was
         // not created by a ties-to-even rounding and is already a sticky bit.
-
         // Compute the sticky bit addition.
         // This is only done when r is non-zero:
         // sign sum   last bit sum    sign r    sticky
@@ -549,7 +496,6 @@ public class StickySumPerformance {
         // 0          0               0         +1
         //
         // Sign of sum and r is the sign-bit of sum or r
-
         // In the majority of cases there is some round-off.
         // Testing for non-zero allows the branch to assume the sticky bit magnitude
         // is 1 (unless the final bit of hi is already set).
@@ -557,7 +503,6 @@ public class StickySumPerformance {
             // Bits will be lost.
             final long hi = Double.doubleToRawLongBits(sum);
             final long lo = Double.doubleToRawLongBits(r);
-
             // Can only set a sticky bit if the bit is not already set.
             // Flip the bits and extract the lowest bit. This is 1 if
             // the sticky bit is not currently set. If already set then
@@ -568,11 +513,9 @@ public class StickySumPerformance {
             //    // set sticky ...
             // }
             int sticky = ~((int) hi) & 0x1;
-
             // The sign bit is created as + or - using the XOR of hi and lo.
             // Signed shift will create a flag: -1 to negate, else 0.
             final int fNegate = (int) ((hi ^ lo) >> 63);
-
             // Conditionally negate a value without branching:
             // http://graphics.stanford.edu/~seander/bithacks.html#ConditionalNegate
             // (Logic updated since fNegate is already negative.)
@@ -581,15 +524,12 @@ public class StickySumPerformance {
             // (1 ^ -1) - -1 = -2 - -1 = -1
             // (0 ^ -1) - -1 = -1 - -1 =  0
             sticky = (sticky ^ fNegate) - fNegate;
-
             return Double.longBitsToDouble(hi + sticky);
         }
-
         return sum;
     }
 
     // Benchmark methods.
-
     /**
      * Benchmark the sticky summation of two numbers.
      *
@@ -599,10 +539,6 @@ public class StickySumPerformance {
      */
     @Benchmark
     public void stickySum(BiFactors factors, Blackhole bh, SumMethod method) {
-        final DoubleBinaryOperator fun = method.getFunction();
-        final double[] a = factors.getFactors();
-        for (int i = 0; i < a.length; i += 2) {
-            bh.consume(fun.applyAsDouble(a[i], a[i + 1]));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

@@ -33,7 +33,9 @@ package org.apache.commons.numbers.gamma;
  */
 public final class RegularizedBeta {
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private RegularizedBeta() {
         // intentionally empty.
     }
@@ -53,10 +55,8 @@ public final class RegularizedBeta {
      * @return the regularized beta function \( I_x(a, b) \).
      * @throws ArithmeticException if the series evaluation fails to converge.
      */
-    public static double value(double x,
-                               double a,
-                               double b) {
-        return BoostBeta.ibeta(a, b, x);
+    public static double value(double x, double a, double b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -76,12 +76,8 @@ public final class RegularizedBeta {
      * @return the regularized beta function \( I_x(a, b) \).
      * @throws ArithmeticException if the series evaluation fails to converge.
      */
-    public static double value(double x,
-                               final double a,
-                               final double b,
-                               double epsilon,
-                               int maxIterations) {
-        return BoostBeta.ibeta(a, b, x, new Policy(epsilon, maxIterations));
+    public static double value(double x, final double a, final double b, double epsilon, int maxIterations) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -98,10 +94,8 @@ public final class RegularizedBeta {
      * @throws ArithmeticException if the series evaluation fails to converge.
      * @since 1.1
      */
-    public static double complement(double x,
-                                    double a,
-                                    double b) {
-        return BoostBeta.ibetac(a, b, x);
+    public static double complement(double x, double a, double b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -120,12 +114,8 @@ public final class RegularizedBeta {
      * @throws ArithmeticException if the series evaluation fails to converge.
      * @since 1.1
      */
-    public static double complement(double x,
-                                    final double a,
-                                    final double b,
-                                    double epsilon,
-                                    int maxIterations) {
-        return BoostBeta.ibetac(a, b, x, new Policy(epsilon, maxIterations));
+    public static double complement(double x, final double a, final double b, double epsilon, int maxIterations) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -146,9 +136,7 @@ public final class RegularizedBeta {
      * @throws ArithmeticException if the series evaluation fails to converge.
      * @since 1.1
      */
-    public static double derivative(double x,
-                                    double a,
-                                    double b) {
-        return BoostBeta.ibetaDerivative(a, b, x);
+    public static double derivative(double x, double a, double b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

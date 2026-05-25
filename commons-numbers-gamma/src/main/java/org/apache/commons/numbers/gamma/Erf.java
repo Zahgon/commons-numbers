@@ -22,7 +22,10 @@ package org.apache.commons.numbers.gamma;
  * <p>\[ \operatorname{erf}(z) = \frac{2}{\sqrt\pi}\int_0^z e^{-t^2}\,dt \]
  */
 public final class Erf {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private Erf() {
         // intentionally empty.
     }
@@ -46,6 +49,6 @@ public final class Erf {
      * @return the error function.
      */
     public static double value(double x) {
-        return BoostErf.erf(x);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

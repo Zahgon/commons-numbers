@@ -31,7 +31,6 @@ import org.openjdk.jmh.annotations.Setup;
 import org.openjdk.jmh.annotations.State;
 import org.openjdk.jmh.annotations.Warmup;
 import org.openjdk.jmh.infra.Blackhole;
-
 import java.math.BigInteger;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntBinaryOperator;
@@ -44,18 +43,21 @@ import java.util.function.LongBinaryOperator;
 @Warmup(iterations = 5, time = 500, timeUnit = TimeUnit.MILLISECONDS)
 @Measurement(iterations = 10, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-server", "-Xms512M", "-Xmx512M"})
+@Fork(value = 1, jvmArgs = { "-server", "-Xms512M", "-Xmx512M" })
 public class GcdPerformance {
+
     /**
      * Provides random ints for benchmarking.
      */
     @State(Scope.Benchmark)
     public static class Ints {
+
         /**
          * The random seed to use for number generation.
          */
         @Param("42")
         private long seed;
+
         /**
          * The number of number pairs to generate.
          */
@@ -72,12 +74,7 @@ public class GcdPerformance {
          */
         @Setup(Level.Iteration)
         public void setup() {
-            values = getRandomProvider(seed).ints()
-                    .filter(i -> i != Integer.MIN_VALUE).
-                    limit(numPairs * 2)
-                    .toArray();
-
-            seed = (((long) values[0]) << Integer.SIZE) | values[1];
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -86,6 +83,7 @@ public class GcdPerformance {
      */
     @State(Scope.Benchmark)
     public static class Longs {
+
         /**
          * The random seed to use for number generation.
          */
@@ -108,12 +106,7 @@ public class GcdPerformance {
          */
         @Setup(Level.Iteration)
         public void setup() {
-            values = getRandomProvider(seed).longs()
-                    .filter(i -> i != Long.MIN_VALUE)
-                    .limit(numPairs * 2)
-                    .toArray();
-
-            seed = values[0];
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -135,7 +128,7 @@ public class GcdPerformance {
      */
     @Benchmark
     public void gcdInt(Ints ints, Blackhole blackhole) {
-        calcAndConsumeGcds(ints, blackhole, ArithmeticUtils::gcd);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -146,7 +139,7 @@ public class GcdPerformance {
      */
     @Benchmark
     public void gcdLongAdaptedForInt(Ints ints, Blackhole blackhole) {
-        calcAndConsumeGcds(ints, blackhole, GcdPerformance::gcdLongAdaptedForInt);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -157,7 +150,7 @@ public class GcdPerformance {
      */
     @Benchmark
     public void gcdLong(Longs longs, Blackhole blackhole) {
-        calcAndConsumeGcds(longs, blackhole, ArithmeticUtils::gcd);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -168,7 +161,7 @@ public class GcdPerformance {
      */
     @Benchmark
     public void gcdLongWithInts(Ints ints, Blackhole blackhole) {
-        calcAndConsumeIntGcdsWithLongImpl(ints, blackhole, ArithmeticUtils::gcd);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -179,7 +172,7 @@ public class GcdPerformance {
      */
     @Benchmark
     public void oldGcdLong(Longs longs, Blackhole blackhole) {
-        calcAndConsumeGcds(longs, blackhole, GcdPerformance::oldGcdLong);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -190,7 +183,7 @@ public class GcdPerformance {
      */
     @Benchmark
     public void gcdIntAdaptedForLong(Longs longs, Blackhole blackhole) {
-        calcAndConsumeGcds(longs, blackhole, GcdPerformance::gcdIntAdaptedForLong);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -201,7 +194,7 @@ public class GcdPerformance {
      */
     @Benchmark
     public void gcdBigInteger(Longs longs, Blackhole blackhole) {
-        calcAndConsumeGcds(longs, blackhole, GcdPerformance::gcdBigInteger);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -269,7 +262,6 @@ public class GcdPerformance {
         // need to be handled separately
         long a = p > 0 ? -p : p;
         long b = q > 0 ? -q : q;
-
         long negatedGcd;
         if (a == 0) {
             negatedGcd = b;
@@ -282,7 +274,6 @@ public class GcdPerformance {
             a >>= aTwos;
             b >>= bTwos;
             final int shift = Math.min(aTwos, bTwos);
-
             // "a" and "b" are negative and odd.
             // If a < b then "gdc(a, b)" is equal to "gcd(a - b, b)".
             // If a > b then "gcd(a, b)" is equal to "gcd(b - a, a)".
@@ -293,18 +284,15 @@ public class GcdPerformance {
                 final long delta = a - b;
                 b = Math.max(a, b);
                 a = delta > 0 ? -delta : delta;
-
                 // Remove any power of 2 in "a" ("b" is guaranteed to be odd).
                 a >>= Long.numberOfTrailingZeros(a);
             }
-
             // Recover the common power of 2.
             negatedGcd = a << shift;
         }
         if (negatedGcd == Long.MIN_VALUE) {
             throw new ArithmeticException();
         }
-
         return -negatedGcd;
     }
 
@@ -331,31 +319,37 @@ public class GcdPerformance {
         /* assert u!=0 && v!=0; */
         if (u > 0) {
             u = -u;
-        } // make u negative
+        }
+        // make u negative
         if (v > 0) {
             v = -v;
-        } // make v negative
+        }
+        // make v negative
         // B1. [Find power of 2]
         int k = 0;
-        while ((u & 1) == 0 && (v & 1) == 0 && k < 63) { // while u and v are
+        while ((u & 1) == 0 && (v & 1) == 0 && k < 63) {
+            // while u and v are
             // both even...
             u /= 2;
             v /= 2;
-            k++; // cast out twos.
+            // cast out twos.
+            k++;
         }
         if (k == 63) {
             throw new ArithmeticException();
         }
         // B2. Initialize: u and v have been divided by 2^k and at least
         // one is odd.
-        long t = ((u & 1) == 1) ? v : -(u / 2)/* B3 */;
+        long t = ((u & 1) == 1) ? v : -(u / 2);
         // t negative: u was odd, v may be even (t replaces v)
         // t positive: u was even, v is odd (t replaces u)
         do {
             /* assert u<0 && v<0; */
             // B4/B3: cast out twos from t.
-            while ((t & 1) == 0) { // while t is even..
-                t /= 2; // cast out twos
+            while ((t & 1) == 0) {
+                // while t is even..
+                // cast out twos
+                t /= 2;
             }
             // B5 [reset max(u,v)]
             if (t > 0) {
@@ -368,7 +362,8 @@ public class GcdPerformance {
             // |u| larger: t positive (replace u)
             // |v| larger: t negative (replace v)
         } while (t != 0);
-        return -u * (1L << k); // gcd is u*2^k
+        // gcd is u*2^k
+        return -u * (1L << k);
     }
 
     /**
@@ -383,7 +378,6 @@ public class GcdPerformance {
         // need to be handled separately
         int a = p > 0 ? -p : p;
         int b = q > 0 ? -q : q;
-
         int negatedGcd;
         if (a == 0) {
             negatedGcd = b;
@@ -396,7 +390,6 @@ public class GcdPerformance {
             a >>= aTwos;
             b >>= bTwos;
             final int shift = Math.min(aTwos, bTwos);
-
             // "a" and "b" are negative and odd.
             // If a < b then "gdc(a, b)" is equal to "gcd(a - b, b)".
             // If a > b then "gcd(a, b)" is equal to "gcd(b - a, a)".
@@ -405,18 +398,14 @@ public class GcdPerformance {
             //  "b" becomes that value of the two that is closer to zero.
             while (true) {
                 final int delta = a - b;
-
                 if (delta == 0) {
                     break;
                 }
-
                 b = Math.max(a, b);
                 a = delta > 0 ? -delta : delta;
-
                 // Remove any power of 2 in "a" ("b" is guaranteed to be odd).
                 a >>= Integer.numberOfTrailingZeros(a);
             }
-
             // Recover the common power of 2.
             negatedGcd = a << shift;
         }

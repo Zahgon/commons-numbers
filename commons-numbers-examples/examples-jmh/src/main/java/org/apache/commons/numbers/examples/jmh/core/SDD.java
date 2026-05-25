@@ -58,6 +58,7 @@ package org.apache.commons.numbers.examples.jmh.core;
  * @since 1.2
  */
 final class SDD {
+
     // Caveat:
     //
     // The code below uses many additions/subtractions that may
@@ -91,7 +92,6 @@ final class SDD {
     // for e: |e - e_m| < ulp(e_m); and the sum of the parts to
     // e_(m-1) is within 1 ULP of the round-off ulp(|e - e_m|).
     // These final two terms create the double-double result using two-sum.
-
     /**
      * The multiplier used to split the double value into high and low parts. From
      * Dekker (1971): "The constant should be chosen equal to 2^(p - p/2) + 1,
@@ -99,6 +99,7 @@ final class SDD {
      * and the multiplier is {@code 2^27 + 1}.
      */
     private static final double MULTIPLIER = 1.0 + 0x1.0p27;
+
     /**
      * The upper limit above which a number may overflow during the split into a high part.
      * Assuming the multiplier is above 2^27 and the maximum exponent is 1023 then a safe
@@ -106,45 +107,92 @@ final class SDD {
      * 996 is the value obtained from {@code Math.getExponent(Double.MAX_VALUE / MULTIPLIER)}.
      */
     private static final double SAFE_UPPER = 0x1.0p996;
-    /** The scale to use when down-scaling during a split into a high part.
-     * This must be smaller than the inverse of the multiplier and a power of 2 for exact scaling. */
+
+    /**
+     * The scale to use when down-scaling during a split into a high part.
+     * This must be smaller than the inverse of the multiplier and a power of 2 for exact scaling.
+     */
     private static final double DOWN_SCALE = 0x1.0p-30;
-    /** The scale to use when re-scaling during a split into a high part.
-     * This is the inverse of {@link #DOWN_SCALE}. */
+
+    /**
+     * The scale to use when re-scaling during a split into a high part.
+     * This is the inverse of {@link #DOWN_SCALE}.
+     */
     private static final double UP_SCALE = 0x1.0p30;
-    /** The mask to extract the raw 11-bit exponent.
-     * The value must be shifted 52-bits to remove the mantissa bits. */
+
+    /**
+     * The mask to extract the raw 11-bit exponent.
+     * The value must be shifted 52-bits to remove the mantissa bits.
+     */
     private static final int EXP_MASK = 0x7ff;
-    /** The value 2046 converted for use if using {@link Integer#compareUnsigned(int, int)}.
-     * This requires adding {@link Integer#MIN_VALUE} to 2046. */
+
+    /**
+     * The value 2046 converted for use if using {@link Integer#compareUnsigned(int, int)}.
+     * This requires adding {@link Integer#MIN_VALUE} to 2046.
+     */
     private static final int CMP_UNSIGNED_2046 = Integer.MIN_VALUE + 2046;
-    /** The value -1 converted for use if using {@link Integer#compareUnsigned(int, int)}.
-     * This requires adding {@link Integer#MIN_VALUE} to -1. */
+
+    /**
+     * The value -1 converted for use if using {@link Integer#compareUnsigned(int, int)}.
+     * This requires adding {@link Integer#MIN_VALUE} to -1.
+     */
     private static final int CMP_UNSIGNED_MINUS_1 = Integer.MIN_VALUE - 1;
-    /** The value 1022 converted for use if using {@link Integer#compareUnsigned(int, int)}.
-     * This requires adding {@link Integer#MIN_VALUE} to 1022. */
+
+    /**
+     * The value 1022 converted for use if using {@link Integer#compareUnsigned(int, int)}.
+     * This requires adding {@link Integer#MIN_VALUE} to 1022.
+     */
     private static final int CMP_UNSIGNED_1022 = Integer.MIN_VALUE + 1022;
-    /** 2^512. */
+
+    /**
+     * 2^512.
+     */
     private static final double TWO_POW_512 = 0x1.0p512;
-    /** 2^-512. */
+
+    /**
+     * 2^-512.
+     */
     private static final double TWO_POW_M512 = 0x1.0p-512;
-    /** Mask to remove the sign bit from a long. */
+
+    /**
+     * Mask to remove the sign bit from a long.
+     */
     private static final long UNSIGN_MASK = 0x7fff_ffff_ffff_ffffL;
-    /** Mask to extract the 52-bit mantissa from a long representation of a double. */
+
+    /**
+     * Mask to extract the 52-bit mantissa from a long representation of a double.
+     */
     private static final long MANTISSA_MASK = 0x000f_ffff_ffff_ffffL;
-    /** Exponent offset in IEEE754 representation. */
+
+    /**
+     * Exponent offset in IEEE754 representation.
+     */
     private static final int EXPONENT_OFFSET = 1023;
-    /** 0.5. */
+
+    /**
+     * 0.5.
+     */
     private static final double HALF = 0.5;
-    /** The limit for safe multiplication of {@code x*y}, assuming values above 1.
-     * Used to maintain positive values during the power computation. */
+
+    /**
+     * The limit for safe multiplication of {@code x*y}, assuming values above 1.
+     * Used to maintain positive values during the power computation.
+     */
     private static final double SAFE_MULTIPLY = 0x1.0p500;
-    /** Error message when the input is not a normalized double: {@code x != x + xx}. */
+
+    /**
+     * Error message when the input is not a normalized double: {@code x != x + xx}.
+     */
     private static final String NOT_NOMALIZED = "Input is not a normalized double-double";
 
-    /** The high part of the double-double number. */
+    /**
+     * The high part of the double-double number.
+     */
     private double hi;
-    /** The low part of the double-double number. */
+
+    /**
+     * The low part of the double-double number.
+     */
     private double lo;
 
     /**
@@ -170,7 +218,7 @@ final class SDD {
      * @return the copy
      */
     SDD copy() {
-        return new SDD(this);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -179,7 +227,7 @@ final class SDD {
      * @return the double-double
      */
     static SDD create() {
-        return new SDD();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -189,9 +237,7 @@ final class SDD {
      * @return the double-double
      */
     static SDD create(double x) {
-        final SDD z = new SDD();
-        z.hi = x;
-        return z;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -205,7 +251,7 @@ final class SDD {
      * @return the double-double
      */
     static SDD create(double a, double b) {
-        return twoSum(a, b, new SDD());
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -214,7 +260,7 @@ final class SDD {
      * @return the high part
      */
     double hi() {
-        return hi;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -223,7 +269,7 @@ final class SDD {
      * @return the low part
      */
     double lo() {
-        return lo;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -232,7 +278,7 @@ final class SDD {
      * @return the value converted to a double
      */
     double doubleValue() {
-        return hi + lo;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -256,8 +302,7 @@ final class SDD {
      * @return the double-double
      */
     static SDD set(double x, SDD z) {
-        z.set(x, 0);
-        return z;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -270,9 +315,7 @@ final class SDD {
      * @return the double-double
      */
     static SDD set(double x, double xx, SDD z) {
-        assert x == x + xx : NOT_NOMALIZED;
-        z.set(x, xx);
-        return z;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -291,13 +334,7 @@ final class SDD {
      * Shewchuk (1997) Theorum 6</a>
      */
     static SDD fastTwoSum(double a, double b, SDD s) {
-        // (x, xx) = a + b
-        // bVirtual = x - a
-        // xx = b - bVirtual
-        final double x = a + b;
-        s.lo = b - (x - a);
-        s.hi = x;
-        return s;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -333,13 +370,7 @@ final class SDD {
      * Shewchuk (1997) Theorum 6</a>
      */
     static SDD fastTwoDiff(double a, double b, SDD d) {
-        // (x, xx) = a - b
-        // bVirtual = a - x
-        // xx = bVirtual - b
-        final double x = a - b;
-        d.lo = (a - x) - b;
-        d.hi = x;
-        return d;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -356,17 +387,7 @@ final class SDD {
      * Shewchuk (1997) Theorum 7</a>
      */
     static SDD twoSum(double a, double b, SDD s) {
-        // (x, xx) = a + b
-        // bVirtual = x - a
-        // aVirtual = x - bVirtual
-        // bRoundoff = b - bVirtual
-        // aRoundoff = a - aVirtual
-        // xx = aRoundoff + bRoundoff
-        final double x = a + b;
-        final double bVirtual = x - a;
-        s.lo = (a - (x - bVirtual)) + (b - bVirtual);
-        s.hi = x;
-        return s;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -398,17 +419,7 @@ final class SDD {
      * @see #twoSum(double, double, SDD)
      */
     static SDD twoDiff(double a, double b, SDD d) {
-        // (x, xx) = a - b
-        // bVirtual = a - x
-        // aVirtual = x + bVirtual
-        // bRoundoff = b - bVirtual
-        // aRoundoff = a - aVirtual
-        // xx = aRoundoff - bRoundoff
-        final double x = a - b;
-        final double bVirtual = a - x;
-        d.lo = (a - (x + bVirtual)) - (b - bVirtual);
-        d.hi = x;
-        return d;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -437,44 +448,7 @@ final class SDD {
      * @return the product
      */
     static SDD twoProd(double x, double y, SDD z) {
-        final double xy = x * y;
-        z.hi = xy;
-
-        // If the number is sub-normal, inf or nan there is no round-off.
-        if (isNotNormal(xy)) {
-            // Returns 0.0 for sub-normal xy, otherwise NaN for inf/nan:
-            z.lo = xy - xy;
-            return z;
-        }
-
-        // The result xy is finite and normal.
-        // Use Dekker's mul12 algorithm that splits the values into high and low parts.
-        // Dekker's split using multiplication will overflow if the value is within 2^27
-        // of double max value. It can also produce 26-bit approximations that are larger
-        // than the input numbers for the high part causing overflow in hx * hy when
-        // x * y does not overflow. So we must scale down big numbers.
-        // We only have to scale the largest number as we know the product does not overflow
-        // (if one is too big then the other cannot be).
-        // We also scale if the product is close to overflow to avoid intermediate overflow.
-        // This could be done at a higher limit (e.g. Math.abs(xy) > Double.MAX_VALUE / 4)
-        // but is included here to have a single low probability branch condition.
-
-        // Add the absolute inputs for a single comparison. The sum will not be more than
-        // 3-fold higher than any component.
-        final double a = Math.abs(x);
-        final double b = Math.abs(y);
-        if (a + b + Math.abs(xy) >= SAFE_UPPER) {
-            // Only required to scale the largest number as x*y does not overflow.
-            if (a > b) {
-                z.lo = productLowUnscaled(x * DOWN_SCALE, y, xy * DOWN_SCALE) * UP_SCALE;
-            } else {
-                z.lo = productLowUnscaled(x, y * DOWN_SCALE, xy * DOWN_SCALE) * UP_SCALE;
-            }
-        } else {
-            // No scaling required. This is the expected branch for a finite product.
-            z.lo = productLowUnscaled(x, y, xy);
-        }
-        return z;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -496,10 +470,8 @@ final class SDD {
         // Split the numbers using Dekker's algorithm without scaling
         final double hx = highPartUnscaled(x);
         final double lx = x - hx;
-
         final double hy = highPartUnscaled(y);
         final double ly = y - hy;
-
         // Compute the multiply low part:
         // err1 = xy - hx * hy
         // err2 = err1 - lx * hy
@@ -630,11 +602,7 @@ final class SDD {
      * @see #fastAdd(double, double, double, double, SDD)
      */
     static SDD fastAdd(double x, double xx, double y, SDD s) {
-        // (s0, s1) = x + y
-        twoSum(x, y, s);
-        // Note: if x + y cancel to a non-zero result then s.hi is >= 1 ulp of x.
-        // This is larger than xx so fast-two-sum can be used.
-        return fastTwoSum(s.hi, s.lo + xx, s);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -651,21 +619,7 @@ final class SDD {
      * @see #add(double, double, double, double, SDD)
      */
     static SDD add(double x, double xx, double y, SDD s) {
-        // Grow expansion (Schewchuk): (x, xx) + y -> (s0, s1, s2)
-        twoSum(xx, y, s);
-        double s2 = s.lo;
-        twoSum(x, s.hi, s);
-        final double s1 = s.lo;
-        final double s0 = s.hi;
-        // Compress (Schewchuk Fig. 15): (s0, s1, s2) -> (s0, s1)
-        fastTwoSum(s1, s2, s);
-        s2 = s.lo;
-        fastTwoSum(s0, s.hi, s);
-        // Here (s0, s1) = s
-        // e = exact 159-bit result
-        // |e - s0| <= ulp(s0)
-        // |s1 + s2| <= ulp(e - s0)
-        return fastTwoSum(s.hi, s2 + s.lo, s);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -682,20 +636,7 @@ final class SDD {
      * @see #add(double, double, double, double, SDD)
      */
     static SDD fastAdd(double x, double xx, double y, double yy, SDD s) {
-        // Sum parts and save
-        // (p, pp) = x + y
-        twoSum(x, y, s);
-        final double p = s.hi;
-        final double pp = s.lo;
-        // (q, qq) = xx + yy
-        twoSum(xx, yy, s);
-        final double q = s.hi;
-        final double qq = s.lo;
-        // result = p + q
-        // |pp| is >= 1 ulp of max(|x|, |y|)
-        // |q| is >= 1 ulp of max(|xx|, |yy|)
-        fastTwoSum(p, pp + q, s);
-        return fastTwoSum(s.hi, s.lo + qq, s);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -714,31 +655,7 @@ final class SDD {
      * @see #fastAdd(double, double, double, double, SDD)
      */
     static SDD add(double x, double xx, double y, double yy, SDD s) {
-        // Expansion sum (Schewchuk Fig 7): (x, xx) + (x, yy) -> (s0, s1, s2, s3)
-        twoSum(xx, yy, s);
-        double s3 = s.lo;
-        twoSum(x, s.hi, s);
-        // (s0, s1, s2) == (s.hi, s.lo, s3)
-        double s0 = s.hi;
-        twoSum(s.lo, y, s);
-        double s2 = s.lo;
-        twoSum(s0, s.hi, s);
-        // s1 = s.lo
-        s0 = s.hi;
-        // Compress (Schewchuk Fig. 15) (s0, s1, s2, s3) -> (s0, s1)
-        fastTwoSum(s.lo, s2, s);
-        final double s1 = s.hi;
-        fastTwoSum(s.lo, s3, s);
-        // s2 = s.hi
-        s3 = s.lo;
-        fastTwoSum(s1, s.hi, s);
-        s2 = s.lo;
-        fastTwoSum(s0, s.hi, s);
-        // Here (s0, s1) = s
-        // e = exact 212-bit result
-        // |e - s0| <= ulp(s0)
-        // |s1 + s2 + s3| <= ulp(e - s0)   (Sum magnitudes small to high)
-        return fastTwoSum(s.hi, s3 + s2 + s.lo, s);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -755,12 +672,7 @@ final class SDD {
      * @see #multiply(double, double, double, double, SDD)
      */
     static SDD multiply(double x, double xx, double y, SDD p) {
-        // Dekker mul2 with yy=0
-        // (Alternative: Scale expansion (Schewchuk Fig 13))
-        twoProd(x, y, p);
-        // Save 2 FLOPS compared to multiply(x, xx, y, 0).
-        // This is reused in divide to save more FLOPS so worth the optimisation.
-        return fastTwoSum(p.hi, p.lo + xx * y, p);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -776,10 +688,7 @@ final class SDD {
      * @return the product
      */
     static SDD multiply(double x, double xx, double y, double yy, SDD p) {
-        // Dekker mul2
-        // (Alternative: Scale expansion (Schewchuk Fig 13))
-        twoProd(x, y, p);
-        return fastTwoSum(p.hi, p.lo + (x * yy + xx * y), p);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -803,10 +712,7 @@ final class SDD {
      * @see #multiply(double, double, double, double, SDD)
      */
     static SDD uncheckedMultiply(double x, double xx, double y, double yy, SDD p) {
-        // Dekker mul2
-        final double hi = x * y;
-        final double lo = productLowUnscaled(x, y, hi);
-        return fastTwoSum(hi, lo + (x * yy + xx * y), p);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -819,17 +725,7 @@ final class SDD {
      * @return the quotient
      */
     static SDD divide(double x, double y, SDD q) {
-        // Long division
-        // quotient q0 = x / y
-        final double q0 = x / y;
-        // remainder r = x - q0 * y
-        twoProd(q0, y, q);
-        final double p1 = q.lo;
-        twoDiff(x, q.hi, q);
-        q.lo -= p1;
-        // correction term q1 = r0 / y
-        final double q1 = q.doubleValue() / y;
-        return fastTwoSum(q0, q1, q);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -846,17 +742,7 @@ final class SDD {
      * @return the quotient
      */
     static SDD uncheckedDivide(double x, double y, SDD q) {
-        // Long division
-        // quotient q0 = x / y
-        final double q0 = x / y;
-        // remainder r = x - q0 * y
-        final double p0 = q0 * y;
-        final double p1 = productLowUnscaled(q0, y, p0);
-        twoDiff(x, p0, q);
-        q.lo -= p1;
-        // correction term q1 = r0 / y
-        final double q1 = q.doubleValue() / y;
-        return fastTwoSum(q0, q1, q);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -871,24 +757,7 @@ final class SDD {
      * @return the quotient
      */
     static SDD divide(double x, double xx, double y, double yy, SDD q) {
-        // Long division
-        // quotient q0 = x / y
-        final double q0 = x / y;
-        // remainder r0 = x - q0 * y
-        multiply(y, yy, q0, q);
-        add(-q.hi, -q.lo, x, xx, q);
-        final double r = q.hi;
-        final double rr = q.lo;
-        // next quotient q1 = r0 / y
-        final double q1 = r / y;
-        // remainder r1 = r0 - q1 * y
-        multiply(y, yy, q1, q);
-        add(-q.hi, -q.lo, r, rr, q);
-        // next quotient q2 = r1 / y
-        final double q2 = q.hi / y;
-        // Collect (q0, q1, q2)
-        fastTwoSum(q0, q1, q);
-        return twoSum(q.hi, q.lo + q2, q);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -901,25 +770,7 @@ final class SDD {
      * @return the inverse
      */
     static SDD inverse(double y, double yy, SDD q) {
-        // As per divide using (x, xx) = (1, 0)
-        // quotient q0 = x / y
-        final double q0 = 1 / y;
-        // remainder r0 = x - q0 * y
-        multiply(y, yy, q0, q);
-        // This add saves 2 twoSum and 2 fastTwoSum (18 FLOPS)
-        add(-q.hi, -q.lo, 1, q);
-        final double r = q.hi;
-        final double rr = q.lo;
-        // next quotient q1 = r0 / y
-        final double q1 = r / y;
-        // remainder r1 = r0 - q1 * y
-        multiply(y, yy, q1, q);
-        add(-q.hi, -q.lo, r, rr, q);
-        // next quotient q2 = r1 / y
-        final double q2 = q.hi / y;
-        // Collect (q0, q1, q2)
-        fastTwoSum(q0, q1, q);
-        return twoSum(q.hi, q.lo + q2, q);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -947,70 +798,7 @@ final class SDD {
      * @see <a href="https://www.cplusplus.com/reference/cmath/ldexp/">C math.h ldexp</a>
      */
     static SDD ldexp(double x, double xx, int exp, SDD r) {
-        // Handle scaling when 2^n can be represented with a single normal number
-        // n >= -1022 && n <= 1023
-        // Using unsigned compare => n + 1022 <= 1023 + 1022
-        if (exp + CMP_UNSIGNED_1022 < CMP_UNSIGNED_2046) {
-            final double s = twoPow(exp);
-            r.hi = x * s;
-            r.lo = xx * s;
-            return r;
-        }
-
-        // Scale by multiples of 2^512 (largest representable power of 2).
-        // Scaling requires max 5 multiplications to under/overflow any normal value.
-        // Break this down into e.g.: 2^512^(exp / 512) * 2^(exp % 512)
-        // Number of multiples n = exp / 512   : exp >>> 9
-        // Remainder           m = exp % 512   : exp & 511  (exp must be positive)
-        int n;
-        int m;
-        double p;
-        if (exp < 0) {
-            // Downscaling
-            // (Note: Using an unsigned shift handles negation of min value: -2^31)
-            n = -exp >>> 9;
-            // m = exp % 512
-            m = -(-exp & 511);
-            p = TWO_POW_M512;
-        } else {
-            // Upscaling
-            n = exp >>> 9;
-            m = exp & 511;
-            p = TWO_POW_512;
-        }
-
-        // Multiply by the remainder scaling factor first. The remaining multiplications
-        // are either 2^512 or 2^-512.
-        // Down-scaling to sub-normal will use the final multiplication into a sub-normal result.
-        // Note here that n >= 1 as the n in [-1022, 1023] case has been handled.
-
-        // Handle n : 1, 2, 3, 4, 5
-        if (n >= 5) {
-            // n >= 5 will be over/underflow. Use an extreme scale factor.
-            // Do not use +/- infinity as this creates NaN if x = 0.
-            // p -> 2^1023 or 2^-1025
-            p *= p * 0.5;
-            r.hi = x * p * p * p;
-            r.lo = xx * p * p * p;
-            return r;
-        }
-
-        final double s = twoPow(m);
-        if (n == 4) {
-            r.hi = x * s * p * p * p * p;
-            r.lo = xx * s * p * p * p * p;
-        } else if (n == 3) {
-            r.hi = x * s * p * p * p;
-            r.lo = xx * s * p * p * p;
-        } else if (n == 2) {
-            r.hi = x * s * p * p;
-            r.lo = xx * s * p * p;
-        } else {
-            // n = 1. Occurs only if exp = -1023.
-            r.hi = x * s * p;
-            r.lo = xx * s * p;
-        }
-        return r;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1058,30 +846,7 @@ final class SDD {
      * @see <a href="https://www.cplusplus.com/reference/cmath/frexp/">C math.h frexp</a>
      */
     static int frexp(double x, double xx, SDD f) {
-        int exp = getScale(x);
-        // Handle non-scalable numbers
-        if (exp == Double.MAX_EXPONENT + 1) {
-            // Returns +/-0.0, inf or nan
-            f.hi = x;
-            // Maintain the fractional part unchanged.
-            // Do not change the fractional part of inf/nan, and assume
-            // |xx| < |x| thus if x == 0 then xx == 0 (otherwise the double-double is invalid)
-            f.lo = xx;
-            // Unspecified for NaN/inf so just return zero
-            return 0;
-        }
-        // The scale will create the fraction in [1, 2) so increase by 1 for [0.5, 1)
-        exp += 1;
-        ldexp(x, xx, -exp, f);
-        // Return |(hi, lo)| = (1, -eps) if required.
-        // f.hi * f.lo < 0 detects sign change unless the product underflows.
-        // Handle extreme case of |f.lo| being min value by doubling f.hi to 1.
-        if (Math.abs(f.hi) == HALF && 2 * f.hi * f.lo < 0) {
-            f.hi *= 2;
-            f.lo *= 2;
-            exp -= 1;
-        }
-        return exp;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1117,7 +882,6 @@ final class SDD {
         final long bits = Double.doubleToRawLongBits(a) & UNSIGN_MASK;
         // Get the unbiased exponent
         int exp = ((int) (bits >>> 52)) - EXPONENT_OFFSET;
-
         // No case to distinguish nan/inf (exp == 1024).
         // Handle sub-normal numbers
         if (exp == Double.MIN_EXPONENT - 1) {
@@ -1174,38 +938,7 @@ final class SDD {
      * @see #frexp(double, double, SDD)
      */
     static long fastPowScaled(double x, double xx, int n, SDD f) {
-        // Edge cases.
-        if (n == 0) {
-            f.set(0.5, 0);
-            return 1;
-        }
-        // IEEE result for non-finite or zero
-        if (!Double.isFinite(x) || x == 0) {
-            f.set(Math.pow(x, n), 0);
-            return 0;
-        }
-        // Here the number is non-zero finite
-        assert x == x + xx : NOT_NOMALIZED;
-        long b = frexp(x, xx, f);
-        // Handle exact powers of 2
-        if (Math.abs(f.hi) == HALF && f.lo == 0) {
-            // (f * 2^b)^n = (2f)^n * 2^(b-1)^n
-            // Use Math.pow to create the sign.
-            // Note the result must be scaled to the fractional representation
-            // by multiplication by 0.5 and addition of 1 to the exponent.
-            f.hi = 0.5 * Math.pow(2 * f.hi, n);
-            // Propagate sign change (x*f.hi) to the zero
-            f.lo = Math.copySign(0.0, x * f.hi * xx);
-            return 1 + (b - 1) * n;
-        }
-        if (n < 0) {
-            b = computeFastPowScaled(b, f.hi, f.lo, -n, f);
-            // Result is a non-zero fraction part so inversion is safe
-            inverse(f.hi, f.lo, f);
-            // Rescale to [0.5, 1.0]
-            return -b + frexp(f.hi, f.lo, f);
-        }
-        return computeFastPowScaled(b, f.hi, f.lo, n, f);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1235,7 +968,6 @@ final class SDD {
         //    - square the current result
         //    - if the current bit is 1 then multiply by x
         // In this scheme the factors to multiply by x can be pre-computed.
-
         // Scale the input in [0.5, 1) to be above 1. Represented as 2^be * b.
         final long be = exp - 1;
         final double b0 = x * 2;
@@ -1243,21 +975,17 @@ final class SDD {
         // Split b
         final double b0h = highPartUnscaled(b0);
         final double b0l = b0 - b0h;
-
         // Initialise the result as x^1. Represented as 2^fe * f.
         long fe = be;
         double f0 = b0;
         double f1 = b1;
-
         double u;
         double v;
         double w;
-
         // Shift the highest set bit off the top.
         // Any remaining bits are detected in the sign bit.
         final int shift = Integer.numberOfLeadingZeros(n) + 1;
         int bits = n << shift;
-
         // Multiplication is done without using SDD.multiply as the arguments
         // are always finite and the product will not overflow. The square can be optimised.
         // Process remaining bits below highest set bit.
@@ -1296,7 +1024,6 @@ final class SDD {
                 // Avoid rescale as x2 is in [1, 2)
             }
         }
-
         return fe + frexp(f0, f1, f);
     }
 
@@ -1338,31 +1065,7 @@ final class SDD {
      * @see #frexp(double, double, SDD)
      */
     static long powScaled(double x, double xx, int n, SDD f) {
-        // Edge cases.
-        if (n == 0) {
-            f.set(0.5, 0);
-            return 1;
-        }
-        // IEEE result for non-finite or zero
-        if (!Double.isFinite(x) || x == 0) {
-            f.set(Math.pow(x, n), 0);
-            return 0;
-        }
-        // Here the number is non-zero finite
-        assert x == x + xx : NOT_NOMALIZED;
-        final long b = frexp(x, xx, f);
-        // Handle exact powers of 2
-        if (Math.abs(f.hi) == HALF && f.lo == 0) {
-            // (f * 2^b)^n = (2f)^n * 2^(b-1)^n
-            // Use Math.pow to create the sign.
-            // Note the result must be scaled to the fractional representation
-            // by multiplication by 0.5 and addition of 1 to the exponent.
-            f.hi = 0.5 * Math.pow(2 * f.hi, n);
-            // Propagate sign change (x*f.hi) to the zero
-            f.lo = Math.copySign(0.0, x * f.hi * xx);
-            return 1 + (b - 1) * n;
-        }
-        return computePowScaled(b, f.hi, f.lo, n, f);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1381,7 +1084,6 @@ final class SDD {
      */
     private static long computePowScaled(long exp, double x, double xx, int n, SDD f) {
         // Same as computePowScaled using a triple-double intermediate.
-
         // triple-double multiplication:
         // (a0, a1, a2) * (b0, b1, b2)
         // a x b ~ a0b0                 O(1) term
@@ -1410,7 +1112,6 @@ final class SDD {
         // Sum (2 * p01, q00) -> (s1, r2)                  Order(eps)
         // Sum (2 * p02, 2 * q01, p11, r2) -> (s2, r3b)    Order(eps^2)
         // Sum (2 * p12, 2 * q02, q11, r3b) -> s3          Order(eps^3)
-
         // Scale the input in [0.5, 1) to be above 1. Represented as 2^be * b.
         final long be = exp - 1;
         final double b0 = x * 2;
@@ -1420,19 +1121,16 @@ final class SDD {
         final double b0l = b0 - b0h;
         final double b1h = highPartUnscaled(b1);
         final double b1l = b1 - b1h;
-
         // Initialise the result as x^1. Represented as 2^fe * f.
         long fe = be;
         double f0 = b0;
         double f1 = b1;
         double f2 = 0;
-
         // Shift the highest set bit off the top.
         // Any remaining bits are detected in the sign bit.
         final int an = Math.abs(n);
         final int shift = Integer.numberOfLeadingZeros(an) + 1;
         int bits = an << shift;
-
         // Multiplication is done inline with some triple precision helper routines.
         // Process remaining bits below highest set bit.
         for (int i = 32 - shift; i != 0; i--, bits <<= 1) {
@@ -1470,7 +1168,6 @@ final class SDD {
             f0 = norm3(s0, s1, s2, s3, f);
             f1 = f.hi;
             f2 = f.lo;
-
             // Rescale
             if (Math.abs(f0) > SAFE_MULTIPLY) {
                 // Scale back to the [1, 2) range. As safe multiply is 2^500
@@ -1482,7 +1179,6 @@ final class SDD {
                 f1 *= s;
                 f2 *= s;
             }
-
             if (bits < 0) {
                 // Multiply by b
                 fe += be;
@@ -1527,11 +1223,9 @@ final class SDD {
                 // Avoid rescale as x2 is in [1, 2)
             }
         }
-
         // Ensure (f0, f1) are 1 ulp exact
         final double u = f1 + f2;
         SDD.fastTwoSum(f0, u, f);
-
         // If the power is negative, invert in triple precision
         if (n < 0) {
             // Require the round-off
@@ -1541,7 +1235,6 @@ final class SDD {
             // Rescale to [0.5, 1.0]
             return -fe + frexp(f.hi, f.lo, f);
         }
-
         return fe + frexp(f.hi, f.lo, f);
     }
 

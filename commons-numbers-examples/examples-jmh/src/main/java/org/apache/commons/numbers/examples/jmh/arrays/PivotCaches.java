@@ -22,12 +22,18 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 final class PivotCaches {
-    /** Default value for an unset upper floating pivot.
-     * Set as a value higher than any valid array index. */
+
+    /**
+     * Default value for an unset upper floating pivot.
+     * Set as a value higher than any valid array index.
+     */
     private static final int UPPER_DEFAULT = Integer.MAX_VALUE;
 
-    /** No instances. */
-    private PivotCaches() {}
+    /**
+     * No instances.
+     */
+    private PivotCaches() {
+    }
 
     /**
      * Return a {@link PivotCache} for a single {@code k}.
@@ -36,7 +42,7 @@ final class PivotCaches {
      * @return the pivot cache
      */
     static PivotCache ofIndex(int k) {
-        return new PointPivotCache(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -48,12 +54,7 @@ final class PivotCaches {
      * @return the pivot cache
      */
     static PivotCache ofPairedIndex(int k) {
-        if (k >= 0) {
-            return new PointPivotCache(k);
-        }
-        // Remove sign bit
-        final int ka = k & Integer.MAX_VALUE;
-        return new RangePivotCache(ka, ka + 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -72,10 +73,7 @@ final class PivotCaches {
      * @see #ofFullRange(int, int)
      */
     static PivotCache ofRange(int left, int right) {
-        validateRange(left, right);
-        return left == right ?
-            new PointPivotCache(left) :
-            new RangePivotCache(left, right);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -89,13 +87,7 @@ final class PivotCaches {
      * @return the pivot cache
      */
     static PivotCache ofFullRange(int left, int right) {
-        validateRange(left, right);
-        if (right - left <= 1) {
-            return left == right ?
-                new PointPivotCache(left) :
-                new RangePivotCache(left, right);
-        }
-        return IndexSet.ofRange(left, right);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -114,13 +106,22 @@ final class PivotCaches {
      * PivotCache for range {@code [left, right]} consisting of a single point.
      */
     private static class PointPivotCache implements ScanningPivotCache {
-        /** The target point. */
+
+        /**
+         * The target point.
+         */
         private final int target;
-        /** The upstream pivot closest to the left bound of the support.
-         * Provides a lower search bound for the range [left, right]. */
+
+        /**
+         * The upstream pivot closest to the left bound of the support.
+         * Provides a lower search bound for the range [left, right].
+         */
         private int lowerPivot = -1;
-        /** The downstream pivot closest to the right bound of the support.
-         * Provides an upper search bound for the range [left, right]. */
+
+        /**
+         * The downstream pivot closest to the right bound of the support.
+         * Provides an upper search bound for the range [left, right].
+         */
         private int upperPivot = UPPER_DEFAULT;
 
         /**
@@ -132,86 +133,58 @@ final class PivotCaches {
 
         @Override
         public void add(int index) {
-            // Update the floating pivots
-            if (index <= target) {
-                // This does not update upperPivot if index == target.
-                // This case is checked in nextPivot(int).
-                lowerPivot = Math.max(index, lowerPivot);
-            } else {
-                upperPivot = Math.min(index, upperPivot);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public void add(int fromIndex, int toIndex) {
-            // Update the floating pivots
-            if (toIndex <= target) {
-                // This does not update upperPivot if toIndex == target.
-                // This case is checked in nextPivot(int).
-                lowerPivot = Math.max(toIndex, lowerPivot);
-            } else if (fromIndex > target) {
-                upperPivot = Math.min(fromIndex, upperPivot);
-            } else {
-                // Range brackets the target
-                lowerPivot = upperPivot = target;
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int left() {
-            return target;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int right() {
-            return target;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean sparse() {
-            // Not sparse between [left, right]
-            return false;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean moveLeft(int newLeft) {
-            // Unsupported
-            return false;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean contains(int k) {
-            return lowerPivot == k;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int previousPivot(int k) {
-            // Only support scanning within [left, right] => assume k == target
-            return lowerPivot;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         // Do not override: int nextPivot(int k)
-
         @Override
         public int nextPivotOrElse(int k, int other) {
-            // Only support scanning within [left, right]
-            // assume lowerPivot <= left <= k <= right <= upperPivot
-            if (lowerPivot == target) {
-                return target;
-            }
-            return upperPivot == UPPER_DEFAULT ? other : upperPivot;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int nextNonPivot(int k) {
-            // Only support scanning within [left, right] => assume k == target
-            return lowerPivot == target ? target + 1 : target;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int previousNonPivot(int k) {
-            // Only support scanning within [left, right] => assume k == target
-            return lowerPivot == target ? target - 1 : target;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -224,15 +197,27 @@ final class PivotCaches {
      * between left and right is small.
      */
     private static class RangePivotCache implements ScanningPivotCache {
-        /** Left bound of the support. */
+
+        /**
+         * Left bound of the support.
+         */
         private final int left;
-        /** Right bound of the support. */
+
+        /**
+         * Right bound of the support.
+         */
         private final int right;
-        /** The upstream pivot closest to the left bound of the support.
-         * Provides a lower search bound for the range [left, right]. */
+
+        /**
+         * The upstream pivot closest to the left bound of the support.
+         * Provides a lower search bound for the range [left, right].
+         */
         private int lowerPivot = -1;
-        /** The downstream pivot closest to the right bound of the support.
-         * Provides an upper search bound for the range [left, right]. */
+
+        /**
+         * The downstream pivot closest to the right bound of the support.
+         * Provides an upper search bound for the range [left, right].
+         */
         private int upperPivot = UPPER_DEFAULT;
 
         /**
@@ -246,129 +231,58 @@ final class PivotCaches {
 
         @Override
         public void add(int index) {
-            // Update the floating pivots
-            if (index <= left) {
-                lowerPivot = Math.max(index, lowerPivot);
-            } else if (index >= right) {
-                upperPivot = Math.min(index, upperPivot);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public void add(int fromIndex, int toIndex) {
-            // Update the floating pivots
-            if (toIndex <= left) {
-                //     l-------------r
-                // f---t
-                lowerPivot = Math.max(toIndex, lowerPivot);
-            } else if (fromIndex >= right) {
-                //   l-------------r
-                //                 f---t
-                upperPivot = Math.min(fromIndex, upperPivot);
-            } else {
-                // Range [left, right] overlaps [from, to]
-                // toIndex > left && fromIndex < right
-                //   l-------------r
-                // f---t
-                //        f----t
-                //               f----t
-                if (fromIndex <= left) {
-                    lowerPivot = left;
-                }
-                if (toIndex >= right) {
-                    upperPivot = right;
-                }
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int left() {
-            return left;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int right() {
-            return right;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean sparse() {
-            // Sparse if there are internal points between [left, right]
-            return right - left > 1;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean moveLeft(int newLeft) {
-            // Unsupported
-            return false;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean contains(int k) {
-            return lowerPivot == k || upperPivot == k;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int previousPivot(int k) {
-            // Only support scanning within [left, right]
-            // assume lowerPivot <= left <= k <= right <= upperPivot
-            return k == upperPivot ? k : lowerPivot;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         // Do not override: int nextPivot(int k)
-
         @Override
         public int nextPivotOrElse(int k, int other) {
-            // Only support scanning within [left, right]
-            // assume lowerPivot <= left <= k <= right <= upperPivot
-            if (k == lowerPivot) {
-                return k;
-            }
-            return upperPivot == UPPER_DEFAULT ? other : upperPivot;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int nextNonPivot(int k) {
-            // Only support scanning within [left, right]
-            // assume lowerPivot <= left <= k <= right <= upperPivot
-            if (sparse()) {
-                throw new UnsupportedOperationException();
-            }
-            // range of size 2
-            // scan right
-            int i = k;
-            if (i == left) {
-                if (lowerPivot != left) {
-                    return left;
-                }
-                i++;
-            }
-            if (i == right && upperPivot == right) {
-                i++;
-            }
-            return i;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int previousNonPivot(int k) {
-            // Only support scanning within [left, right]
-            // assume lowerPivot <= left <= k <= right <= upperPivot
-            if (sparse()) {
-                throw new UnsupportedOperationException();
-            }
-            // range of size 2
-            // scan left
-            int i = k;
-            if (i == right) {
-                if (upperPivot != right) {
-                    return right;
-                }
-                i--;
-            }
-            if (i == left && lowerPivot == left) {
-                i--;
-            }
-            return i;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.arrays;
 
 import java.util.ArrayList;
@@ -39,12 +38,19 @@ import java.util.List;
  * </ul>
  */
 public enum SortInPlace {
-    /** Sort in ascending order. */
+
+    /**
+     * Sort in ascending order.
+     */
     ASCENDING((o1, o2) -> Double.compare(o1.key(), o2.key())),
-    /** Sort in descending order. */
+    /**
+     * Sort in descending order.
+     */
     DESCENDING((o1, o2) -> Double.compare(o2.key(), o1.key()));
 
-    /** Comparator. */
+    /**
+     * Comparator.
+     */
     private final Comparator<PairDoubleInteger> comparator;
 
     /**
@@ -63,76 +69,46 @@ public enum SortInPlace {
      * those performed on {@code x}.
      * @throws IllegalArgumentException if not all arrays have the same size.
      */
-    public void apply(double[] x,
-                      double[]... yList) {
-        final int yListLen = yList.length;
-        final int len = x.length;
-
-        for (int j = 0; j < yListLen; j++) {
-            final double[] y = yList[j];
-            if (y.length != len) {
-                throw new IllegalArgumentException("Size mismatch: " +
-                                                   y.length + " != " + len);
-            }
-        }
-
-        // Associate each abscissa "x[i]" with its index "i".
-        final List<PairDoubleInteger> list = new ArrayList<>(len);
-        for (int i = 0; i < len; i++) {
-            list.add(new PairDoubleInteger(x[i], i));
-        }
-
-        // Sort.
-        Collections.sort(list, comparator);
-
-        // Modify the original array so that its elements are in the prescribed order.
-        // Retrieve indices of original locations.
-        final int[] indices = new int[len];
-        for (int i = 0; i < len; i++) {
-            final PairDoubleInteger e = list.get(i);
-            x[i] = e.key();
-            indices[i] = e.value();
-        }
-
-        // In every associated array, move the elements to their new location.
-        for (int j = 0; j < yListLen; j++) {
-            // Input array will be modified in place.
-            final double[] yInPlace = yList[j];
-            final double[] yOrig = Arrays.copyOf(yInPlace, len);
-
-            for (int i = 0; i < len; i++) {
-                yInPlace[i] = yOrig[indices[i]];
-            }
-        }
+    public void apply(double[] x, double[]... yList) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
      * Helper data structure holding a (double, integer) pair.
      */
     private static class PairDoubleInteger {
-        /** Key. */
+
+        /**
+         * Key.
+         */
         private final double key;
-        /** Value. */
+
+        /**
+         * Value.
+         */
         private final int value;
 
         /**
          * @param key Key.
          * @param value Value.
          */
-        PairDoubleInteger(double key,
-                          int value) {
+        PairDoubleInteger(double key, int value) {
             this.key = key;
             this.value = value;
         }
 
-        /** @return the key. */
+        /**
+         * @return the key.
+         */
         double key() {
-            return key;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** @return the value. */
+        /**
+         * @return the value.
+         */
         int value() {
-            return value;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

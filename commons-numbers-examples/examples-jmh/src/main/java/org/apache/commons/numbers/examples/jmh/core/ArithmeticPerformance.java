@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.core;
 
 import java.util.concurrent.TimeUnit;
@@ -47,15 +46,27 @@ import org.openjdk.jmh.annotations.Warmup;
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-server", "-Xms512M", "-Xmx512M"})
+@Fork(value = 1, jvmArgs = { "-server", "-Xms512M", "-Xmx512M" })
 public class ArithmeticPerformance {
-    /** Method to compute the divide using unsigned arithmetic. */
+
+    /**
+     * Method to compute the divide using unsigned arithmetic.
+     */
     private static final String DIVIDE_UNSIGNED_1_0 = "divideUnsigned_1.0";
-    /** Method to compute the remainder using unsigned arithmetic. */
+
+    /**
+     * Method to compute the remainder using unsigned arithmetic.
+     */
     private static final String REMAINDER_UNSIGNED_1_0 = "remainderUnsigned_1.0";
-    /** Method to compute the divide using unsigned arithmetic. */
+
+    /**
+     * Method to compute the divide using unsigned arithmetic.
+     */
     private static final String DIVIDE_UNSIGNED_1_1 = "divideUnsigned_1.1";
-    /** Method to compute the remainder using unsigned arithmetic. */
+
+    /**
+     * Method to compute the remainder using unsigned arithmetic.
+     */
     private static final String REMAINDER_UNSIGNED_1_1 = "remainderUnsigned_1.1";
 
     /**
@@ -63,18 +74,23 @@ public class ArithmeticPerformance {
      */
     @State(Scope.Benchmark)
     public static class LongDataSource {
-        /** Data length. */
-        @Param({"1024"})
+
+        /**
+         * Data length.
+         */
+        @Param({ "1024" })
         private int length;
 
-        /** Data. */
+        /**
+         * Data.
+         */
         private long[] data;
 
         /**
          * @return the data
          */
         public long[] getData() {
-            return data;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -83,7 +99,7 @@ public class ArithmeticPerformance {
          */
         @Setup(Level.Iteration)
         public void setup() {
-            data = RandomSource.XO_RO_SHI_RO_128_PP.create().longs(length).toArray();
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -92,18 +108,23 @@ public class ArithmeticPerformance {
      */
     @State(Scope.Benchmark)
     public static class IntDataSource {
-        /** Data length. */
-        @Param({"1024"})
+
+        /**
+         * Data length.
+         */
+        @Param({ "1024" })
         private int length;
 
-        /** Data. */
+        /**
+         * Data.
+         */
         private int[] data;
 
         /**
          * @return the data
          */
         public int[] getData() {
-            return data;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -112,7 +133,7 @@ public class ArithmeticPerformance {
          */
         @Setup(Level.Iteration)
         public void setup() {
-            data = RandomSource.XO_RO_SHI_RO_128_PP.create().ints(length).toArray();
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -121,19 +142,23 @@ public class ArithmeticPerformance {
      */
     @State(Scope.Benchmark)
     public static class LongFunctionSource {
-        /** Name of the source. */
-        @Param({"Long.divideUnsigned", DIVIDE_UNSIGNED_1_0, DIVIDE_UNSIGNED_1_1,
-                "Long.remainderUnsigned", REMAINDER_UNSIGNED_1_0, REMAINDER_UNSIGNED_1_1})
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "Long.divideUnsigned", DIVIDE_UNSIGNED_1_0, DIVIDE_UNSIGNED_1_1, "Long.remainderUnsigned", REMAINDER_UNSIGNED_1_0, REMAINDER_UNSIGNED_1_1 })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private LongBinaryOperator function;
 
         /**
          * @return the function
          */
         public LongBinaryOperator getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -141,21 +166,7 @@ public class ArithmeticPerformance {
          */
         @Setup(Level.Iteration)
         public void setup() {
-            if ("Long.divideUnsigned".equals(name)) {
-                function = Long::divideUnsigned;
-            } else if (DIVIDE_UNSIGNED_1_0.equals(name)) {
-                function = ArithmeticPerformance::divideUnsigned;
-            } else if (DIVIDE_UNSIGNED_1_1.equals(name)) {
-                function = ArithmeticUtils::divideUnsigned;
-            } else if ("Long.remainderUnsigned".equals(name)) {
-                function = Long::remainderUnsigned;
-            } else if (REMAINDER_UNSIGNED_1_0.equals(name)) {
-                function = ArithmeticPerformance::remainderUnsigned;
-            } else if (REMAINDER_UNSIGNED_1_1.equals(name)) {
-                function = ArithmeticUtils::remainderUnsigned;
-            } else {
-                throw new IllegalStateException("Unknown long function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -164,19 +175,23 @@ public class ArithmeticPerformance {
      */
     @State(Scope.Benchmark)
     public static class IntFunctionSource {
-        /** Name of the source. */
-        @Param({"Integer.divideUnsigned", DIVIDE_UNSIGNED_1_0, DIVIDE_UNSIGNED_1_1,
-                "Integer.remainderUnsigned", REMAINDER_UNSIGNED_1_0, REMAINDER_UNSIGNED_1_1})
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "Integer.divideUnsigned", DIVIDE_UNSIGNED_1_0, DIVIDE_UNSIGNED_1_1, "Integer.remainderUnsigned", REMAINDER_UNSIGNED_1_0, REMAINDER_UNSIGNED_1_1 })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private IntBinaryOperator function;
 
         /**
          * @return the function
          */
         public IntBinaryOperator getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -184,21 +199,7 @@ public class ArithmeticPerformance {
          */
         @Setup(Level.Iteration)
         public void setup() {
-            if ("Integer.divideUnsigned".equals(name)) {
-                function = Integer::divideUnsigned;
-            } else if (DIVIDE_UNSIGNED_1_0.equals(name)) {
-                function = ArithmeticPerformance::divideUnsigned;
-            } else if (DIVIDE_UNSIGNED_1_1.equals(name)) {
-                function = ArithmeticUtils::divideUnsigned;
-            } else if ("Integer.remainderUnsigned".equals(name)) {
-                function = Integer::remainderUnsigned;
-            } else if (REMAINDER_UNSIGNED_1_0.equals(name)) {
-                function = ArithmeticPerformance::remainderUnsigned;
-            } else if (REMAINDER_UNSIGNED_1_1.equals(name)) {
-                function = ArithmeticUtils::remainderUnsigned;
-            } else {
-                throw new IllegalStateException("Unknown int function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -216,20 +217,7 @@ public class ArithmeticPerformance {
      * the second argument.
      */
     public static int remainderUnsigned(int dividend, int divisor) {
-        if (divisor >= 0) {
-            if (dividend >= 0) {
-                return dividend % divisor;
-            }
-            // The implementation is a Java port of algorithm described in the book
-            // "Hacker's Delight" (section "Unsigned short division from signed division").
-            final int q = ((dividend >>> 1) / divisor) << 1;
-            dividend -= q * divisor;
-            if (dividend < 0 || dividend >= divisor) {
-                dividend -= divisor;
-            }
-            return dividend;
-        }
-        return dividend >= 0 || dividend < divisor ? dividend : dividend - divisor;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -246,20 +234,7 @@ public class ArithmeticPerformance {
      * the second argument.
      */
     public static long remainderUnsigned(long dividend, long divisor) {
-        if (divisor >= 0L) {
-            if (dividend >= 0L) {
-                return dividend % divisor;
-            }
-            // The implementation is a Java port of algorithm described in the book
-            // "Hacker's Delight" (section "Unsigned short division from signed division").
-            final long q = ((dividend >>> 1) / divisor) << 1;
-            dividend -= q * divisor;
-            if (dividend < 0L || dividend >= divisor) {
-                dividend -= divisor;
-            }
-            return dividend;
-        }
-        return dividend >= 0L || dividend < divisor ? dividend : dividend - divisor;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -281,20 +256,7 @@ public class ArithmeticPerformance {
      * the second argument
      */
     public static int divideUnsigned(int dividend, int divisor) {
-        if (divisor >= 0) {
-            if (dividend >= 0) {
-                return dividend / divisor;
-            }
-            // The implementation is a Java port of algorithm described in the book
-            // "Hacker's Delight" (section "Unsigned short division from signed division").
-            int q = ((dividend >>> 1) / divisor) << 1;
-            dividend -= q * divisor;
-            if (dividend < 0L || dividend >= divisor) {
-                q++;
-            }
-            return q;
-        }
-        return dividend >= 0 || dividend < divisor ? 0 : 1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -316,24 +278,10 @@ public class ArithmeticPerformance {
      * the second argument.
      */
     public static long divideUnsigned(long dividend, long divisor) {
-        if (divisor >= 0L) {
-            if (dividend >= 0L) {
-                return dividend / divisor;
-            }
-            // The implementation is a Java port of algorithm described in the book
-            // "Hacker's Delight" (section "Unsigned short division from signed division").
-            long q = ((dividend >>> 1) / divisor) << 1;
-            dividend -= q * divisor;
-            if (dividend < 0L || dividend >= divisor) {
-                q++;
-            }
-            return q;
-        }
-        return dividend >= 0L || dividend < divisor ? 0L : 1L;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Benchmark methods.
-
     /**
      * Benchmark a {@link LongBinaryOperator}.
      *
@@ -343,13 +291,7 @@ public class ArithmeticPerformance {
      */
     @Benchmark
     public long longOp(LongDataSource data, LongFunctionSource function) {
-        final LongBinaryOperator fun = function.getFunction();
-        final long[] a = data.getData();
-        long s = 0;
-        for (int i = 0; i < a.length; i += 2) {
-            s += fun.applyAsLong(a[i], a[i + 1]);
-        }
-        return s;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -361,12 +303,6 @@ public class ArithmeticPerformance {
      */
     @Benchmark
     public int intOp(IntDataSource data, IntFunctionSource function) {
-        final IntBinaryOperator fun = function.getFunction();
-        final int[] a = data.getData();
-        int s = 0;
-        for (int i = 0; i < a.length; i += 2) {
-            s += fun.applyAsInt(a[i], a[i + 1]);
-        }
-        return s;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

@@ -25,9 +25,15 @@ import java.util.function.DoubleUnaryOperator;
  * {@code a - |period| * floor((a - offset) / |period|) - offset}.
  */
 public class Reduce implements DoubleUnaryOperator {
-    /** Offset. */
+
+    /**
+     * Offset.
+     */
     private final double offset;
-    /** Period. */
+
+    /**
+     * Period.
+     */
     private final double period;
 
     /**
@@ -36,16 +42,16 @@ public class Reduce implements DoubleUnaryOperator {
      * @param offset Value that will be mapped to {@code 0}.
      * @param period Period.
      */
-    public Reduce(double offset,
-                  double period) {
+    public Reduce(double offset, double period) {
         this.offset = offset;
         this.period = Math.abs(period);
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public double applyAsDouble(double x) {
-        final double xMo = x - offset;
-        return xMo - period * Math.floor(xMo / period);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

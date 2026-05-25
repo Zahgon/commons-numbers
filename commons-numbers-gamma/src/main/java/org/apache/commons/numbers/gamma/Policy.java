@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.gamma;
 
 /**
@@ -28,14 +27,22 @@ package org.apache.commons.numbers.gamma;
  * Policies: Controlling Precision, Error Handling etc</a>
  */
 final class Policy {
-    /** Default policy. The Boost default uses 2^-52 for the epsilon. This uses
+
+    /**
+     * Default policy. The Boost default uses 2^-52 for the epsilon. This uses
      * 2^-53 to use an extra guard digit in the Kahan series summations.
-     * The minimum value for the Commons continued fraction epsilon is also 2^-53. */
+     * The minimum value for the Commons continued fraction epsilon is also 2^-53.
+     */
     private static final Policy DEFAULT = new Policy(0x1.0p-53, 1000000);
 
-    /** Epsilon value for relative error. */
+    /**
+     * Epsilon value for relative error.
+     */
     private final double eps;
-    /** The maximum number of iterations permitted in a series evaluation. */
+
+    /**
+     * The maximum number of iterations permitted in a series evaluation.
+     */
     private final int maxIterations;
 
     /**
@@ -56,7 +63,7 @@ final class Policy {
      * @return the default policy
      */
     static Policy getDefault() {
-        return DEFAULT;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -65,7 +72,7 @@ final class Policy {
      * @return the epsilon
      */
     double getEps() {
-        return eps;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -74,6 +81,6 @@ final class Policy {
      * @return max iterations
      */
     int getMaxIterations() {
-        return maxIterations;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

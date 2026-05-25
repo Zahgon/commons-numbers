@@ -23,19 +23,35 @@ package org.apache.commons.numbers.gamma;
  * \( \psi_1(x) = \frac{d^2}{dx^2} (\ln \Gamma(x)) \).
  */
 public final class Trigamma {
-    /** C limit. */
+
+    /**
+     * C limit.
+     */
     private static final double C_LIMIT = 49;
 
-    /** S limit. */
+    /**
+     * S limit.
+     */
     private static final double S_LIMIT = 1e-5;
-    /** Fraction. */
+
+    /**
+     * Fraction.
+     */
     private static final double F_1_6 = 1d / 6;
-    /** Fraction. */
+
+    /**
+     * Fraction.
+     */
     private static final double F_1_30 = 1d / 30;
-    /** Fraction. */
+
+    /**
+     * Fraction.
+     */
     private static final double F_1_42 = 1d / 42;
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private Trigamma() {
         // intentionally empty.
     }
@@ -47,26 +63,6 @@ public final class Trigamma {
      * @return trigamma(x) to within {@code 1e-8} relative or absolute error whichever is larger.
      */
     public static double value(double x) {
-        if (!Double.isFinite(x)) {
-            return x;
-        }
-
-        if (x > 0 && x <= S_LIMIT) {
-            return 1 / (x * x);
-        }
-
-        double trigamma = 0;
-        while (x < C_LIMIT) {
-            trigamma += 1 / (x * x);
-            x += 1;
-        }
-
-        final double inv = 1 / (x * x);
-        //  1     1       1       1        1
-        //  - + ----- + ----- - ------ + ------
-        //  x   2 x^2   6 x^3   30 x^5   42 x^7
-        trigamma += 1 / x + 0.5 * inv + inv / x * (F_1_6 - inv * (F_1_30 + F_1_42 * inv));
-
-        return trigamma;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

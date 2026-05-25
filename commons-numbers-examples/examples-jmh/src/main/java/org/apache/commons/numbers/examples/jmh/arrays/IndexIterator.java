@@ -33,6 +33,7 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 interface IndexIterator {
+
     /**
      * The start (inclusive) of the current block of indices.
      *
@@ -88,12 +89,7 @@ interface IndexIterator {
      * @return true if {@code right > index}
      */
     default boolean positionAfter(int index) {
-        while (right() <= index) {
-            if (!next()) {
-                return false;
-            }
-        }
-        return true;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -109,6 +105,6 @@ interface IndexIterator {
      * @return true if the next {@code left > index}, or there is no next left
      */
     default boolean nextAfter(int index) {
-        return right() >= end();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

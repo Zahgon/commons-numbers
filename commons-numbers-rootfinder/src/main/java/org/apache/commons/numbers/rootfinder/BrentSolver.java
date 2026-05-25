@@ -36,11 +36,20 @@ import java.util.function.DoubleUnaryOperator;
  *  </blockquote>
  */
 public class BrentSolver {
-    /** Relative accuracy. */
+
+    /**
+     * Relative accuracy.
+     */
     private final double relativeAccuracy;
-    /** Absolute accuracy. */
+
+    /**
+     * Absolute accuracy.
+     */
     private final double absoluteAccuracy;
-    /** Function accuracy. */
+
+    /**
+     * Function accuracy.
+     */
     private final double functionValueAccuracy;
 
     /**
@@ -50,9 +59,7 @@ public class BrentSolver {
      * @param absoluteAccuracy Absolute accuracy.
      * @param functionValueAccuracy Function value accuracy.
      */
-    public BrentSolver(double relativeAccuracy,
-                       double absoluteAccuracy,
-                       double functionValueAccuracy) {
+    public BrentSolver(double relativeAccuracy, double absoluteAccuracy, double functionValueAccuracy) {
         this.relativeAccuracy = relativeAccuracy;
         this.absoluteAccuracy = absoluteAccuracy;
         this.functionValueAccuracy = functionValueAccuracy;
@@ -69,16 +76,8 @@ public class BrentSolver {
      * @throws IllegalArgumentException if the given interval does
      * not bracket the root.
      */
-    public double findRoot(DoubleUnaryOperator func,
-                           double min,
-                           double max) {
-        // Avoid overflow computing the initial value: 0.5 * (min + max)
-        // Note: This sum is invalid if min == max == Double.MIN_VALUE
-        // so detect this edge case. It will raise a bracketing exception
-        // if min is not the root within the configured function accuracy;
-        // otherwise min is returned.
-        final double initial = min == max ? min : 0.5 * min + 0.5 * max;
-        return findRoot(func, min, initial, max);
+    public double findRoot(DoubleUnaryOperator func, double min, double max) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -95,47 +94,8 @@ public class BrentSolver {
      * @throws IllegalArgumentException if the given interval does
      * not bracket the root.
      */
-    public double findRoot(DoubleUnaryOperator func,
-                           double min,
-                           double initial,
-                           double max) {
-        if (min > max) {
-            throw new SolverException(SolverException.TOO_LARGE, min, max);
-        }
-        if (initial < min ||
-            initial > max) {
-            throw new SolverException(SolverException.OUT_OF_RANGE, initial, min, max);
-        }
-
-        // Return the initial guess if it is good enough.
-        final double yInitial = func.applyAsDouble(initial);
-        if (Math.abs(yInitial) <= functionValueAccuracy) {
-            return initial;
-        }
-
-        // Return the first endpoint if it is good enough.
-        final double yMin = func.applyAsDouble(min);
-        if (Math.abs(yMin) <= functionValueAccuracy) {
-            return min;
-        }
-
-        // Reduce interval if min and initial bracket the root.
-        if (Double.compare(yInitial * yMin, 0.0) < 0) {
-            return brent(func, min, initial, yMin, yInitial);
-        }
-
-        // Return the second endpoint if it is good enough.
-        final double yMax = func.applyAsDouble(max);
-        if (Math.abs(yMax) <= functionValueAccuracy) {
-            return max;
-        }
-
-        // Reduce interval if initial and max bracket the root.
-        if (Double.compare(yInitial * yMax, 0.0) < 0) {
-            return brent(func, initial, max, yInitial, yMax);
-        }
-
-        throw new SolverException(SolverException.BRACKETING, min, yMin, max, yMax);
+    public double findRoot(DoubleUnaryOperator func, double min, double initial, double max) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -155,9 +115,7 @@ public class BrentSolver {
      * @param fHi Function value at the higher bound of the search interval.
      * @return the value where the function is zero.
      */
-    private double brent(DoubleUnaryOperator func,
-                         double lo, double hi,
-                         double fLo, double fHi) {
+    private double brent(DoubleUnaryOperator func, double lo, double hi, double fLo, double fHi) {
         double a = lo;
         double fa = fLo;
         double b = hi;
@@ -166,10 +124,8 @@ public class BrentSolver {
         double fc = fa;
         double d = b - a;
         double e = d;
-
         final double t = absoluteAccuracy;
         final double eps = relativeAccuracy;
-
         while (true) {
             if (Math.abs(fc) < Math.abs(fb)) {
                 a = b;
@@ -179,16 +135,12 @@ public class BrentSolver {
                 fb = fc;
                 fc = fa;
             }
-
             final double tol = 2 * eps * Math.abs(b) + t;
             final double m = 0.5 * (c - b);
-
-            if (Math.abs(m) <= tol ||
-                equalsZero(fb))  {
+            if (Math.abs(m) <= tol || equalsZero(fb)) {
                 return b;
             }
-            if (Math.abs(e) < tol ||
-                Math.abs(fa) <= Math.abs(fb)) {
+            if (Math.abs(e) < tol || Math.abs(fa) <= Math.abs(fb)) {
                 // Force bisection.
                 d = m;
                 e = d;
@@ -215,8 +167,7 @@ public class BrentSolver {
                 } else {
                     p = -p;
                 }
-                if (p >= 1.5 * m * q - Math.abs(tol * q) ||
-                    p >= Math.abs(0.5 * e * q)) {
+                if (p >= 1.5 * m * q - Math.abs(tol * q) || p >= Math.abs(0.5 * e * q)) {
                     // Inverse quadratic interpolation gives a value
                     // in the wrong direction, or progress is slow.
                     // Fall back to bisection.
@@ -229,7 +180,6 @@ public class BrentSolver {
             }
             a = b;
             fa = fb;
-
             if (Math.abs(d) > tol) {
                 b += d;
             } else if (m > 0) {
@@ -238,8 +188,7 @@ public class BrentSolver {
                 b -= tol;
             }
             fb = func.applyAsDouble(b);
-            if ((fb > 0 && fc > 0) ||
-                (fb <= 0 && fc <= 0)) {
+            if ((fb > 0 && fc > 0) || (fb <= 0 && fc <= 0)) {
                 c = a;
                 fc = fa;
                 d = b - a;

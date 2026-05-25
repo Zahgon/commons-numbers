@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.arrays;
 
 /**
@@ -23,16 +22,27 @@ package org.apache.commons.numbers.arrays;
  * @since 1.2
  */
 final class KeyUpdatingInterval implements UpdatingInterval {
-    /** Size to use a scan of the keys when splitting instead of binary search.
+
+    /**
+     * Size to use a scan of the keys when splitting instead of binary search.
      * Note binary search has an overhead on small size due to the random left/right
-     * branching per iteration. It is much faster on very large sizes. */
+     * branching per iteration. It is much faster on very large sizes.
+     */
     private static final int SCAN_SIZE = 256;
 
-    /** The ordered keys. */
+    /**
+     * The ordered keys.
+     */
     private final int[] keys;
-    /** Index of the left key. */
+
+    /**
+     * Index of the left key.
+     */
     private int l;
-    /** Index of the right key. */
+
+    /**
+     * Index of the right key.
+     */
     private int r;
 
     /**
@@ -60,64 +70,27 @@ final class KeyUpdatingInterval implements UpdatingInterval {
 
     @Override
     public int left() {
-        return keys[l];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int right() {
-        return keys[r];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int updateLeft(int k) {
-        // Assume left < k <= right (i.e. we must move left at least 1)
-        // Search using a scan on the assumption that k is close to the end
-        int i = l;
-        do {
-            ++i;
-        } while (keys[i] < k);
-        l = i;
-        return keys[i];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int updateRight(int k) {
-        // Assume left <= k < right (i.e. we must move right at least 1)
-        // Search using a scan on the assumption that k is close to the end
-        int i = r;
-        do {
-            --i;
-        } while (keys[i] > k);
-        r = i;
-        return keys[i];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public UpdatingInterval splitLeft(int ka, int kb) {
-        // left < ka <= kb < right
-
-        // Find the new left bound for the upper interval.
-        // Switch to a linear scan if length is small.
-        int i;
-        if (r - l < SCAN_SIZE) {
-            i = r;
-            do {
-                --i;
-            } while (keys[i] > kb);
-        } else {
-            // Binary search
-            i = searchLessOrEqual(keys, l, r, kb);
-        }
-        final int lowerLeft = l;
-        l = i + 1;
-
-        // Find the new right bound for the lower interval using a scan since a
-        // typical use case has ka == kb and this is faster than a second binary search.
-        while (keys[i] >= ka) {
-            --i;
-        }
-        // return left
-        return new KeyUpdatingInterval(keys, lowerLeft, i);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -126,7 +99,7 @@ final class KeyUpdatingInterval implements UpdatingInterval {
      * @return the size
      */
     int size() {
-        return r - l + 1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -179,27 +152,6 @@ final class KeyUpdatingInterval implements UpdatingInterval {
      * such index exists
      */
     static int searchLessOrEqual(int[] a, int left, int right, int k) {
-        int l = left;
-        int r = right;
-        while (l <= r) {
-            // Middle value
-            final int m = (l + r) >>> 1;
-            final int v = a[m];
-            // Test:
-            // l------m------r
-            //        v  k      update left
-            //     k  v         update right
-            if (v < k) {
-                l = m + 1;
-            } else if (v > k) {
-                r = m - 1;
-            } else {
-                // Equal
-                return m;
-            }
-        }
-        // Return largest known value below:
-        // r is always moved downward when a middle index value is too high
-        return r;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

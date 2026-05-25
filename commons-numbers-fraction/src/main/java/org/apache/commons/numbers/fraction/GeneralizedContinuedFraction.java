@@ -54,6 +54,7 @@ import java.util.function.Supplier;
  * @since 1.1
  */
 public final class GeneralizedContinuedFraction {
+
     /**
      * The value for any number close to zero.
      *
@@ -61,8 +62,12 @@ public final class GeneralizedContinuedFraction {
      * eps * |b_n|, e.g., 1e-50".
      */
     static final double SMALL = 1e-50;
-    /** Default maximum number of iterations. */
+
+    /**
+     * Default maximum number of iterations.
+     */
     static final int DEFAULT_ITERATIONS = Integer.MAX_VALUE;
+
     /**
      * Minimum relative error epsilon. Equal to 1 - Math.nextDown(1.0), or 2^-53.
      *
@@ -79,15 +84,24 @@ public final class GeneralizedContinuedFraction {
      * increase or decrease in the convergent.
      */
     private static final double MIN_EPSILON = 0x1.0p-53;
-    /** Maximum relative error epsilon. This is configured to prevent incorrect usage. Values
+
+    /**
+     * Maximum relative error epsilon. This is configured to prevent incorrect usage. Values
      * higher than 1.0 invalidate the relative error lower bound of {@code (1 - eps) / 1}.
-     * Set to 0.5 which is a very weak relative error tolerance. */
+     * Set to 0.5 which is a very weak relative error tolerance.
+     */
     private static final double MAX_EPSILON = 0.5;
-    /** Default low threshold for change in magnitude. Precomputed using MIN_EPSILON.
-     * Equal to 1 - 2^-53. */
+
+    /**
+     * Default low threshold for change in magnitude. Precomputed using MIN_EPSILON.
+     * Equal to 1 - 2^-53.
+     */
     private static final double DEFAULT_LOW = 1 - MIN_EPSILON;
-    /** Default absolute difference threshold for change in magnitude. Precomputed using MIN_EPSILON.
-     * Equal to {@code 1 / (1 - 2^-53) = 2^-52}. */
+
+    /**
+     * Default absolute difference threshold for change in magnitude. Precomputed using MIN_EPSILON.
+     * Equal to {@code 1 / (1 - 2^-53) = 2^-52}.
+     */
     private static final double DEFAULT_EPS = 0x1.0p-52;
 
     /**
@@ -97,9 +111,15 @@ public final class GeneralizedContinuedFraction {
      * @since 1.1
      */
     public static final class Coefficient {
-        /** "a" coefficient. */
+
+        /**
+         * "a" coefficient.
+         */
         private final double a;
-        /** "b" coefficient. */
+
+        /**
+         * "b" coefficient.
+         */
         private final double b;
 
         /**
@@ -117,7 +137,7 @@ public final class GeneralizedContinuedFraction {
          * @return the coefficient <code>a<sub>n</sub></code>.
          */
         public double getA() {
-            return a;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -126,7 +146,7 @@ public final class GeneralizedContinuedFraction {
          * @return the coefficient <code>b<sub>n</sub></code>.
          */
         public double getB() {
-            return b;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -137,12 +157,15 @@ public final class GeneralizedContinuedFraction {
          * @return the coefficient
          */
         public static Coefficient of(double a, double b) {
-            return new Coefficient(a, b);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
-    /** No instances. */
-    private GeneralizedContinuedFraction() {}
+    /**
+     * No instances.
+     */
+    private GeneralizedContinuedFraction() {
+    }
 
     /**
      * Evaluates the continued fraction.
@@ -156,7 +179,7 @@ public final class GeneralizedContinuedFraction {
      * @see #value(Supplier,double,int)
      */
     public static double value(Supplier<Coefficient> gen) {
-        return value(gen, MIN_EPSILON, DEFAULT_ITERATIONS);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -172,7 +195,7 @@ public final class GeneralizedContinuedFraction {
      * @see #value(Supplier,double,int)
      */
     public static double value(Supplier<Coefficient> gen, double epsilon) {
-        return value(gen, epsilon, DEFAULT_ITERATIONS);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -209,10 +232,7 @@ public final class GeneralizedContinuedFraction {
      * @see #value(double, Supplier, double, int)
      */
     public static double value(Supplier<Coefficient> gen, double epsilon, int maxIterations) {
-        // Use the first b coefficient to seed the evaluation of the fraction.
-        // Coefficient a is discarded.
-        final Coefficient c = gen.get();
-        return evaluate(c.getB(), gen, epsilon, maxIterations);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -235,7 +255,7 @@ public final class GeneralizedContinuedFraction {
      * @see #value(double,Supplier,double,int)
      */
     public static double value(double b0, Supplier<Coefficient> gen) {
-        return value(b0, gen, MIN_EPSILON, DEFAULT_ITERATIONS);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -259,7 +279,7 @@ public final class GeneralizedContinuedFraction {
      * @see #value(double,Supplier,double,int)
      */
     public static double value(double b0, Supplier<Coefficient> gen, double epsilon) {
-        return value(b0, gen, epsilon, DEFAULT_ITERATIONS);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -320,11 +340,7 @@ public final class GeneralizedContinuedFraction {
      * @see #value(Supplier,double,int)
      */
     public static double value(double b0, Supplier<Coefficient> gen, double epsilon, int maxIterations) {
-        // Use the first b coefficient to seed the evaluation of the fraction.
-        // Coefficient a is used to compute the final result as the numerator term a1.
-        // The supplied b0 is added to the result.
-        final Coefficient c = gen.get();
-        return b0 + c.getA() / evaluate(c.getB(), gen, epsilon, maxIterations);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -362,90 +378,7 @@ public final class GeneralizedContinuedFraction {
      * of iterations is reached before the expected convergence is achieved.
      */
     static double evaluate(double b0, Supplier<Coefficient> gen, double epsilon, int maxIterations) {
-        // Relative error epsilon should not be zero to prevent drift in the event
-        // that the update ratio never achieves 1.0.
-
-        // Epsilon is the relative change allowed from 1. Configure the absolute limits so
-        // convergence requires: low <= deltaN <= high
-        // low = 1 - eps
-        // high = 1 / (1 - eps)
-        // High is always further from 1 than low in absolute distance. Do not store high
-        // but store the maximum absolute deviation from 1 for convergence = high - 1.
-        // If this is achieved a second check is made against low.
-        final double low;
-        final double eps;
-        if (epsilon > MIN_EPSILON && epsilon <= MAX_EPSILON) {
-            low = 1 - epsilon;
-            eps = 1 / low - 1;
-        } else {
-            // Precomputed defaults. Used when epsilon <= MIN_EPSILON
-            low = DEFAULT_LOW;
-            eps = DEFAULT_EPS;
-        }
-
-        double hPrev = updateIfCloseToZero(b0);
-
-        // Notes from Thompson and Barnett:
-        //
-        // Fraction convergent: hn = An / Bn
-        // A(-1) = 1, A0 = b0, B(-1) = 0, B0 = 1
-
-        // Compute the ratios:
-        // Dn = B(n-1) / Bn  = 1 / (an * D(n-1) + bn)
-        // Cn = An / A(n-1)  = an / C(n-1) + bn
-        //
-        // Ratio of successive convergents:
-        // delta n = hn / h(n-1)
-        //         = Cn / Dn
-
-        // Avoid divisors being zero (less than machine precision) by shifting them to e.g. 1e-50.
-
-        double dPrev = 0.0;
-        double cPrev = hPrev;
-
-        for (int n = maxIterations; n > 0; n--) {
-            final Coefficient c = gen.get();
-            final double a = c.getA();
-            final double b = c.getB();
-
-            double dN = updateIfCloseToZero(b + a * dPrev);
-            final double cN = updateIfCloseToZero(b + a / cPrev);
-
-            dN = 1 / dN;
-            final double deltaN = cN * dN;
-            final double hN = hPrev * deltaN;
-
-            // If the fraction is convergent then deltaN -> 1.
-            // Computation of deltaN = 0 or deltaN = big will result in zero or overflow.
-            // Directly check for overflow on hN (this ensures the result is finite).
-
-            if (!Double.isFinite(hN)) {
-                throw new FractionException("Continued fraction diverged to " + hN);
-            }
-
-            // Check for underflow on deltaN. This allows fractions to compute zero
-            // if this is the convergent limit.
-            // Note: deltaN is only zero if dN > 1e-50 / min_value, or 2.02e273.
-            // Since dN is the ratio of convergent denominators this magnitude of
-            // ratio is a presumed to be an error.
-            if (deltaN == 0) {
-                throw new FractionException("Ratio of successive convergents is zero");
-            }
-
-            // Update from Thompson and Barnett to use <= eps in place of < eps.
-            // eps = high - 1
-            // A second check is made to ensure:
-            // low <= deltaN <= high
-            if (Math.abs(deltaN - 1) <= eps && deltaN >= low) {
-                return hN;
-            }
-
-            dPrev = dN;
-            cPrev = cN;
-            hPrev = hN;
-        }
-
-        throw new FractionException("Maximum iterations (%d) exceeded", maxIterations);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**

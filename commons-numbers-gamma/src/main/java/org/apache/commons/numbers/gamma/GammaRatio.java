@@ -34,7 +34,10 @@ package org.apache.commons.numbers.gamma;
  * @since 1.1
  */
 public final class GammaRatio {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private GammaRatio() {
         // intentionally empty.
     }
@@ -51,7 +54,7 @@ public final class GammaRatio {
      * @return \( \Gamma(a) / \Gamma(b) \)
      */
     public static double value(double a, double b) {
-        return BoostGamma.tgammaRatio(a, b);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -68,6 +71,6 @@ public final class GammaRatio {
      * @return \( \Gamma(a) / \Gamma(a + delta) \)
      */
     public static double delta(double a, double delta) {
-        return BoostGamma.tgammaDeltaRatio(a, delta);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

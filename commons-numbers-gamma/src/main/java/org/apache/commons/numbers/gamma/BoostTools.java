@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 //  (C) Copyright John Maddock 2006.
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
 package org.apache.commons.numbers.gamma;
 
 import java.util.function.DoubleSupplier;
@@ -32,6 +30,7 @@ import java.util.function.DoubleSupplier;
  * All work is copyright John Maddock 2006 and subject to the Boost Software License.
  */
 final class BoostTools {
+
     /**
      * The minimum epsilon value for relative error in the summation.
      * Equal to Math.ulp(1.0) or 2^-52.
@@ -55,6 +54,7 @@ final class BoostTools {
      * be achieved by multiplication by 2^-52.
      */
     private static final double EPSILON = 0x1.0p-52;
+
     /**
      * The minimum epsilon value for relative error in the Kahan summation.
      * This can be lower than {@link #EPSILON}. Set to 2^-62.
@@ -76,10 +76,15 @@ final class BoostTools {
      * much as the inclusion of extra guard digits.
      */
     private static final double KAHAN_EPSILON = 0x1.0p-62;
-    /** Message for failure to converge. */
+
+    /**
+     * Message for failure to converge.
+     */
     private static final String MSG_FAILED_TO_CONVERGE = "Failed to converge within %d iterations";
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private BoostTools() {
         // intentionally empty.
     }
@@ -95,7 +100,7 @@ final class BoostTools {
      * @return result
      */
     static double sumSeries(DoubleSupplier func, double epsilon, int maxTerms) {
-        return sumSeries(func, epsilon, maxTerms, 0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -110,36 +115,7 @@ final class BoostTools {
      * @return result
      */
     static double sumSeries(DoubleSupplier func, double epsilon, int maxTerms, double initValue) {
-        // Note:
-        // The Boost code requires eps to be non-zero. It is created in the
-        // <boost/math/policies/policy.hpp> as a non-zero relative error term.
-        // An alternative termination condition with a divide is:
-        // (eps < Math.abs(nextTerm / result))
-        //
-        // Here the argument is checked against the minimum epsilon for a double
-        // to provide functional equivalence with the Boost policy.
-        // In the min eps case the loop terminates if the most recently added term is
-        // 0 or 1 ulp of the result. This condition is acceptable if the next
-        // computed term will be at most half of the most recent term (thus
-        // cannot be added to the current result).
-
-        final double eps = getEpsilon(epsilon, EPSILON);
-
-        int counter = maxTerms;
-
-        double result = initValue;
-        double nextTerm;
-        do {
-            nextTerm = func.getAsDouble();
-            result += nextTerm;
-        } while (Math.abs(eps * result) < Math.abs(nextTerm) && --counter > 0);
-
-        if (counter <= 0) {
-            throw new ArithmeticException(
-               String.format(MSG_FAILED_TO_CONVERGE, maxTerms));
-        }
-
-        return result;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -153,7 +129,7 @@ final class BoostTools {
      * @return result
      */
     static double kahanSumSeries(DoubleSupplier func, double epsilon, int maxTerms) {
-        return kahanSumSeries(func, epsilon, maxTerms, 0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -168,35 +144,7 @@ final class BoostTools {
      * @return result
      */
     static double kahanSumSeries(DoubleSupplier func, double epsilon, int maxTerms, double initValue) {
-        final double eps = getEpsilon(epsilon, KAHAN_EPSILON);
-
-        int counter = maxTerms;
-
-        // Kahan summation:
-        // https://en.wikipedia.org/wiki/Kahan_summation_algorithm
-        // This summation is accurate if the term is smaller in magnitude
-        // than the current sum. This is a condition required for the
-        // series termination thus the extended precision sum need not
-        // check magnitudes of terms to compute the carry.
-
-        double result = initValue;
-        double carry = 0;
-        double nextTerm;
-        do {
-            nextTerm = func.getAsDouble();
-            final double y = nextTerm - carry;
-            final double t = result + y;
-            carry = t - result;
-            carry -= y;
-            result = t;
-        } while (Math.abs(eps * result) < Math.abs(nextTerm) && --counter > 0);
-
-        if (counter <= 0) {
-            throw new ArithmeticException(
-               String.format(MSG_FAILED_TO_CONVERGE, maxTerms));
-        }
-
-        return result;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -230,12 +178,6 @@ final class BoostTools {
      * @return polynomial value
      */
     static double evaluatePolynomial(double[] c, double x) {
-        final int count = c.length;
-        double sum = c[count - 1];
-        for (int i = count - 2; i >= 0; --i) {
-            sum *= x;
-            sum += c[i];
-        }
-        return sum;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

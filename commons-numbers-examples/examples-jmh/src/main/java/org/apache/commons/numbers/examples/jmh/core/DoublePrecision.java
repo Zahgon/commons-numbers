@@ -24,6 +24,7 @@ package org.apache.commons.numbers.examples.jmh.core;
  * Dekker (1971) A floating-point technique for extending the available precision</a>.
  */
 final class DoublePrecision {
+
     /*
      * Caveat:
      *
@@ -47,7 +48,6 @@ final class DoublePrecision {
      * [1] Shewchuk (1997): Arbitrary Precision Floating-Point Arithmetic
      * http://www-2.cs.cmu.edu/afs/cs/project/quake/public/papers/robust-arithmetic.ps
      */
-
     /**
      * The multiplier used to split the double value into high and low parts. From
      * Dekker (1971): "The constant should be chosen equal to 2^(p - p/2) + 1,
@@ -56,58 +56,91 @@ final class DoublePrecision {
      */
     private static final double MULTIPLIER = 1.34217729E8;
 
-    /** The upper limit above which a number may overflow during the split into a high part.
+    /**
+     * The upper limit above which a number may overflow during the split into a high part.
      * Assuming the multiplier is above 2^27 and the maximum exponent is 1023 then a safe
-     * limit is a value with an exponent of (1023 - 27) = 2^996. */
+     * limit is a value with an exponent of (1023 - 27) = 2^996.
+     */
     private static final double SAFE_UPPER = 0x1.0p996;
-    /** The lower limit for a product {@code x * y} below which the round-off component may be
-     * sub-normal. This is set as 2^-1022 * 2^54. */
+
+    /**
+     * The lower limit for a product {@code x * y} below which the round-off component may be
+     * sub-normal. This is set as 2^-1022 * 2^54.
+     */
     private static final double SAFE_LOWER = 0x1.0p-968;
 
-    /** The scale to use when down-scaling during a split into a high part.
-     * This must be smaller than the inverse of the multiplier and a power of 2 for exact scaling. */
+    /**
+     * The scale to use when down-scaling during a split into a high part.
+     * This must be smaller than the inverse of the multiplier and a power of 2 for exact scaling.
+     */
     private static final double DOWN_SCALE = 0x1.0p-30;
 
-    /** The scale to use when re-scaling during a split into a high part.
-     * This is the inverse of {@link #DOWN_SCALE}. */
+    /**
+     * The scale to use when re-scaling during a split into a high part.
+     * This is the inverse of {@link #DOWN_SCALE}.
+     */
     private static final double UP_SCALE = 0x1.0p30;
 
-    /** The upscale factor squared. */
+    /**
+     * The upscale factor squared.
+     */
     private static final double UP_SCALE2 = 0x1.0p60;
-    /** The downscale factor squared. */
+
+    /**
+     * The downscale factor squared.
+     */
     private static final double DOWN_SCALE2 = 0x1.0p-60;
-    /** The safe upper limit so the product {@code x * y} can be upscaled by 2^60. */
+
+    /**
+     * The safe upper limit so the product {@code x * y} can be upscaled by 2^60.
+     */
     private static final double SAFE_UPPER_S = 0x1.0p963;
 
-    /** The mask to zero the lower 27-bits of a long . */
+    /**
+     * The mask to zero the lower 27-bits of a long .
+     */
     private static final long ZERO_LOWER_27_BITS = 0xffff_ffff_f800_0000L;
 
-    /** The mask to extract the raw 11-bit exponent.
-     * The value must be shifted 52-bits to remove the mantissa bits. */
+    /**
+     * The mask to extract the raw 11-bit exponent.
+     * The value must be shifted 52-bits to remove the mantissa bits.
+     */
     private static final int EXP_MASK = 0x7ff;
 
-    /** The value 2046 converted for use if using {@link Integer#compareUnsigned(int, int)}.
-     * This requires adding {@link Integer#MIN_VALUE} to 2046. */
+    /**
+     * The value 2046 converted for use if using {@link Integer#compareUnsigned(int, int)}.
+     * This requires adding {@link Integer#MIN_VALUE} to 2046.
+     */
     private static final int CMP_UNSIGNED_2046 = Integer.MIN_VALUE + 2046;
 
-    /** The value -1 converted for use if using {@link Integer#compareUnsigned(int, int)}.
-     * This requires adding {@link Integer#MIN_VALUE} to -1. */
+    /**
+     * The value -1 converted for use if using {@link Integer#compareUnsigned(int, int)}.
+     * This requires adding {@link Integer#MIN_VALUE} to -1.
+     */
     private static final int CMP_UNSIGNED_MINUS_1 = Integer.MIN_VALUE - 1;
 
     /**
      * Represents a floating-point number with twice the precision of a {@code double}.
      */
     static final class Quad {
+
         // This is treated as a simple struct.
         // CHECKSTYLE: stop VisibilityModifier
-        /** The high part of the number. */
+        /**
+         * The high part of the number.
+         */
         double hi;
-        /** The low part of the number. */
+
+        /**
+         * The low part of the number.
+         */
         double lo;
         // CHECKSTYLE: resume VisibilityModifier
     }
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private DoublePrecision() {
         // intentionally empty.
     }
@@ -127,18 +160,7 @@ final class DoublePrecision {
      * @param z Result
      */
     static void multiplyUnscaled(double x, double y, Quad z) {
-        // Note: The original mul12 algorithm avoids x * y and saves 1 multiplication.
-        double p;
-        p = x * MULTIPLIER;
-        final double hx = x - p + p;
-        final double lx = x - hx;
-        p = y * MULTIPLIER;
-        final double hy = y - p + p;
-        final double ly = y - hy;
-        p = hx * hy;
-        final double q = hx * ly + lx * hy;
-        z.hi = p + q;
-        z.lo = p - z.hi + q + lx * ly;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -166,70 +188,7 @@ final class DoublePrecision {
      * @see DoublePrecision#productLowUnscaled(double, double, double)
      */
     static void multiply(double x, double y, Quad c) {
-        // Special cases. Check the product.
-        final double xy = x * y;
-        if (isNotNormal(xy)) {
-            c.hi = xy;
-            // Returns 0.0 for sub-normal xy, otherwise NaN for inf/nan
-            c.lo = xy - xy;
-            return;
-        }
-        // Extract biased exponent and normalise.
-        // Sub-normals are scaled by 2^54 and the exponent adjusted.
-        // This is equivalent to the c function frexp which decomposes given floating
-        // point value arg into a normalized fraction and an integral power of two.
-        // Here we use a biased exponent as it is later adjusted when re-scaling.
-        long xb = Double.doubleToRawLongBits(x);
-        int xe = getBiasedExponent(xb);
-        double xs;
-        if (xe == 0) {
-            // Sub-normal. Scale up and extract again
-            xs = x * 0x1.0p54;
-            xb = Double.doubleToRawLongBits(xs);
-            xe = getBiasedExponent(xb) - 54;
-        }
-        xs = getNormalisedFraction(xb);
-
-        long yb = Double.doubleToRawLongBits(y);
-        int ye = getBiasedExponent(yb);
-        double ys;
-        if (ye == 0) {
-            // Sub-normal. Scale up and extract again
-            ys = y * 0x1.0p54;
-            yb = Double.doubleToRawLongBits(ys);
-            ye = getBiasedExponent(yb) - 54;
-        }
-        ys = getNormalisedFraction(yb);
-
-        // Compute hi as x*y.
-        // Thus if the standard precision result is finite (as verified in the initial test
-        // on x * y) then the extended precision result will be.
-        double z = xs * ys;
-        double zz = productLowUnscaled(xs, ys, z);
-
-        // Re-scale. The result is currently in the range [0.25, 1) so no checks for
-        // 0, nan, inf (the result exponent will be -2 or -1).
-        // Both exponents are currently biased so subtract 1023 to get the biased scale.
-        int scale = xe + ye - 1023;
-        // Compute scaling by multiplication so we can scale both together.
-        // If a single multiplication to a normal number then handle here.
-        if (scale <= 2046 && scale > 0) {
-            // Convert to a normalized power of 2
-            final double d = Double.longBitsToDouble(((long) scale) << 52);
-            z *= d;
-            zz *= d;
-        } else {
-            // Delegate to java.util.Math
-            // We have to adjust the biased scale to unbiased using the exponent offset 1023.
-            scale -= 1023;
-            z = Math.scalb(z, scale);
-            zz = Math.scalb(zz, scale);
-        }
-
-        // Final result. The hi part should be same as the IEEE754 result.
-        // assert z == xy;
-        c.hi = z;
-        c.lo = zz;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -243,13 +202,7 @@ final class DoublePrecision {
      * @return true if the value is not normal
      */
     static boolean isNotNormal(double a) {
-        // Sub-normal numbers have a biased exponent of 0.
-        // Inf/NaN numbers have a biased exponent of 2047.
-        // Catch both cases by extracting the raw exponent, subtracting 1
-        // and compare unsigned (so 0 underflows to a large value).
-        final int baisedExponent = ((int) (Double.doubleToRawLongBits(a) >>> 52)) & EXP_MASK;
-        // Pre-compute the additions used by Integer.compareUnsigned
-        return baisedExponent + CMP_UNSIGNED_MINUS_1 >= CMP_UNSIGNED_2046;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -259,7 +212,7 @@ final class DoublePrecision {
      * @return the exponent
      */
     private static int getBiasedExponent(long bits) {
-        return (int)(bits >>> 52) & 0x7ff;
+        return (int) (bits >>> 52) & 0x7ff;
     }
 
     /**
@@ -300,28 +253,7 @@ final class DoublePrecision {
      * @return the high part of the value.
      */
     static double highPart(double value) {
-        // Avoid overflow
-        if (Math.abs(value) >= SAFE_UPPER) {
-            // Do scaling.
-            final double hi = highPartUnscaled(value * DOWN_SCALE) * UP_SCALE;
-            if (Double.isInfinite(hi)) {
-                // Number is too large.
-                // This occurs if value is infinite or close to Double.MAX_VALUE.
-                // Note that Dekker's split creates an approximating 26-bit number which may
-                // have an exponent 1 greater than the input value. This will overflow if the
-                // exponent is already +1023. Revert to the raw upper 26 bits of the 53-bit
-                // mantissa (including the assumed leading 1 bit). This conversion will result in
-                // the low part being a 27-bit significand and the potential loss of bits during
-                // addition and multiplication. (Contrast to the Dekker split which creates two
-                // 26-bit numbers with a bit of information moved to the sign of low.)
-                // The conversion will maintain Infinite in the high part where the resulting
-                // low part a_lo = a - a_hi = inf - inf = NaN.
-                return highPartSplit(value);
-            }
-            return hi;
-        }
-        // normal conversion
-        return highPartUnscaled(value);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -337,8 +269,7 @@ final class DoublePrecision {
      * @see Math#getExponent(double)
      */
     static double highPartUnscaled(double value) {
-        final double c = MULTIPLIER * value;
-        return c - (c - value);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -356,7 +287,7 @@ final class DoublePrecision {
      * @return the high part of the value.
      */
     static double highPartSplit(double value) {
-        return Double.longBitsToDouble(Double.doubleToRawLongBits(value) & ZERO_LOWER_27_BITS);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -391,53 +322,8 @@ final class DoublePrecision {
      * @see #productLow(double, double, double, double, double)
      */
     static double productLow(double x, double y, double xy) {
-        // Verify the input. This must be NaN safe.
-        //assert Double.compare(x * y, xy) == 0
-
-        // If the number is sub-normal, inf or nan there is no round-off.
-        if (isNotNormal(xy)) {
-            // Returns 0.0 for sub-normal xy, otherwise NaN for inf/nan:
-            return xy - xy;
-        }
-
-        // The result xy is finite and normal.
-        // Use Dekker's mul12 algorithm that splits the values into high and low parts.
-        // Dekker's split using multiplication will overflow if the value is within 2^27
-        // of double max value. It can also produce 26-bit approximations that are larger
-        // than the input numbers for the high part causing overflow in hx * hy when
-        // x * y does not overflow. So we must scale down big numbers.
-        // We only have to scale the largest number as we know the product does not overflow
-        // (if one is too big then the other cannot be).
-        // We also scale if the product is close to overflow to avoid intermediate overflow.
-        // This could be done at a higher limit (e.g. Math.abs(xy) > Double.MAX_VALUE / 4)
-        // but is included here to have a single low probability branch condition.
-
-        // Add the absolute inputs for a single comparison. The sum will not be more than
-        // 3-fold higher than any component.
-        final double a = Math.abs(x);
-        final double b = Math.abs(y);
-        final double ab = Math.abs(xy);
-        if (a + b + ab >= SAFE_UPPER) {
-            // Only required to scale the largest number as x*y does not overflow.
-            if (a > b) {
-                return productLowUnscaled(x * DOWN_SCALE, y, xy * DOWN_SCALE) * UP_SCALE;
-            }
-            return productLowUnscaled(x, y * DOWN_SCALE, xy * DOWN_SCALE) * UP_SCALE;
-        }
-
-        // The result is computed using a product of the low parts.
-        // To avoid underflow in the low parts we note that these are approximately a factor
-        // of 2^27 smaller than the original inputs so their product will be ~2^54 smaller
-        // than the product xy. Ensure the product is at least 2^54 above a sub-normal.
-        if (ab <= SAFE_LOWER) {
-            // Scaling up here is safe: the largest magnitude cannot be above SAFE_LOWER / MIN_VALUE.
-            return productLowUnscaled(x * UP_SCALE, y * UP_SCALE, xy * UP_SCALE2) * DOWN_SCALE2;
-        }
-
-        // No scaling required
-        return productLowUnscaled(x, y, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
-
 
     /**
      * Compute the low part of the double length number {@code (z,zz)} for the exact
@@ -471,44 +357,7 @@ final class DoublePrecision {
      * @see #productLow(double, double, double, double, double)
      */
     static double productLowS(double x, double y, double xy) {
-        // Verify the input. This must be NaN safe.
-        //assert Double.compare(x * y, xy) == 0
-
-        // If the number is sub-normal, inf or nan there is no round-off.
-        if (isNotNormal(xy)) {
-            // Returns 0.0 for sub-normal xy, otherwise NaN for inf/nan:
-            return xy - xy;
-        }
-
-        // The result xy is finite and normal.
-        // Use Dekker's mul12 algorithm that splits the values into high and low parts.
-        // Dekker's split using multiplication will overflow if the value is within 2^27
-        // of double max value. It can also produce 26-bit approximations that are larger
-        // than the input numbers for the high part causing overflow in hx * hy when
-        // x * y does not overflow. So we must scale down big numbers.
-        // We only have to scale the largest number as we know the product does not overflow
-        // (if one is too big then the other cannot be).
-        // We also scale if the product is close to overflow to avoid intermediate overflow.
-        // This could be done at a higher limit (e.g. Math.abs(xy) > Double.MAX_VALUE / 4)
-        // but is included here to have a single low probability branch condition.
-
-        // Add the absolute inputs for a single comparison. The sum will not be more than
-        // 3-fold higher than any component.
-
-        // Note: To drop a branch to check for upscaling, we use a lower threshold than
-        // SAFE_UPPER in productLow
-        final double a = Math.abs(x);
-        final double b = Math.abs(y);
-        if (a + b + Math.abs(xy) >= SAFE_UPPER_S) {
-            // Only required to scale the largest number as x*y does not overflow.
-            if (a > b) {
-                return productLowUnscaled(x * DOWN_SCALE, y, xy * DOWN_SCALE) * UP_SCALE;
-            }
-            return productLowUnscaled(x, y * DOWN_SCALE, xy * DOWN_SCALE) * UP_SCALE;
-        }
-
-        // Scaling up here is safe
-        return productLowUnscaled(x * UP_SCALE, y * UP_SCALE, xy * UP_SCALE2) * DOWN_SCALE2;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -543,41 +392,7 @@ final class DoublePrecision {
      * @see #productLow(double, double, double, double, double)
      */
     static double productLow0(double x, double y, double xy) {
-        // Verify the input. This must be NaN safe.
-        //assert Double.compare(x * y, xy) == 0
-
-        // If the number is sub-normal, inf or nan there is no round-off.
-        if (isNotNormal(xy)) {
-            // Returns 0.0 for sub-normal xy, otherwise NaN for inf/nan:
-            return xy - xy;
-        }
-
-        // The result xy is finite and normal.
-        // Use Dekker's mul12 algorithm that splits the values into high and low parts.
-        // Dekker's split using multiplication will overflow if the value is within 2^27
-        // of double max value. It can also produce 26-bit approximations that are larger
-        // than the input numbers for the high part causing overflow in hx * hy when
-        // x * y does not overflow. So we must scale down big numbers.
-        // We only have to scale the largest number as we know the product does not overflow
-        // (if one is too big then the other cannot be).
-        // We also scale if the product is close to overflow to avoid intermediate overflow.
-        // This could be done at a higher limit (e.g. Math.abs(xy) > Double.MAX_VALUE / 4)
-        // but is included here to have a single low probability branch condition.
-
-        // Add the absolute inputs for a single comparison. The sum will not be more than
-        // 3-fold higher than any component.
-        final double a = Math.abs(x);
-        final double b = Math.abs(y);
-        if (a + b + Math.abs(xy) >= SAFE_UPPER) {
-            // Only required to scale the largest number as x*y does not overflow.
-            if (a > b) {
-                return productLowUnscaled(x * DOWN_SCALE, y, xy * DOWN_SCALE) * UP_SCALE;
-            }
-            return productLowUnscaled(x, y * DOWN_SCALE, xy * DOWN_SCALE) * UP_SCALE;
-        }
-
-        // No scaling required
-        return productLowUnscaled(x, y, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -604,23 +419,9 @@ final class DoublePrecision {
      * @see #productLow(double, double, double, double, double)
      */
     static double productLow1(double x, double y, double xy) {
-        // Verify the input. This must be NaN safe.
-        //assert Double.compare(x * y, xy) == 0
-
-        // Logic as per productLow but with no check for sub-normal or NaN.
-        final double a = Math.abs(x);
-        final double b = Math.abs(y);
-        if (a + b + Math.abs(xy) >= SAFE_UPPER) {
-            // Only required to scale the largest number as x*y does not overflow.
-            if (a > b) {
-                return productLowUnscaled(x * DOWN_SCALE, y, xy * DOWN_SCALE) * UP_SCALE;
-            }
-            return productLowUnscaled(x, y * DOWN_SCALE, xy * DOWN_SCALE) * UP_SCALE;
-        }
-
-        // No scaling required
-        return productLowUnscaled(x, y, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
+
     /**
      * Compute the low part of the double length number {@code (z,zz)} for the exact
      * product of {@code x} and {@code y}. This is equivalent to computing a {@code double}
@@ -653,33 +454,7 @@ final class DoublePrecision {
      * @see #productLow(double, double, double, double, double)
      */
     static double productLow2(double x, double y, double xy) {
-        // Verify the input. This must be NaN safe.
-        //assert Double.compare(x * y, xy) == 0
-
-        // If the number is sub-normal, inf or nan there is no round-off.
-        if (isNotNormal(xy)) {
-            // Returns 0.0 for sub-normal xy, otherwise NaN for inf/nan:
-            return xy - xy;
-        }
-
-        // The result xy is finite and normal.
-        // Use Dekker's mul12 algorithm that splits the values into high and low parts.
-        // Dekker's split using multiplication will overflow if the value is within 2^27
-        // of double max value. It can also produce 26-bit approximations that are larger
-        // than the input numbers for the high part causing overflow in hx * hy when
-        // x * y does not overflow. So we must scale down big numbers.
-        // We only have to scale the largest number as we know the product does not overflow
-        // (if one is too big then the other cannot be).
-        // Also scale if the product is close to max value.
-
-        if (Math.abs(x) >= SAFE_UPPER) {
-            return productLowUnscaled(x * DOWN_SCALE, y, xy * DOWN_SCALE) * UP_SCALE;
-        }
-        if (Math.abs(y) >= SAFE_UPPER || Math.abs(xy) >= Double.MAX_VALUE / 4) {
-            return productLowUnscaled(x, y * DOWN_SCALE, xy * DOWN_SCALE) * UP_SCALE;
-        }
-        // No scaling required
-        return productLowUnscaled(x, y, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -706,14 +481,7 @@ final class DoublePrecision {
      * @see #productLow(double, double, double, double, double)
      */
     static double productLow3(double x, double y, double xy) {
-        // Split the numbers using Dekker's algorithm
-        final double hx = highPart(x);
-        final double lx = x - hx;
-
-        final double hy = highPart(y);
-        final double ly = y - hy;
-
-        return productLow(hx, lx, hy, ly, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -737,14 +505,7 @@ final class DoublePrecision {
      * @see #productLow(double, double, double, double, double)
      */
     static double productLowSplit(double x, double y, double xy) {
-        // Split the numbers using Dekker's algorithm
-        final double hx = highPartSplit(x);
-        final double lx = x - hx;
-
-        final double hy = highPartSplit(y);
-        final double ly = y - hy;
-
-        return productLow(hx, lx, hy, ly, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -764,14 +525,7 @@ final class DoublePrecision {
      * @see #productLow(double, double, double, double, double)
      */
     static double productLowUnscaled(double x, double y, double xy) {
-        // Split the numbers using Dekker's algorithm without scaling
-        final double hx = highPartUnscaled(x);
-        final double lx = x - hx;
-
-        final double hy = highPartUnscaled(y);
-        final double ly = y - hy;
-
-        return productLow(hx, lx, hy, ly, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -794,12 +548,7 @@ final class DoublePrecision {
      * Shewchuk (1997) Theorum 18</a>
      */
     static double productLow(double hx, double lx, double hy, double ly, double xy) {
-        // Compute the multiply low part:
-        // err1 = xy - hx * hy
-        // err2 = err1 - lx * hy
-        // err3 = err2 - hx * ly
-        // low = lx * ly - err3
-        return lx * ly - (((xy - hx * hy) - lx * hy) - hx * ly);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -822,9 +571,7 @@ final class DoublePrecision {
      * @return The round-off from the sum (x + y) = s
      */
     static double sumLow(double x, double xx, double y, double yy, double r) {
-        return Math.abs(x) > Math.abs(y) ?
-                x - r + y + yy + xx :
-                y - r + x + xx + yy;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -840,9 +587,7 @@ final class DoublePrecision {
      * Shewchuk (1997) Theorum 6</a>
      */
     static double fastTwoSumLow(double a, double b, double sum) {
-        // bVirtual = sum - a
-        // b - bVirtual == b round-off
-        return b - (sum - a);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -858,10 +603,6 @@ final class DoublePrecision {
      * Shewchuk (1997) Theorum 7</a>
      */
     static double twoSumLow(double a, double b, double sum) {
-        final double bVirtual = sum - a;
-        // sum - bVirtual == aVirtual.
-        // a - aVirtual == a round-off
-        // b - bVirtual == b round-off
-        return (a - (sum - bVirtual)) + (b - bVirtual);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

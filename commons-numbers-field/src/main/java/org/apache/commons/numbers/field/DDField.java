@@ -24,11 +24,17 @@ import org.apache.commons.numbers.core.DD;
  * @since 1.2
  */
 public final class DDField extends AbstractField<DD> {
-    /** Singleton. */
+
+    /**
+     * Singleton.
+     */
     private static final DDField INSTANCE = new DDField();
 
-    /** Singleton. */
-    private DDField() {}
+    /**
+     * Singleton.
+     */
+    private DDField() {
+    }
 
     /**
      * Get the field instance.
@@ -36,18 +42,22 @@ public final class DDField extends AbstractField<DD> {
      * @return the field instance.
      */
     public static DDField get() {
-        return INSTANCE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DD one() {
-        return DD.ONE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public DD zero() {
-        return DD.ZERO;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

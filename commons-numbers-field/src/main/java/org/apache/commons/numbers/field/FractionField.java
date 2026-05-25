@@ -22,11 +22,17 @@ import org.apache.commons.numbers.fraction.Fraction;
  * {@link Fraction} field.
  */
 public final class FractionField extends AbstractField<Fraction> {
-    /** Singleton. */
+
+    /**
+     * Singleton.
+     */
     private static final FractionField INSTANCE = new FractionField();
 
-    /** Singleton. */
-    private FractionField() {}
+    /**
+     * Singleton.
+     */
+    private FractionField() {
+    }
 
     /**
      * Get the field instance.
@@ -34,18 +40,22 @@ public final class FractionField extends AbstractField<Fraction> {
      * @return the field instance.
      */
     public static FractionField get() {
-        return INSTANCE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Fraction one() {
-        return Fraction.ONE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Fraction zero() {
-        return Fraction.ZERO;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

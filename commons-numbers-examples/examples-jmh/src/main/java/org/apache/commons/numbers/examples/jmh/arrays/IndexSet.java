@@ -42,26 +42,48 @@ import java.util.function.IntConsumer;
  * @since 1.2
  */
 final class IndexSet implements PivotCache, SearchableInterval, SearchableInterval2 {
-    /** All 64-bits bits set. */
+
+    /**
+     * All 64-bits bits set.
+     */
     private static final long LONG_MASK = -1L;
-    /** A bit shift to apply to an integer to divided by 64 (2^6). */
+
+    /**
+     * A bit shift to apply to an integer to divided by 64 (2^6).
+     */
     private static final int DIVIDE_BY_64 = 6;
-    /** Default value for an unset upper floating pivot.
-     * Set as a value higher than any valid array index. */
+
+    /**
+     * Default value for an unset upper floating pivot.
+     * Set as a value higher than any valid array index.
+     */
     private static final int UPPER_DEFAULT = Integer.MAX_VALUE;
 
-    /** Bit indexes. */
+    /**
+     * Bit indexes.
+     */
     private final long[] data;
 
-    /** Left bound of the support. */
+    /**
+     * Left bound of the support.
+     */
     private final int left;
-    /** Right bound of the support. */
+
+    /**
+     * Right bound of the support.
+     */
     private final int right;
-    /** The upstream pivot closest to the left bound of the support.
-     * Provides a lower search bound for the range [left, right]. */
+
+    /**
+     * The upstream pivot closest to the left bound of the support.
+     * Provides a lower search bound for the range [left, right].
+     */
     private int lowerPivot = -1;
-    /** The downstream pivot closest to the right bound of the support.
-     * Provides an upper search bound for the range [left, right]. */
+
+    /**
+     * The downstream pivot closest to the right bound of the support.
+     * Provides an upper search bound for the range [left, right].
+     */
     private int upperPivot = UPPER_DEFAULT;
 
     /**
@@ -89,11 +111,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @throws IllegalArgumentException if {@code right < left}
      */
     static IndexSet ofRange(int left, int right) {
-        if (left < 0) {
-            throw new IllegalArgumentException("Invalid lower index: " + left);
-        }
-        checkRange(left, right);
-        return new IndexSet(left, right);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -105,7 +123,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @throws IllegalArgumentException if {@code indices.length == 0}
      */
     static IndexSet of(int[] indices) {
-        return of(indices, indices.length);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -118,20 +136,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @throws IllegalArgumentException if {@code n == 0}
      */
     static IndexSet of(int[] indices, int n) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("No indices to define the range");
-        }
-        int min = indices[0];
-        int max = min;
-        for (int i = 1; i < n; i++) {
-            min = Math.min(min, indices[i]);
-            max = Math.max(max, indices[i]);
-        }
-        final IndexSet set = IndexSet.ofRange(min, max);
-        for (int i = 0; i < n; i++) {
-            set.set(indices[i]);
-        }
-        return set;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -150,7 +155,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the memory footprint
      */
     static long memoryFootprint(int left, int right) {
-        return (getLongIndex(right - left) + 1L) * Long.BYTES;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -198,7 +203,6 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
     }
 
     // Compressed cardinality methods
-
     /**
      * Returns the number of bits set to {@code true} in this {@code IndexSet} using a
      * compression of 2 to 1. This counts as enabled <em>all</em> bits of each consecutive
@@ -213,15 +217,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * compression of 2 to 1
      */
     public int cardinality2() {
-        int c = 0;
-        for (long x : data) {
-            // Shift and mask out the bits that were shifted
-            x = (x | (x >>> 1)) & 0b0101010101010101010101010101010101010101010101010101010101010101L;
-            // Add [0, 32]
-            c += Long.bitCount(x);
-        }
-        // Multiply by 2
-        return c << 1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -238,17 +234,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * of 8 to 1
      */
     public int cardinality4() {
-        int c = 0;
-        for (long x : data) {
-            // Shift powers of 2 and mask out the bits that were shifted
-            x = x | (x >>> 1);
-            x = (x | (x >>> 2)) & 0b0001000100010001000100010001000100010001000100010001000100010001L;
-            // Expect a population count intrinsic method
-            // Add [0, 16]
-            c += Long.bitCount(x);
-        }
-        // Multiply by 4
-        return c << 2;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -265,18 +251,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * of 8 to 1
      */
     public int cardinality8() {
-        int c = 0;
-        for (long x : data) {
-            // Shift powers of 2 and mask out the bits that were shifted
-            x = x | (x >>> 1);
-            x = x | (x >>> 2);
-            x = (x | (x >>> 4)) & 0b0000000100000001000000010000000100000001000000010000000100000001L;
-            // Expect a population count intrinsic method
-            // Add [0, 8]
-            c += Long.bitCount(x);
-        }
-        // Multiply by 8
-        return c << 3;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -293,24 +268,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * of 16 to 1
      */
     public int cardinality16() {
-        int c = 0;
-        for (long x : data) {
-            // Shift powers of 2 and mask out the bits that were shifted
-            x = x | (x >>> 1);
-            x = x | (x >>> 2);
-            x = x | (x >>> 4);
-            x = (x | (x >>> 8)) & 0b0000000000000001000000000000000100000000000000010000000000000001L;
-            // Count the bits using folding
-            // if x = mask:
-            // (x += (x >>> 16)) : 0000000000000001000000000000001000000000000000100000000000000010
-            // (x += (x >>> 32)) : 0000000100000001000000100000001000000011000000110000010000000100
-            x = x + (x >>> 16); // put count of each 32 bits into their lowest 2 bits
-            x = x + (x >>> 32); // put count of each 64 bits into their lowest 3 bits
-            // Add [0, 4]
-            c += (int) x & 0b111;
-        }
-        // Multiply by 16
-        return c << 4;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -327,14 +285,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * of 32 to 1
      */
     public int cardinality32() {
-        int c = 0;
-        for (final long x : data) {
-            // Are any lower 32-bits or upper 32-bits set?
-            c += (int) x != 0 ? 1 : 0;
-            c += (x >>> 32) != 0L ? 1 : 0;
-        }
-        // Multiply by 32
-        return c << 5;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -351,28 +302,17 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * of 64 to 1
      */
     public int cardinality64() {
-        int c = 0;
-        for (final long x : data) {
-            // Are any bits set?
-            c += x != 0L ? 1 : 0;
-        }
-        // Multiply by 64
-        return c << 6;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Adapt method API from BitSet
-
     /**
      * Returns the number of bits set to {@code true} in this {@code IndexSet}.
      *
      * @return the number of bits set to {@code true} in this {@code IndexSet}
      */
     public int cardinality() {
-        int c = 0;
-        for (final long x : data) {
-            c += Long.bitCount(x);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -382,11 +322,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the value of the bit with the specified index
      */
     public boolean get(int bitIndex) {
-        // WARNING: No range checks !!!
-        final int index = bitIndex - left;
-        final int i = getLongIndex(index);
-        final long m = getLongBit(index);
-        return (data[i] & m) != 0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -398,11 +334,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @param bitIndex the bit index (assumed to be positive)
      */
     public void set(int bitIndex) {
-        // WARNING: No range checks !!!
-        final int index = bitIndex - left;
-        final int i = getLongIndex(index);
-        final long m = getLongBit(index);
-        data[i] |= m;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -421,36 +353,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @param rightIndex the right index
      */
     public void set(int leftIndex, int rightIndex) {
-        final int l = leftIndex - left;
-        final int r = rightIndex - left;
-
-        // WARNING: No range checks !!!
-        int i = getLongIndex(l);
-        final int j = getLongIndex(r);
-
-        // Fill in bits using (big-endian mask):
-        // end      middle   start
-        // 00011111 11111111 11111100
-
-        // start = -1L << (left % 64)
-        // end = -1L >>> (64 - ((right+1) % 64))
-        final long start = LONG_MASK << l;
-        final long end = LONG_MASK >>> -(r + 1);
-        if (i == j) {
-            // Special case where the two masks overlap at the same long index
-            // 11111100 & 00011111 => 00011100
-            data[i] |= start & end;
-        } else {
-            // 11111100
-            data[i] |= start;
-            while (++i < j) {
-                // 11111111
-                // Note: -1L is all bits set
-                data[i] = -1L;
-            }
-            // 00011111
-            data[j] |= end;
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -461,7 +364,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the index of the previous set bit, or {@code -1} if there is no such bit
      */
     public int previousSetBit(int fromIndex) {
-        return previousSetBitOrElse(fromIndex, -1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -474,36 +377,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the index of the previous set bit, or {@code defaultValue} if there is no such bit
      */
     int previousSetBitOrElse(int fromIndex, int defaultValue) {
-        if (fromIndex < left) {
-            // index is in an unknown range
-            return defaultValue;
-        }
-        final int index = fromIndex - left;
-        int i = getLongIndex(index);
-
-        long bits = data[i];
-
-        // Repeat logic of get(int) to check the bit
-        if ((bits & getLongBit(index)) != 0) {
-            return fromIndex;
-        }
-
-        // Mask bits before the bit index
-        // mask = 00011111 = -1L >>> (64 - ((index + 1) % 64))
-        bits &= LONG_MASK >>> -(index + 1);
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |  index   |
-                // |    |     |
-                // 0  001010000
-                return (i + 1) * Long.SIZE - Long.numberOfLeadingZeros(bits) - 1 + left;
-            }
-            if (i == 0) {
-                return defaultValue;
-            }
-            bits = data[--i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -515,7 +389,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the index of the next set bit, or {@code -1} if there is no such bit
      */
     public int nextSetBit(int fromIndex) {
-        return nextSetBitOrElse(fromIndex, -1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -528,27 +402,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the index of the next set bit, or {@code defaultValue} if there is no such bit
      */
     int nextSetBitOrElse(int fromIndex, int defaultValue) {
-        // Support searching forward through the known range
-        final int index = fromIndex < left ? 0 : fromIndex - left;
-
-        int i = getLongIndex(index);
-
-        // Mask bits after the bit index
-        // mask = 11111000 = -1L << (index % 64)
-        long bits = data[i] & (LONG_MASK << index);
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |    index |
-                // |      |   |
-                // 0  001010000
-                return i * Long.SIZE + Long.numberOfTrailingZeros(bits) + left;
-            }
-            if (++i == data.length) {
-                return defaultValue;
-            }
-            bits = data[i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -563,31 +417,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the index of the next unset bit, or the {@code capacity} if there is no such bit
      */
     public int nextClearBit(int fromIndex) {
-        if (fromIndex < left) {
-            return fromIndex;
-        }
-        // Support searching forward through the known range
-        final int index = fromIndex - left;
-
-        int i = getLongIndex(index);
-
-        // Note: This method is conceptually the same as nextSetBit with the exception
-        // that: all the data is bit-flipped; the capacity is returned when the
-        // scan reaches the end.
-
-        // Mask bits after the bit index
-        // mask = 11111000 = -1L << (fromIndex % 64)
-        long bits = ~data[i] & (LONG_MASK << index);
-        for (;;) {
-            if (bits != 0) {
-                return i * Long.SIZE + Long.numberOfTrailingZeros(bits) + left;
-            }
-            if (++i == data.length) {
-                // Capacity
-                return data.length * Long.SIZE + left;
-            }
-            bits = ~data[i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -602,33 +432,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the index of the previous unset bit, or {@code -1} if there is no such bit
      */
     public int previousClearBit(int fromIndex) {
-        if (fromIndex < left) {
-            // index is in an unknown range
-            return fromIndex;
-        }
-        final int index = fromIndex - left;
-        int i = getLongIndex(index);
-
-        // Note: This method is conceptually the same as previousSetBit with the exception
-        // that: all the data is bit-flipped; the offset - 1 is returned when the
-        // scan reaches the end.
-
-        // Mask bits before the bit index
-        // mask = 00011111 = -1L >>> (64 - ((index + 1) % 64))
-        long bits = ~data[i] & (LONG_MASK >>> -(index + 1));
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |  index   |
-                // |    |     |
-                // 0  001010000
-                return (i + 1) * Long.SIZE - Long.numberOfLeadingZeros(bits) - 1 + left;
-            }
-            if (i == 0) {
-                return left - 1;
-            }
-            bits = ~data[--i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -637,20 +441,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @param action Action.
      */
     public void forEach(IntConsumer action) {
-        // Adapted from o.a.c.collections4.IndexProducer
-        int wordIdx = left;
-        for (int i = 0; i < data.length; i++) {
-            long bits = data[i];
-            int index = wordIdx;
-            while (bits != 0) {
-                if ((bits & 1L) == 1L) {
-                    action.accept(index);
-                }
-                bits >>>= 1;
-                index++;
-            }
-            wordIdx += Long.SIZE;
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -666,19 +457,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @see #of(int[], int)
      */
     public int toArray(int[] a) {
-        // This benchmarks as faster for index sorting than toArray2 even at
-        // high density (average separation of 2).
-        int n = -1;
-        int offset = left;
-        for (long bits : data) {
-            while (bits != 0) {
-                final int index = Long.numberOfTrailingZeros(bits);
-                a[++n] = index + offset;
-                bits &= ~(1L << index);
-            }
-            offset += Long.SIZE;
-        }
-        return n + 1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -694,200 +473,90 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @see #of(int[], int)
      */
     public int toArray2(int[] a) {
-        // Adapted from o.a.c.collections4.IndexProducer
-        int n = -1;
-        for (int i = 0, offset = left; i < data.length; i++, offset += Long.SIZE) {
-            long bits = data[i];
-            int index = offset;
-            while (bits != 0) {
-                if ((bits & 1L) == 1L) {
-                    a[++n] = index;
-                }
-                bits >>>= 1;
-                index++;
-            }
-        }
-        return n + 1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // PivotCache interface
-
     @Override
     public int left() {
-        return left;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int right() {
-        return right;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public boolean sparse() {
-        // Can store all pivots between [left, right]
-        return false;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public boolean contains(int k) {
-        // Assume [left <= k <= right]
-        return get(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public void add(int index) {
-        // Update the floating pivots if outside the support
-        if (index < left) {
-            lowerPivot = Math.max(index, lowerPivot);
-        } else if (index > right) {
-            upperPivot = Math.min(index, upperPivot);
-        } else {
-            set(index);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public void add(int fromIndex, int toIndex) {
-        // Optimisation for the main use case of the PivotCache
-        if (fromIndex == toIndex) {
-            add(fromIndex);
-            return;
-        }
-
-        // Note:
-        // Storing all pivots allows regions of identical values
-        // and sorted regions to be skipped in subsequent partitioning.
-        // Repeat sorting these regions is typically more expensive
-        // than caching them and moving over them during partitioning.
-        // An alternative is to: store fromIndex and only store
-        // toIndex if they are well separated, optionally storing
-        // regions between. If they are not well separated (e.g. < 10)
-        // then using a single pivot is an alternative to investigate
-        // with performance benchmarks on a range of input data.
-
-        // Pivots are required to bracket [L, R]:
-        // LP-----L--------------R------UP
-        // If the range [i, j] overlaps either L or R then
-        // the floating pivots are no longer required:
-        //     i-j                             Set lower pivot
-        //     i--------j                      Ignore lower pivot
-        //     i---------------------j         Ignore lower & upper pivots (no longer required)
-        //           i-------j                 Ignore lower & upper pivots
-        //           i---------------j         Ignore upper pivot
-        //                         i-j         Set upper pivot
-        if (fromIndex <= right && toIndex >= left) {
-            // Clip the range between [left, right]
-            final int i = Math.max(fromIndex, left);
-            final int j = Math.min(toIndex, right);
-            set(i, j);
-        } else if (toIndex < left) {
-            lowerPivot = Math.max(toIndex, lowerPivot);
-        } else {
-            // fromIndex > right
-            upperPivot = Math.min(fromIndex, upperPivot);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int previousPivot(int k) {
-        // Assume scanning in [left <= k <= right]
-        return previousSetBitOrElse(k, lowerPivot);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int nextPivotOrElse(int k, int other) {
-        // Assume scanning in [left <= k <= right]
-        final int p = upperPivot == UPPER_DEFAULT ? other : upperPivot;
-        return nextSetBitOrElse(k, p);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // IndexInterval
-
     @Override
     public int previousIndex(int k) {
-        // Re-implement previousSetBitOrElse without index checks
-        // as this supports left <= k <= right
-
-        final int index = k - left;
-        int i = getLongIndex(index);
-
-        // Mask bits before the bit index
-        // mask = 00011111 = -1L >>> (64 - ((index + 1) % 64))
-        long bits = data[i] & (LONG_MASK >>> -(index + 1));
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |  index   |
-                // |    |     |
-                // 0  001010000
-                return (i + 1) * Long.SIZE - Long.numberOfLeadingZeros(bits) - 1 + left;
-            }
-            // Unsupported: the interval should contain k
-            //if (i == 0) {
-            //    return left - 1;
-            //}
-            bits = data[--i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int nextIndex(int k) {
-        // Re-implement nextSetBitOrElse without index checks
-        // as this supports left <= k <= right
-
-        final int index = k - left;
-        int i = getLongIndex(index);
-
-        // Mask bits after the bit index
-        // mask = 11111000 = -1L << (index % 64)
-        long bits = data[i] & (LONG_MASK << index);
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |    index |
-                // |      |   |
-                // 0  001010000
-                return i * Long.SIZE + Long.numberOfTrailingZeros(bits) + left;
-            }
-            // Unsupported: the interval should contain k
-            //if (++i == data.length) {
-            //    return right + 1;
-            //}
-            bits = data[++i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // No override for split.
     // This requires searching for previousIndex(k - 1) and nextIndex(k + 1).
     // The only shared code is getLongIndex(x - left). Since argument indices are 2 apart
     // these will map to a different long with a probability of 1/32.
-
     // IndexInterval2
     // This is exactly the same as IndexInterval as the pointers i are the same as the keys k
-
     @Override
     public int start() {
-        return left();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int end() {
-        return right();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int index(int i) {
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int previous(int i, int k) {
-        return previousIndex(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int next(int i, int k) {
-        return nextIndex(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -921,7 +590,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * supported.
      */
     ScanningPivotCache asScanningPivotCache(int lower, int upper) {
-        return asScanningPivotCache(lower, upper, true);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -936,8 +605,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @throws IllegalArgumentException if {@code right < left}
      */
     static ScanningPivotCache createScanningPivotCache(int left, int right) {
-        final IndexSet set = ofRange(left, right);
-        return set.asScanningPivotCache(left, right, false);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -956,9 +624,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
             checkRange(lower, upper);
             final int capacity = data.length * Long.SIZE + lower;
             if (lower < left || upper >= capacity) {
-                throw new IllegalArgumentException(
-                    String.format("Unsupported range: [%d, %d] is not within [%d, %d]", lower, upper,
-                        left, capacity - 1));
+                throw new IllegalArgumentException(String.format("Unsupported range: [%d, %d] is not within [%d, %d]", lower, upper, left, capacity - 1));
             }
             // Clear existing data
             Arrays.fill(data, 0);
@@ -973,7 +639,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * @return the interval
      */
     UpdatingInterval interval() {
-        return new IndexSetUpdatingInterval(left, right);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -985,8 +651,7 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      */
     private static void checkRange(int left, int right) {
         if (right < left) {
-            throw new IllegalArgumentException(
-                String.format("Invalid range: [%d, %d]", left, right));
+            throw new IllegalArgumentException(String.format("Invalid range: [%d, %d]", left, right));
         }
     }
 
@@ -1008,15 +673,27 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * Creation will zero the underlying storage and the range may be different.
      */
     private class IndexPivotCache implements ScanningPivotCache {
-        /** Left bound of the support. */
+
+        /**
+         * Left bound of the support.
+         */
         private int left;
-        /** Right bound of the support. */
+
+        /**
+         * Right bound of the support.
+         */
         private final int right;
-        /** The upstream pivot closest to the left bound of the support.
-         * Provides a lower search bound for the range [left, right]. */
+
+        /**
+         * The upstream pivot closest to the left bound of the support.
+         * Provides a lower search bound for the range [left, right].
+         */
         private int lowerPivot = -1;
-        /** The downstream pivot closest to the right bound of the support.
-         * Provides an upper search bound for the range [left, right]. */
+
+        /**
+         * The downstream pivot closest to the right bound of the support.
+         * Provides an upper search bound for the range [left, right].
+         */
         private int upperPivot = UPPER_DEFAULT;
 
         /**
@@ -1030,125 +707,57 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
 
         @Override
         public int left() {
-            return left;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int right() {
-            return right;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean sparse() {
-            // Can store all pivots between [left, right]
-            return false;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean moveLeft(int newLeft) {
-            if (newLeft > right) {
-                // Signal that this cache can no longer be used in that range
-                return false;
-            }
-            if (newLeft < left) {
-                throw new UnsupportedOperationException(
-                    String.format("New left is outside current support: %d < %d", newLeft, left));
-            }
-            // Here [left <= newLeft <= right]
-            // Move the upstream pivot
-            lowerPivot = previousPivot(newLeft);
-            left = newLeft;
-            return true;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean contains(int k) {
-            // Assume [left <= k <= right]
-            return IndexSet.this.get(k);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int previousPivot(int k) {
-            // Assume scanning in [left <= k <= right]
-            // Here left is moveable and lower pivot holds the last pivot below it.
-            // The cache will not store any bits below left so if it has moved
-            // searching may find stale bits below the current lower pivot.
-            // So we return the max of the found bit or the lower pivot.
-            if (k < left) {
-                return lowerPivot;
-            }
-            return Math.max(lowerPivot, IndexSet.this.previousSetBitOrElse(k, lowerPivot));
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int nextPivotOrElse(int k, int other) {
-            // Assume scanning in [left <= k <= right]
-            final int p = upperPivot == UPPER_DEFAULT ? other : upperPivot;
-            return IndexSet.this.nextSetBitOrElse(k, p);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int nextNonPivot(int k) {
-            // Assume scanning in [left <= k <= right]
-            return IndexSet.this.nextClearBit(k);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int previousNonPivot(int k) {
-            // Assume scanning in [left <= k <= right]
-            return IndexSet.this.previousClearBit(k);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public void add(int index) {
-            // Update the floating pivots if outside the support
-            if (index < left) {
-                lowerPivot = Math.max(index, lowerPivot);
-            } else if (index > right) {
-                upperPivot = Math.min(index, upperPivot);
-            } else {
-                IndexSet.this.set(index);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public void add(int fromIndex, int toIndex) {
-            if (fromIndex == toIndex) {
-                add(fromIndex);
-                return;
-            }
-            // Note:
-            // Storing all pivots allows regions of identical values
-            // and sorted regions to be skipped in subsequent partitioning.
-            // Repeat sorting these regions is typically more expensive
-            // than caching them and moving over them during partitioning.
-            // An alternative is to: store fromIndex and only store
-            // toIndex if they are well separated, optionally storing
-            // regions between. If they are not well separated (e.g. < 10)
-            // then using a single pivot is an alternative to investigate
-            // with performance benchmarks on a range of input data.
-
-            // Pivots are required to bracket [L, R]:
-            // LP-----L--------------R------UP
-            // If the range [i, j] overlaps either L or R then
-            // the floating pivots are no longer required:
-            //     i-j                             Set lower pivot
-            //     i--------j                      Ignore lower pivot
-            //     i---------------------j         Ignore lower & upper pivots (no longer required)
-            //           i-------j                 Ignore lower & upper pivots
-            //           i---------------j         Ignore upper pivot
-            //                         i-j         Set upper pivot
-            if (fromIndex <= right && toIndex >= left) {
-                // Clip the range between [left, right]
-                final int i = Math.max(fromIndex, left);
-                final int j = Math.min(toIndex, right);
-                IndexSet.this.set(i, j);
-            } else if (toIndex < left) {
-                lowerPivot = Math.max(toIndex, lowerPivot);
-            } else {
-                // fromIndex > right
-                upperPivot = Math.min(fromIndex, upperPivot);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -1159,9 +768,15 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
      * the functionality to search indexes.
      */
     private class IndexSetUpdatingInterval implements UpdatingInterval {
-        /** Left bound of the interval. */
+
+        /**
+         * Left bound of the interval.
+         */
         private int left;
-        /** Right bound of the interval. */
+
+        /**
+         * Right bound of the interval.
+         */
         private int right;
 
         /**
@@ -1175,40 +790,32 @@ final class IndexSet implements PivotCache, SearchableInterval, SearchableInterv
 
         @Override
         public int left() {
-            return left;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int right() {
-            return right;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int updateLeft(int k) {
-            // Assume left < k= < right
-            return left = nextIndex(k);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int updateRight(int k) {
-            // Assume left <= k < right
-            return right = previousIndex(k);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public UpdatingInterval splitLeft(int ka, int kb) {
-            // Assume left < ka <= kb < right
-            final int lower = left;
-            left = nextIndex(kb + 1);
-            return new IndexSetUpdatingInterval(lower, previousIndex(ka - 1));
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public UpdatingInterval splitRight(int ka, int kb) {
-            // Assume left < ka <= kb < right
-            final int upper = right;
-            right = previousIndex(ka - 1);
-            return new IndexSetUpdatingInterval(nextIndex(kb + 1), upper);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

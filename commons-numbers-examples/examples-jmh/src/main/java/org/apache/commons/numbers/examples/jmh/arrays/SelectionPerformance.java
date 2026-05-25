@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.arrays;
 
 import java.util.ArrayList;
@@ -60,17 +59,32 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-server", "-Xms512M", "-Xmx8192M"})
+@Fork(value = 1, jvmArgs = { "-server", "-Xms512M", "-Xmx8192M" })
 public class SelectionPerformance {
-    /** Use the JDK sort function. */
+
+    /**
+     * Use the JDK sort function.
+     */
     private static final String JDK = "JDK";
-    /** Use a sort function. */
+
+    /**
+     * Use a sort function.
+     */
     private static final String SORT = "Sort";
-    /** Baseline for the benchmark. */
+
+    /**
+     * Baseline for the benchmark.
+     */
     private static final String BASELINE = "Baseline";
-    /** Selection method using a heap. */
+
+    /**
+     * Selection method using a heap.
+     */
     private static final String HEAP_SELECT = "HeapSelect";
-    /** Selection method using a sort. */
+
+    /**
+     * Selection method using a sort.
+     */
     private static final String SORT_SELECT = "SortSelect";
 
     // First generation partition functions.
@@ -78,39 +92,64 @@ public class SelectionPerformance {
     // - Single k or a pair of indices (k,k+1) are selected in a single
     // call; multiple indices cache pivots in a heap structure or use a BitSet.
     // - They dynamically correct signed zeros when they are encountered.
-
-    /** Single-pivot partitioning. This method uses a special comparison of double
+    /**
+     * Single-pivot partitioning. This method uses a special comparison of double
      * values similar to {@link Double#compare(double, double)}. This handles
-     * NaN and signed zeros. */
+     * NaN and signed zeros.
+     */
     private static final String SP = "SP";
-    /** Single-pivot partitioning; uses a BitSet to cache pivots. */
+
+    /**
+     * Single-pivot partitioning; uses a BitSet to cache pivots.
+     */
     private static final String SPN = "SPN";
-    /** Single-pivot partitioning using a heap to cache pivots.
-     * This method is copied from Commons Math. */
+
+    /**
+     * Single-pivot partitioning using a heap to cache pivots.
+     * This method is copied from Commons Math.
+     */
     private static final String SPH = "SPH";
-    /** Bentley-McIlroy partitioning (Sedgewick); uses a BitSet to cache pivots. */
+
+    /**
+     * Bentley-McIlroy partitioning (Sedgewick); uses a BitSet to cache pivots.
+     */
     private static final String SBM = "SBM";
-    /** Bentley-McIlroy partitioning (original); uses a BitSet to cache pivots. */
+
+    /**
+     * Bentley-McIlroy partitioning (original); uses a BitSet to cache pivots.
+     */
     private static final String BM = "BM";
-    /** Dual-pivot partitioning; uses a BitSet to cache pivots. */
+
+    /**
+     * Dual-pivot partitioning; uses a BitSet to cache pivots.
+     */
     private static final String DP = "DP";
-    /** Dual-pivot partitioning with 5 sorted points to choose pivots; uses a BitSet to cache pivots. */
+
+    /**
+     * Dual-pivot partitioning with 5 sorted points to choose pivots; uses a BitSet to cache pivots.
+     */
     private static final String DP5 = "5DP";
 
     // Second generation partition functions.
     // These pre-process data to sort NaN to the end and count signed zeros;
     // post-processing is performed to restore signed zeros in order.
     // The exception is SBM2 which dynamically corrects signed zeros.
-
-    /** Bentley-McIlroy partitioning (Sedgewick). This second generation function
+    /**
+     * Bentley-McIlroy partitioning (Sedgewick). This second generation function
      * dynamically corrects signed zeros when they are encountered. It is based on
      * the fastest first generation method with changes to allow different pivot
-     * store strategies: SEQUENTIAL, INDEX_SET, PIVOT_CACHE. */
+     * store strategies: SEQUENTIAL, INDEX_SET, PIVOT_CACHE.
+     */
     private static final String SBM2 = "2SBM";
 
-    /** Floyd-Rivest partitioning. Only for single k. */
+    /**
+     * Floyd-Rivest partitioning. Only for single k.
+     */
     private static final String FR = "FR";
-    /** Floyd-Rivest partitioning (Kiwiel). Only for a single k. */
+
+    /**
+     * Floyd-Rivest partitioning (Kiwiel). Only for a single k.
+     */
     private static final String KFR = "KFR";
 
     // Introselect functions - switch to a stopper function when progress is poor.
@@ -122,32 +161,50 @@ public class SelectionPerformance {
     // stopper strategy (Partition.StopperStrategy).
     // Parameters to control strategies and introspection are set using the name parameter.
     // See PartitionFactory for details.
-
-    /** Introselect implementation with single-pivot partitioning. */
+    /**
+     * Introselect implementation with single-pivot partitioning.
+     */
     private static final String ISP = "ISP";
-    /** Introselect implementation with dual-pivot partitioning. */
+
+    /**
+     * Introselect implementation with dual-pivot partitioning.
+     */
     private static final String IDP = "IDP";
 
     // Single k selection using various methods which provide linear runtime (Order(n)).
-
-    /** Linearselect implementation with single pivot partitioning using median-of-medians-of-5
-     * for pivot selection. */
+    /**
+     * Linearselect implementation with single pivot partitioning using median-of-medians-of-5
+     * for pivot selection.
+     */
     private static final String LSP = "LSP";
-    /** Linearselect implementation with single pivot partitioning using optimised
-     * median-of-medians. */
+
+    /**
+     * Linearselect implementation with single pivot partitioning using optimised
+     * median-of-medians.
+     */
     private static final String LINEAR = "Linear";
-    /** Quickselect adaptive implementation. Has configuration of the far-step method and some
-     * adaption modes. */
+
+    /**
+     * Quickselect adaptive implementation. Has configuration of the far-step method and some
+     * adaption modes.
+     */
     private static final String QA = "QA";
-    /** Quickselect adaptive implementation. Uses the best performing far-step method and
-     * has configurable adaption control allowing starting at and skipping over adaption modes. */
+
+    /**
+     * Quickselect adaptive implementation. Uses the best performing far-step method and
+     * has configurable adaption control allowing starting at and skipping over adaption modes.
+     */
     private static final String QA2 = "QA2";
 
-    /** Commons Numbers select implementation. This method is built using the best performing
-     * select function across a range of input data. This algorithm cannot be configured. */
+    /**
+     * Commons Numbers select implementation. This method is built using the best performing
+     * select function across a range of input data. This algorithm cannot be configured.
+     */
     private static final String SELECT = "SELECT";
 
-    /** Random source. */
+    /**
+     * Random source.
+     */
     private static final RandomSource RANDOM_SOURCE = RandomSource.XO_RO_SHI_RO_128_PP;
 
     /**
@@ -212,76 +269,121 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public abstract static class AbstractDataSource {
-        /** All distributions / modifications. */
+
+        /**
+         * All distributions / modifications.
+         */
         private static final String ALL = "all";
-        /** All distributions / modifications in the Bentley and McIlroy test suite. */
+
+        /**
+         * All distributions / modifications in the Bentley and McIlroy test suite.
+         */
         private static final String BM = "bm";
-        /** All distributions in the Valois test suite. These currently ignore the seed.
-         * To replicate Valois used a fixed seed and the copy modification. */
+
+        /**
+         * All distributions in the Valois test suite. These currently ignore the seed.
+         * To replicate Valois used a fixed seed and the copy modification.
+         */
         private static final String VALOIS = "valois";
-        /** Flag to determine if the data size should be logged. This is useful to be
+
+        /**
+         * Flag to determine if the data size should be logged. This is useful to be
          * able to determine the execution time per sample when the number of samples
-         * is dynamically created based on the data length, range and seed. */
+         * is dynamically created based on the data length, range and seed.
+         */
         private static final AtomicInteger LOG_SIZE = new AtomicInteger();
 
         /**
          * The type of distribution.
          */
         enum Distribution {
+
             // B&M (1993)
-
-            /** Sawtooth distribution. Ascending data from 0 to m, that repeats. */
+            /**
+             * Sawtooth distribution. Ascending data from 0 to m, that repeats.
+             */
             SAWTOOTH,
-            /** Random distribution. Uniform random data in [0, m] */
+            /**
+             * Random distribution. Uniform random data in [0, m]
+             */
             RANDOM,
-            /** Stagger distribution. Multiple interlaced ascending sequences. */
+            /**
+             * Stagger distribution. Multiple interlaced ascending sequences.
+             */
             STAGGER,
-            /** Plateau distribution. Ascending data from 0 to m, then constant.  */
+            /**
+             * Plateau distribution. Ascending data from 0 to m, then constant.
+             */
             PLATEAU,
-            /** Shuffle distribution. Two randomly interlaced ascending sequences of different lengths. */
+            /**
+             * Shuffle distribution. Two randomly interlaced ascending sequences of different lengths.
+             */
             SHUFFLE,
-
-            /** Sharktooth distribution. Alternating ascending then descending data from 0
+            /**
+             * Sharktooth distribution. Alternating ascending then descending data from 0
              * to m and back. This is an addition to the original suite of BM
              * and is not included in the test suite by default and must be specified.
              *
              * <p>An ascending then descending sequence is also known as organpipe in
              * Valois (2000). This version allows multiple ascending/descending runs in the
-             * same length. */
+             * same length.
+             */
             SHARKTOOTH,
-
             // Valois (2000)
-
-            /** Sorted. */
+            /**
+             * Sorted.
+             */
             SORTED,
-            /** Permutation of ones and zeros. */
+            /**
+             * Permutation of ones and zeros.
+             */
             ONEZERO,
-            /** Musser's median-of-3 killer. This elicits worst case performance for a median-of-3
-             * pivot selection strategy. */
+            /**
+             * Musser's median-of-3 killer. This elicits worst case performance for a median-of-3
+             * pivot selection strategy.
+             */
             M3KILLER,
-            /** A sorted sequence rotated left once. */
+            /**
+             * A sorted sequence rotated left once.
+             */
             ROTATED,
-            /** Musser's two-faced sequence (the median-of-3 killer with two random permutations). */
+            /**
+             * Musser's two-faced sequence (the median-of-3 killer with two random permutations).
+             */
             TWOFACED,
-            /** An ascending then descending sequence. */
-            ORGANPIPE;
+            /**
+             * An ascending then descending sequence.
+             */
+            ORGANPIPE
         }
 
         /**
          * The type of data modification.
          */
         enum Modification {
-            /** Copy modification. */
+
+            /**
+             * Copy modification.
+             */
             COPY,
-            /** Reverse modification. */
+            /**
+             * Reverse modification.
+             */
             REVERSE,
-            /** Reverse front-half modification. */
+            /**
+             * Reverse front-half modification.
+             */
             REVERSE_FRONT,
-            /** Reverse back-half modification. */
+            /**
+             * Reverse back-half modification.
+             */
             REVERSE_BACK,
-            /** Sort modification. */
+            /**
+             * Sort modification.
+             */
             SORT,
-            /** Descending modification (this is an addition to the original suite of BM).
+            /**
+             * Descending modification (this is an addition to the original suite of BM).
              * It is useful for testing worst case performance, e.g. insertion sort performs
              * poorly on descending data. Heapselect using a max heap (to find k minimum elements)
              * would perform poorly if data is processed in the forward direction as all elements
@@ -290,10 +392,13 @@ public class SelectionPerformance {
              * <p>This is not included in the test suite by default and must be specified.
              * Note that the Shuffle distribution with a very large seed 'm' is effectively an
              * ascending sequence and will be reversed to descending as part of the original
-             * B&M suite of data. */
+             * B&M suite of data.
+             */
             DESCENDING,
-            /** Dither modification. Add i % 5 to the data element i.  */
-            DITHER;
+            /**
+             * Dither modification. Add i % 5 to the data element i.
+             */
+            DITHER
         }
 
         /**
@@ -303,15 +408,30 @@ public class SelectionPerformance {
          * information to create the sample distribution.
          */
         public static final class SampleInfo {
-            /** Distribution. */
+
+            /**
+             * Distribution.
+             */
             private final Distribution dist;
-            /** Modification. */
+
+            /**
+             * Modification.
+             */
             private final Modification mod;
-            /** Length. */
+
+            /**
+             * Length.
+             */
             private final int n;
-            /** Seed. */
+
+            /**
+             * Seed.
+             */
             private final int m;
-            /** Offset. */
+
+            /**
+             * Offset.
+             */
             private final int o;
 
             /**
@@ -336,7 +456,7 @@ public class SelectionPerformance {
              * @return the instance
              */
             SampleInfo with(Distribution v) {
-                return new SampleInfo(v, mod, n, m, o);
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
 
             /**
@@ -346,103 +466,126 @@ public class SelectionPerformance {
              * @return the instance
              */
             SampleInfo with(Modification v) {
-                return new SampleInfo(dist, v, n, m, o);
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
 
             /**
              * @return the distribution
              */
             Distribution getDistribution() {
-                return dist;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
 
             /**
              * @return the modification
              */
             Modification getModification() {
-                return mod;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
 
             /**
              * @return the data length
              */
             int getN() {
-                return n;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
 
             /**
              * @return the distribution seed
              */
             int getM() {
-                return m;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
 
             /**
              * @return the distribution offset
              */
             int getO() {
-                return o;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
 
             @Override
             public String toString() {
-                return String.format("%s, %s, n=%d, m=%d, o=%d", dist, mod, n, m, o);
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
         }
 
-        /** Order. This is randomized to ensure that successive calls do not partition
+        /**
+         * Order. This is randomized to ensure that successive calls do not partition
          * similar distributions. Randomized per invocation to avoid the JVM 'learning'
-         * branch decisions on small data sets. */
+         * branch decisions on small data sets.
+         */
         protected int[] order;
-        /** Cached source of randomness. */
+
+        /**
+         * Cached source of randomness.
+         */
         protected UniformRandomProvider rng;
 
-        /** Type of data. Multiple types can be specified in the same string using
-         * lower/upper case, delimited using ':'. */
-        @Param({BM})
+        /**
+         * Type of data. Multiple types can be specified in the same string using
+         * lower/upper case, delimited using ':'.
+         */
+        @Param({ BM })
         private String distribution = BM;
 
-        /** Type of data modification. Multiple types can be specified in the same string using
-         * lower/upper case, delimited using ':'. */
-        @Param({BM})
+        /**
+         * Type of data modification. Multiple types can be specified in the same string using
+         * lower/upper case, delimited using ':'.
+         */
+        @Param({ BM })
         private String modification = BM;
 
-        /** Extra range to add to the data length.
-         * E.g. Use 1 to force use of odd and even length samples. */
-        @Param({"1"})
+        /**
+         * Extra range to add to the data length.
+         * E.g. Use 1 to force use of odd and even length samples.
+         */
+        @Param({ "1" })
         private int range = 1;
 
-        /** Sample 'seed'. This is {@code m} in Bentley and McIlroy's test suite.
-         * If set to zero the default is to use powers of 2 based on sample size. */
-        @Param({"0"})
+        /**
+         * Sample 'seed'. This is {@code m} in Bentley and McIlroy's test suite.
+         * If set to zero the default is to use powers of 2 based on sample size.
+         */
+        @Param({ "0" })
         private int seed;
 
-        /** Sample offset. This is used to shift each distribution to create different data.
-         * It is advanced on each invocation of {@link #setup()}. */
-        @Param({"0"})
+        /**
+         * Sample offset. This is used to shift each distribution to create different data.
+         * It is advanced on each invocation of {@link #setup()}.
+         */
+        @Param({ "0" })
         private int offset;
 
-        /** Number of samples. Applies only to the random distribution. In this case
-         * the length of the data is randomly chosen in {@code [length, length + range)}. */
-        @Param({"0"})
+        /**
+         * Number of samples. Applies only to the random distribution. In this case
+         * the length of the data is randomly chosen in {@code [length, length + range)}.
+         */
+        @Param({ "0" })
         private int samples;
 
-        /** RNG seed. Created using ThreadLocalRandom.current().nextLong(). This is advanced
+        /**
+         * RNG seed. Created using ThreadLocalRandom.current().nextLong(). This is advanced
          * for the random distribution mode per iteration. Each benchmark executed by
          * JMH will use the same random data, even across JVMs.
          *
-         * <p>If this is zero then a random seed is chosen. */
-        @Param({"-7450238124206088695"})
+         * <p>If this is zero then a random seed is chosen.
+         */
+        @Param({ "-7450238124206088695" })
         private long rngSeed = -7450238124206088695L;
 
-        /** Data. This is stored as integer data which saves memory. Note that when ranking
+        /**
+         * Data. This is stored as integer data which saves memory. Note that when ranking
          * data it is not necessary to have the full range of the double data type; the same
          * number of unique values can be recorded in an array using an integer type.
          * Returning a double[] forces a copy to be generated for destructive sorting /
-         * partitioning methods. */
+         * partitioning methods.
+         */
         private int[][] data;
 
-        /** Sample information. */
+        /**
+         * Sample information.
+         */
         private List<SampleInfo> sampleInfo;
 
         /**
@@ -454,7 +597,7 @@ public class SelectionPerformance {
          * @return the data sample
          */
         public double[] getData(int index) {
-            return getDataSample(order[index]);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -466,7 +609,7 @@ public class SelectionPerformance {
          * @return the data sample
          */
         public int[] getIntData(int index) {
-            return getIntDataSample(order[index]);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -476,12 +619,7 @@ public class SelectionPerformance {
          * @return the data sample
          */
         protected double[] getDataSample(int index) {
-            final int[] a = data[index];
-            final double[] x = new double[a.length];
-            for (int i = -1; ++i < a.length;) {
-                x[i] = a[i];
-            }
-            return x;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -491,13 +629,7 @@ public class SelectionPerformance {
          * @return the data sample
          */
         protected int[] getIntDataSample(int index) {
-            // For parity with other methods do not use data.clone()
-            final int[] a = data[index];
-            final int[] x = new int[a.length];
-            for (int i = -1; ++i < a.length;) {
-                x[i] = a[i];
-            }
-            return x;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -507,7 +639,7 @@ public class SelectionPerformance {
          * @return the data sample size
          */
         public int getDataSize(int index) {
-            return data[index].length;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -518,7 +650,7 @@ public class SelectionPerformance {
          * @return the data sample information
          */
         SampleInfo getDataSampleInfo(int index) {
-            return sampleInfo.get(index);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -536,7 +668,7 @@ public class SelectionPerformance {
          * @return the number of samples
          */
         public int size() {
-            return data.length;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -544,127 +676,7 @@ public class SelectionPerformance {
          */
         @Setup(Level.Iteration)
         public void setup() {
-            Objects.requireNonNull(distribution);
-            Objects.requireNonNull(modification);
-
-            // Set-up using parameters (may throw)
-            final EnumSet<Distribution> dist = getDistributions();
-            final int length = getLength();
-            if (length < 1) {
-                throw new IllegalStateException("Unsupported length: " + length);
-            }
-            // Note: Bentley-McIlroy use n in {100, 1023, 1024, 1025}.
-            // Here we only support a continuous range.
-            final int r = range > 0 ? range : 0;
-            if (length + (long) r > Integer.MAX_VALUE) {
-                throw new IllegalStateException("Unsupported upper length: " + length);
-            }
-            final int length2 = length + r;
-
-            // Allow pseudorandom seeding
-            if (rngSeed == 0) {
-                rngSeed = RandomSource.createLong();
-            }
-            if (rng == null) {
-                // First call, create objects
-                rng = RANDOM_SOURCE.create(rngSeed);
-            }
-
-            // Special case for random distribution mode
-            if (dist.contains(Distribution.RANDOM) && dist.size() == 1 && samples > 0) {
-                data = new int[samples][];
-                sampleInfo = new ArrayList<>(samples);
-                final int upper = seed > 0 ? seed : Integer.MAX_VALUE;
-                final SharedStateDiscreteSampler s1 = DiscreteUniformSampler.of(rng, 0, upper);
-                final SharedStateDiscreteSampler s2 = DiscreteUniformSampler.of(rng, length, length2);
-                for (int i = 0; i < data.length; i++) {
-                    final int[] a = new int[s2.sample()];
-                    for (int j = a.length; --j >= 0;) {
-                        a[j] = s1.sample();
-                    }
-                    data[i] = a;
-                    sampleInfo.add(new SampleInfo(Distribution.RANDOM, Modification.COPY, a.length, 0, 0));
-                }
-                return;
-            }
-
-            // New data per iteration
-            data = null;
-            final int o = offset;
-            offset = rng.nextInt();
-
-            final EnumSet<Modification> mod = getModifications();
-
-            // Data using the RNG will be randomized only once.
-            // Here we use the same seed for parity across benchmark methods.
-            // Note that most distributions do not use the source of randomness.
-            final ArrayList<int[]> sampleData = new ArrayList<>();
-            sampleInfo = new ArrayList<>();
-            final List<SampleInfo> info = new ArrayList<>();
-            for (int n = length; n <= length2; n++) {
-                // Note: Large lengths may wish to limit the range of m to limit
-                // the memory required to store the samples. Currently a single
-                // m is supported via the seed parameter.
-                // Default seed will create ceil(log2(2*n)) * 5 dist * 6 mods samples:
-                // MAX  = 32 * 5 * 7 * (2^31-1) * 4 bytes == 7679 GiB
-                // HUGE = 31 * 5 * 7 * 2^30 * 4 bytes == 3719 GiB
-                // BIG  = 21 * 5 * 7 * 2^20 * 4 bytes == 2519 MiB  <-- within configured JVM -Xmx
-                // MED  = 11 * 5 * 7 * 2^10 * 4 bytes == 1318 KiB
-                // (This is for the B&M data.)
-                // It is possible to create lengths above 2^30 using a single distribution,
-                // modification, and seed:
-                // MAX1 = 1 * 1 * 1 * (2^31-1) * 4 bytes == 8191 MiB
-                // However this is then used to create double[] data thus requiring an extra
-                // ~16GiB memory for the sample to partition.
-                for (final int m : createSeeds(seed, n)) {
-                    final List<int[]> d = createDistributions(dist, rng, n, m, o, info);
-                    for (int i = 0; i < d.size(); i++) {
-                        final int[] x = d.get(i);
-                        final SampleInfo si = info.get(i);
-                        if (mod.contains(Modification.COPY)) {
-                            // Don't copy! All other methods generate copies
-                            // so we can use this in-place.
-                            sampleData.add(x);
-                            sampleInfo.add(si.with(Modification.COPY));
-                        }
-                        if (mod.contains(Modification.REVERSE)) {
-                            sampleData.add(reverse(x, 0, n));
-                            sampleInfo.add(si.with(Modification.REVERSE));
-                        }
-                        if (mod.contains(Modification.REVERSE_FRONT)) {
-                            sampleData.add(reverse(x, 0, n >>> 1));
-                            sampleInfo.add(si.with(Modification.REVERSE_FRONT));
-                        }
-                        if (mod.contains(Modification.REVERSE_BACK)) {
-                            sampleData.add(reverse(x, n >>> 1, n));
-                            sampleInfo.add(si.with(Modification.REVERSE_BACK));
-                        }
-                        // Only sort once
-                        if (mod.contains(Modification.SORT) ||
-                            mod.contains(Modification.DESCENDING)) {
-                            final int[] y = x.clone();
-                            Arrays.sort(y);
-                            if (mod.contains(Modification.DESCENDING)) {
-                                sampleData.add(reverse(y, 0, n));
-                                sampleInfo.add(si.with(Modification.DESCENDING));
-                            }
-                            if (mod.contains(Modification.SORT)) {
-                                sampleData.add(y);
-                                sampleInfo.add(si.with(Modification.SORT));
-                            }
-                        }
-                        if (mod.contains(Modification.DITHER)) {
-                            sampleData.add(dither(x));
-                            sampleInfo.add(si.with(Modification.DITHER));
-                        }
-                    }
-                }
-            }
-            data = sampleData.toArray(new int[0][]);
-            if (LOG_SIZE.getAndSet(length) != length) {
-                Logger.getLogger(getClass().getName()).info(
-                    () -> String.format("Data length: [%d, %d] n=%d", length, length2, data.length));
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -676,11 +688,7 @@ public class SelectionPerformance {
          */
         @Setup(Level.Invocation)
         public void createOrder() {
-            if (order == null) {
-                // First call, create objects
-                order = PermutationSampler.natural(size());
-            }
-            ArraySampler.shuffle(rng, order);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -689,21 +697,9 @@ public class SelectionPerformance {
         private EnumSet<Distribution> getDistributions() {
             EnumSet<Distribution> dist;
             if (BM.equals(distribution)) {
-                dist = EnumSet.of(
-                    Distribution.SAWTOOTH,
-                    Distribution.RANDOM,
-                    Distribution.STAGGER,
-                    Distribution.PLATEAU,
-                    Distribution.SHUFFLE);
+                dist = EnumSet.of(Distribution.SAWTOOTH, Distribution.RANDOM, Distribution.STAGGER, Distribution.PLATEAU, Distribution.SHUFFLE);
             } else if (VALOIS.equals(distribution)) {
-                dist = EnumSet.of(
-                    Distribution.RANDOM,
-                    Distribution.SORTED,
-                    Distribution.ONEZERO,
-                    Distribution.M3KILLER,
-                    Distribution.ROTATED,
-                    Distribution.TWOFACED,
-                    Distribution.ORGANPIPE);
+                dist = EnumSet.of(Distribution.RANDOM, Distribution.SORTED, Distribution.ONEZERO, Distribution.M3KILLER, Distribution.ROTATED, Distribution.TWOFACED, Distribution.ORGANPIPE);
             } else {
                 dist = getEnumFromParam(Distribution.class, distribution);
             }
@@ -738,27 +734,7 @@ public class SelectionPerformance {
          * @return the enum values
          */
         static <E extends Enum<E>> EnumSet<E> getEnumFromParam(Class<E> cls, String parameters) {
-            if (ALL.equals(parameters)) {
-                return EnumSet.allOf(cls);
-            }
-            final EnumSet<E> set = EnumSet.noneOf(cls);
-            final String s = parameters.toUpperCase(Locale.ROOT);
-            for (final E e : cls.getEnumConstants()) {
-                // Scan for the name
-                for (int i = s.indexOf(e.name(), 0); i >= 0; i = s.indexOf(e.name(), i)) {
-                    // Ensure a full match to the name:
-                    // either at the end of the string, or followed by the delimiter
-                    i += e.name().length();
-                    if (i == s.length() || s.charAt(i) == ':') {
-                        set.add(e);
-                        break;
-                    }
-                }
-            }
-            if (set.isEmpty()) {
-                throw new IllegalStateException("Unknown parameters: " + parameters);
-            }
-            return set;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -775,13 +751,12 @@ public class SelectionPerformance {
         private static int[] createSeeds(int seed, int n) {
             // Allow [1, 2^31] (note 2^31 is negative but handled as a power of 2)
             if (seed - 1 >= 0) {
-                return new int[] {seed};
+                return new int[] { seed };
             }
             // Bentley-McIlroy use:
             // for: m = 1; m < 2 * n; m *= 2
             // This has been modified here to handle n up to MAX_VALUE
             // by knowing the count of m to generate as the power of 2 >= n.
-
             // ceil(log2(n)) + 1 == ceil(log2(2*n)) but handles MAX_VALUE
             int c = 33 - Integer.numberOfLeadingZeros(n - 1);
             final int[] seeds = new int[c];
@@ -812,8 +787,7 @@ public class SelectionPerformance {
          * @param info Sample information.
          * @return the samples
          */
-        private static List<int[]> createDistributions(EnumSet<Distribution> dist,
-                UniformRandomProvider rng, int n, int m, int o, List<SampleInfo> info) {
+        private static List<int[]> createDistributions(EnumSet<Distribution> dist, UniformRandomProvider rng, int n, int m, int o, List<SampleInfo> info) {
             final ArrayList<int[]> distData = new ArrayList<>(6);
             int[] x;
             info.clear();
@@ -826,13 +800,13 @@ public class SelectionPerformance {
                 // Use the offset.
                 final int mask = m - 1;
                 if ((m & mask) == 0) {
-                    for (int i = -1; ++i < n;) {
+                    for (int i = -1; ++i < n; ) {
                         x[i] = (i + o) & mask;
                     }
                 } else {
                     // User input seed. Start at the offset.
                     int j = Integer.remainderUnsigned(o, m);
-                    for (int i = -1; ++i < n;) {
+                    for (int i = -1; ++i < n; ) {
                         j = j % m;
                         x[i] = j++;
                     }
@@ -843,7 +817,7 @@ public class SelectionPerformance {
                 // rand() % m
                 // A sampler is faster than rng.nextInt(m); the sampler has an inclusive upper.
                 final SharedStateDiscreteSampler s = DiscreteUniformSampler.of(rng, 0, m - 1);
-                for (int i = -1; ++i < n;) {
+                for (int i = -1; ++i < n; ) {
                     x[i] = s.sample();
                 }
             }
@@ -852,7 +826,7 @@ public class SelectionPerformance {
                 // Overflow safe: (i * m + i) % n
                 final long nn = n;
                 final long oo = Integer.toUnsignedLong(o);
-                for (int i = -1; ++i < n;) {
+                for (int i = -1; ++i < n; ) {
                     final long j = i + oo;
                     x[i] = (int) ((j * m + j) % nn);
                 }
@@ -860,10 +834,10 @@ public class SelectionPerformance {
             if (dist.contains(Distribution.PLATEAU)) {
                 x = createSample(distData, info, si.with(Distribution.PLATEAU));
                 // min(i, m)
-                for (int i = Math.min(n, m); --i >= 0;) {
+                for (int i = Math.min(n, m); --i >= 0; ) {
                     x[i] = i;
                 }
-                for (int i = m - 1; ++i < n;) {
+                for (int i = m - 1; ++i < n; ) {
                     x[i] = m;
                 }
                 // Rotate
@@ -879,7 +853,7 @@ public class SelectionPerformance {
                 x = createSample(distData, info, si.with(Distribution.SHUFFLE));
                 // rand() % m ? (j += 2) : (k += 2)
                 final SharedStateDiscreteSampler s = DiscreteUniformSampler.of(rng, 0, m - 1);
-                for (int i = -1, j = 0, k = 1; ++i < n;) {
+                for (int i = -1, j = 0, k = 1; ++i < n; ) {
                     x[i] = s.sample() != 0 ? (j += 2) : (k += 2);
                 }
             }
@@ -889,8 +863,7 @@ public class SelectionPerformance {
                 // ascending-descending runs
                 int i = -1;
                 int j = (o & Integer.MAX_VALUE) % m - 1;
-                OUTER:
-                for (;;) {
+                OUTER: for (; ; ) {
                     while (++j < m) {
                         if (++i == n) {
                             break OUTER;
@@ -908,7 +881,7 @@ public class SelectionPerformance {
             // Valois (2000)
             if (dist.contains(Distribution.SORTED)) {
                 x = createSample(distData, info, si.with(Distribution.SORTED));
-                for (int i = -1; ++i < n;) {
+                for (int i = -1; ++i < n; ) {
                     x[i] = i;
                 }
             }
@@ -921,12 +894,12 @@ public class SelectionPerformance {
                 final int end = n & ~31;
                 for (int i = 0; i < end; i += 32) {
                     int z = rng.nextInt();
-                    for (int j = -1; ++j < 32;) {
+                    for (int j = -1; ++j < 32; ) {
                         x[i + j] = z & 1;
                         z >>>= 1;
                     }
                 }
-                for (int i = end; ++i < n;) {
+                for (int i = end; ++i < n; ) {
                     x[i] = rng.nextBoolean() ? 1 : 0;
                 }
             }
@@ -956,7 +929,7 @@ public class SelectionPerformance {
                 x = createSample(distData, info, si.with(Distribution.ORGANPIPE));
                 // 0, 1, 2, 3, ..., 3, 2, 1, 0
                 // n should be even to leave two equal values in the middle, otherwise a single
-                for (int i = -1, j = n; ++i <= --j;) {
+                for (int i = -1, j = n; ++i <= --j; ) {
                     x[i] = i;
                     x[j] = i;
                 }
@@ -972,8 +945,7 @@ public class SelectionPerformance {
          * @param s Sample information.
          * @return the new sample array
          */
-        private static int[] createSample(ArrayList<int[]> data, List<SampleInfo> info,
-            SampleInfo s) {
+        private static int[] createSample(ArrayList<int[]> data, List<SampleInfo> info, SampleInfo s) {
             final int[] x = new int[s.getN()];
             data.add(x);
             info.add(s);
@@ -1016,7 +988,7 @@ public class SelectionPerformance {
          */
         private static int[] reverse(int[] x, int from, int to) {
             final int[] a = x.clone();
-            for (int i = from - 1, j = to; ++i < --j;) {
+            for (int i = from - 1, j = to; ++i < --j; ) {
                 final int v = a[i];
                 a[i] = a[j];
                 a[j] = v;
@@ -1032,7 +1004,7 @@ public class SelectionPerformance {
          */
         private static int[] dither(int[] x) {
             final int[] a = x.clone();
-            for (int i = a.length; --i >= 0;) {
+            for (int i = a.length; --i >= 0; ) {
                 // Bentley-McIlroy use i % 5.
                 // It is important this is not a power of 2 so it will not coincide
                 // with patterns created in the data using the default m powers-of-2.
@@ -1055,7 +1027,7 @@ public class SelectionPerformance {
          * @return the range
          */
         final int getRange() {
-            return range;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1066,12 +1038,7 @@ public class SelectionPerformance {
          * @param v Values.
          */
         void setDistribution(Distribution... v) {
-            if (v.length == 0 || v[0] == null) {
-                distribution = ALL;
-            } else {
-                final EnumSet<Distribution> s = EnumSet.of(v[0], v);
-                distribution = s.stream().map(Enum::name).collect(Collectors.joining(":"));
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1082,12 +1049,7 @@ public class SelectionPerformance {
          * @param v Value.
          */
         void setModification(Modification... v) {
-            if (v.length == 0 || v[0] == null) {
-                modification = ALL;
-            } else {
-                final EnumSet<Modification> s = EnumSet.of(v[0], v);
-                modification = s.stream().map(Enum::name).collect(Collectors.joining(":"));
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1097,7 +1059,7 @@ public class SelectionPerformance {
          * @param v Value.
          */
         void setRange(int v) {
-            range = v;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1110,7 +1072,7 @@ public class SelectionPerformance {
          * @param v Value (ignored if not within {@code [1, 2^31]}).
          */
         void setSeed(int v) {
-            seed = v;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1120,7 +1082,7 @@ public class SelectionPerformance {
          * @param v Value.
          */
         void setOffset(int v) {
-            offset = v;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1130,7 +1092,7 @@ public class SelectionPerformance {
          * @param v Value.
          */
         void setSamples(int v) {
-            samples = v;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1139,7 +1101,7 @@ public class SelectionPerformance {
          * @param v Value.
          */
         void setRngSeed(long v) {
-            this.rngSeed = v;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -1148,36 +1110,46 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class SortSource extends AbstractDataSource {
-        /** Data length. */
-        @Param({"1023"})
+
+        /**
+         * Data length.
+         */
+        @Param({ "1023" })
         private int length;
-        /** Number of repeats. This is used to control the number of times the data is processed
+
+        /**
+         * Number of repeats. This is used to control the number of times the data is processed
          * per invocation. Note that each invocation randomises the order. For very small data
          * and/or fast methods there may not be enough data to achieve the target of 1
          * millisecond per invocation. Use this value to increase the length of each invocation.
          * For example the insertion sort on tiny data, or the sort5 methods, may require this
-         * to be 1,000,000 or higher. */
-        @Param({"1"})
+         * to be 1,000,000 or higher.
+         */
+        @Param({ "1" })
         private int repeats;
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected int getLength() {
-            return length;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int size() {
-            return super.size() * repeats;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public double[] getData(int index) {
-            // order = (data index) * repeats + repeat
-            // data index = order / repeats
-            return super.getDataSample(order[index] / repeats);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -1190,16 +1162,27 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class KSource extends AbstractDataSource {
-        /** Data length. */
-        @Param({"1023"})
+
+        /**
+         * Data length.
+         */
+        @Param({ "1023" })
         private int length;
-        /** Number of indices to select. */
-        @Param({"1", "2", "3", "5", "10"})
+
+        /**
+         * Number of indices to select.
+         */
+        @Param({ "1", "2", "3", "5", "10" })
         private int k;
-        /** Number of repeats. */
-        @Param({"10"})
+
+        /**
+         * Number of repeats.
+         */
+        @Param({ "10" })
         private int repeats;
-        /** Distribution mode. K indices can be distributed randomly or uniformly.
+
+        /**
+         * Distribution mode. K indices can be distributed randomly or uniformly.
          * <ul>
          * <li>"random": distribute k indices randomly</li>
          * <li>"uniform": distribute k indices uniformly but with a random start point</li>
@@ -1212,46 +1195,60 @@ public class SelectionPerformance {
          * <p>If the mode ends with a "s" then the indices are sorted. For example "randoms"
          * will sort the random indices.
          */
-        @Param({"random"})
+        @Param({ "random" })
         private String mode;
-        /** Separation. K can be single indices (s=0) or paired (s!=0). Paired indices are
+
+        /**
+         * Separation. K can be single indices (s=0) or paired (s!=0). Paired indices are
          * separated using the specified separation. When running in paired mode the
          * number of k is doubled and duplicates may occur. This method is used for
          * testing sparse or uniform distributions of paired indices that may occur when
          * interpolating quantiles. Since the separation is allowed to be above 1 it also
-         * allows testing configurations for close indices. */
-        @Param({"0"})
+         * allows testing configurations for close indices.
+         */
+        @Param({ "0" })
         private int s;
 
-        /** Indices. */
+        /**
+         * Indices.
+         */
         private int[][] indices;
-        /** Cache permutation samplers. */
+
+        /**
+         * Cache permutation samplers.
+         */
         private PermutationSampler[] samplers;
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected int getLength() {
-            return length;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int size() {
-            return super.size() * repeats;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public double[] getData(int index) {
-            // order = (data index) * repeats + repeat
-            // data index = order / repeats
-            return super.getDataSample(order[index] / repeats);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int[] getIntData(int index) {
-            return super.getIntDataSample(order[index] / repeats);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1261,9 +1258,7 @@ public class SelectionPerformance {
          * @return the data indices
          */
         public int[] getIndices(int index) {
-            // order = (data index) * repeats + repeat
-            // Directly look-up the indices for this repeat.
-            return indices[order[index]];
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1272,132 +1267,7 @@ public class SelectionPerformance {
         @Override
         @Setup(Level.Iteration)
         public void setup() {
-            if (s < 0 || s >= getLength()) {
-                throw new IllegalStateException("Invalid separation: " + s);
-            }
-            super.setup();
-
-            // Data will be randomized per iteration
-            if (indices == null) {
-                // First call, create objects
-                indices = new int[size()][];
-                // Cache samplers. These hold an array which is randomized
-                // per call to obtain a permutation.
-                if (k > 1) {
-                    samplers = new PermutationSampler[getRange() + 1];
-                }
-            }
-
-            // Create indices in the data sample length.
-            // If a separation is provided then the length is reduced by the separation
-            // to make space for a second index.
-
-            int index = 0;
-            final int noOfSamples = super.size();
-            if (mode.startsWith("random")) {
-                // random mode creates a permutation of k indices in the length
-                if (k > 1) {
-                    final int baseLength = getLength();
-                    for (int i = 0; i < noOfSamples; i++) {
-                        final int len = getDataSize(i);
-                        // Create permutation sampler for the length
-                        PermutationSampler sampler = samplers[len - baseLength];
-                        if (sampler == null) {
-                            // Reduce length by the separation
-                            final int n = len - s;
-                            samplers[len - baseLength] = sampler = new PermutationSampler(rng, n, k);
-                        }
-                        for (int j = repeats; --j >= 0;) {
-                            indices[index++] = sampler.sample();
-                        }
-                    }
-                } else {
-                    // k=1: No requirement for a permutation
-                    for (int i = 0; i < noOfSamples; i++) {
-                        // Reduce length by the separation
-                        final int n = getDataSize(i) - s;
-                        for (int j = repeats; --j >= 0;) {
-                            indices[index++] = new int[] {rng.nextInt(n)};
-                        }
-                    }
-                }
-            } else if (mode.startsWith("uniform")) {
-                // uniform indices with a random start
-                for (int i = 0; i < noOfSamples; i++) {
-                    // Reduce length by the separation
-                    final int n = getDataSize(i) - s;
-                    final int step = Math.max(1, (int) Math.round((double) n / k));
-                    for (int j = repeats; --j >= 0;) {
-                        final int[] k1 = new int[k];
-                        int p = rng.nextInt(n);
-                        for (int m = 0; m < k; m++) {
-                            p = (p + step) % n;
-                            k1[m] = p;
-                        }
-                        indices[index++] = k1;
-                    }
-                }
-            } else if (mode.startsWith("single")) {
-                // uniform indices with a random start
-                for (int i = 0; i < noOfSamples; i++) {
-                    // Reduce length by the separation
-                    final int n = getDataSize(i) - s;
-                    int[] samples;
-                    // When k approaches n then a linear spacing covers every part
-                    // of the array and we sample. Do this when n < k/4. This handles
-                    // k > n (saturation).
-                    if (n < (k >> 2)) {
-                        samples = rng.ints(k, 0, n).toArray();
-                    } else {
-                        // Linear spacing
-                        final int step = n / k;
-                        samples = new int[k];
-                        for (int j = 0, x = step >> 1; j < k; j++, x += step) {
-                            samples[j] = x;
-                        }
-                    }
-                    for (int j = 0; j < repeats; j++) {
-                        final int ii = j % k;
-                        if (ii == 0) {
-                            ArraySampler.shuffle(rng, samples);
-                        }
-                        indices[index++] = new int[] {samples[ii]};
-                    }
-                }
-            } else if ("index".equals(mode)) {
-                // Same single or paired indices for all samples.
-                // Check the index is valid.
-                for (int i = 0; i < noOfSamples; i++) {
-                    // Reduce length by the separation
-                    final int n = getDataSize(i) - s;
-                    if (k >= n) {
-                        throw new IllegalStateException("Invalid k: " + k + " >= " + n);
-                    }
-                }
-                final int[] kk = s > 0 ? new int[] {k, k + s} : new int[] {k};
-                Arrays.fill(indices, kk);
-                return;
-            } else {
-                throw new IllegalStateException("Unknown index mode: " + mode);
-            }
-            // Add paired indices
-            if (s > 0) {
-                for (int i = 0; i < indices.length; i++) {
-                    final int[] k1 = indices[i];
-                    final int[] k2 = new int[k1.length << 1];
-                    for (int j = 0; j < k1.length; j++) {
-                        k2[j << 1] = k1[j];
-                        k2[(j << 1) + 1] = k1[j] + s;
-                    }
-                    indices[i] = k2;
-                }
-            }
-            // Optionally sort
-            if (mode.endsWith("s")) {
-                for (int i = 0; i < indices.length; i++) {
-                    Arrays.sort(indices[i]);
-                }
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -1408,35 +1278,56 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class IndexSource {
-        /** Indices. */
+
+        /**
+         * Indices.
+         */
         protected int[][] indices;
-        /** Upper bound (exclusive) on the indices. */
-        @Param({"1000", "1000000", "1000000000"})
+
+        /**
+         * Upper bound (exclusive) on the indices.
+         */
+        @Param({ "1000", "1000000", "1000000000" })
         private int length;
-        /** Number of indices to select. */
-        @Param({"10", "20", "40", "80", "160"})
+
+        /**
+         * Number of indices to select.
+         */
+        @Param({ "10", "20", "40", "80", "160" })
         private int k;
-        /** Number of repeats. */
-        @Param({"1000"})
+
+        /**
+         * Number of repeats.
+         */
+        @Param({ "1000" })
         private int repeats;
-        /** RNG seed. Created using ThreadLocalRandom.current().nextLong(). Each benchmark
+
+        /**
+         * RNG seed. Created using ThreadLocalRandom.current().nextLong(). Each benchmark
          * executed by JMH will use the same random data, even across JVMs.
          *
-         * <p>If this is zero then a random seed is chosen. */
-        @Param({"-7450238124206088695"})
+         * <p>If this is zero then a random seed is chosen.
+         */
+        @Param({ "-7450238124206088695" })
         private long rngSeed;
-        /** Ordered keys. */
-        @Param({"false"})
+
+        /**
+         * Ordered keys.
+         */
+        @Param({ "false" })
         private boolean ordered;
-        /** Minimum separation between keys. */
-        @Param({"32"})
+
+        /**
+         * Minimum separation between keys.
+         */
+        @Param({ "32" })
         private int separation;
 
         /**
          * @return the indices
          */
         public int[][] getIndices() {
-            return indices;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1446,7 +1337,7 @@ public class SelectionPerformance {
          * @return the minimum separation
          */
         public int getMinSeparation() {
-            return separation;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1454,42 +1345,14 @@ public class SelectionPerformance {
          */
         @Setup(Level.Iteration)
         public void setup() {
-            if (k < 2) {
-                throw new IllegalStateException("Require multiple indices");
-            }
-            // Data will be randomized per iteration. It is the same sequence across
-            // benchmarks and JVM instances and allows benchmarking across JVM platforms
-            // with the same data.
-            // Allow pseudorandom seeding
-            if (rngSeed == 0) {
-                rngSeed = RandomSource.createLong();
-            }
-            final UniformRandomProvider rng = RANDOM_SOURCE.create(rngSeed);
-            // Advance the seed for the next iteration.
-            rngSeed = rng.nextLong();
-
-            final SharedStateDiscreteSampler s = DiscreteUniformSampler.of(rng, 0, length - 1);
-
-            indices = new int[repeats][];
-
-            for (int i = repeats; --i >= 0;) {
-                // Indices with possible repeats
-                final int[] x = new int[k];
-                for (int j = k; --j >= 0;) {
-                    x[j] = s.sample();
-                }
-                indices[i] = x;
-                if (ordered) {
-                    Sorting.sortIndices(x, x.length);
-                }
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
          * @return the RNG seed
          */
         long getRngSeed() {
-            return rngSeed;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -1500,24 +1363,39 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class SplitIndexSource extends IndexSource {
-        /** Division mode. */
-        @Param({"RANDOM", "BINARY"})
+
+        /**
+         * Division mode.
+         */
+        @Param({ "RANDOM", "BINARY" })
         private DivisionMode mode;
 
-        /** Search points. */
+        /**
+         * Search points.
+         */
         private int[][] points;
-        /** The look-up samples. These are used to identify a set of indices, and a single point to
+
+        /**
+         * The look-up samples. These are used to identify a set of indices, and a single point to
          * find in the range of the indices, e.g. split indices k at point p. The long packs
          * two integers: the index of the indices k; and the search point p. These are packed
-         * as a long to enable easy shuffling of samples and access to the two indices. */
+         * as a long to enable easy shuffling of samples and access to the two indices.
+         */
         private long[] samples;
 
-        /** Options for the division mode. */
+        /**
+         * Options for the division mode.
+         */
         public enum DivisionMode {
-            /** Randomly divide. */
+
+            /**
+             * Randomly divide.
+             */
             RANDOM,
-            /** Divide using binary division with recursion left then right. */
-            BINARY;
+            /**
+             * Divide using binary division with recursion left then right.
+             */
+            BINARY
         }
 
         /**
@@ -1527,14 +1405,14 @@ public class SelectionPerformance {
          * @return the search points
          */
         public int[][] getPoints() {
-            return points;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
          * @return the sample size
          */
         int samples() {
-            return samples.length;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1544,7 +1422,7 @@ public class SelectionPerformance {
          * @return the indices
          */
         int[] getIndices(int index) {
-            return indices[(int) (samples[index] >>> Integer.SIZE)];
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1554,7 +1432,7 @@ public class SelectionPerformance {
          * @return the search point
          */
         int getPoint(int index) {
-            return (int) samples[index];
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1563,55 +1441,7 @@ public class SelectionPerformance {
         @Override
         @Setup(Level.Iteration)
         public void setup() {
-            super.setup();
-
-            final UniformRandomProvider rng = RANDOM_SOURCE.create(getRngSeed());
-
-            final int[][] indices = getIndices();
-            points = new int[indices.length][];
-
-            final int s = getMinSeparation();
-
-            // Set the division mode
-            final boolean random = Objects.requireNonNull(mode) == DivisionMode.RANDOM;
-
-            int size = 0;
-
-            for (int i = points.length; --i >= 0;) {
-                // Get the sorted unique indices
-                final int[] y = indices[i].clone();
-                final int unique = Sorting.sortIndices(y, y.length);
-
-                // Create the cut points between each unique index
-                int[] p = new int[unique - 1];
-                if (random) {
-                    int c = 0;
-                    for (int j = 0; j < p.length; j++) {
-                        // Ignore dense keys
-                        if (y[j] + s < y[j + 1]) {
-                            p[c++] = (y[j] + y[j + 1]) >>> 1;
-                        }
-                    }
-                    p = Arrays.copyOf(p, c);
-                    ArraySampler.shuffle(rng, p);
-                    points[i] = p;
-                } else {
-                    // binary division
-                    final int c = divide(y, 0, unique - 1, p, 0, s);
-                    points[i] = Arrays.copyOf(p, c);
-                }
-                size += points[i].length;
-            }
-
-            // Create the samples: pack indices index+point into a long
-            samples = new long[size];
-            for (int i = points.length; --i >= 0;) {
-                final long l = ((long) i) << Integer.SIZE;
-                for (final int p : points[i]) {
-                    samples[--size] = l | p;
-                }
-            }
-            ArraySampler.shuffle(rng, samples);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1651,17 +1481,18 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class SearchableIntervalSource {
-        /** Name of the source. */
-        @Param({"ScanningKeyInterval",
-            "BinarySearchKeyInterval",
-            "IndexSetInterval",
-            "CompressedIndexSet",
-            // Same speed as the CompressedIndexSet_2
-            //"CompressedIndexSet2",
-            })
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "ScanningKeyInterval", "BinarySearchKeyInterval", "IndexSetInterval", "CompressedIndexSet" // Same speed as the CompressedIndexSet_2
+        //"CompressedIndexSet2",
+        })
         private String name;
 
-        /** The factory. */
+        /**
+         * The factory.
+         */
         private Function<int[], SearchableInterval> factory;
 
         /**
@@ -1669,7 +1500,7 @@ public class SelectionPerformance {
          * @return {@link SearchableInterval}
          */
         public SearchableInterval create(int[] indices) {
-            return factory.apply(indices);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1677,31 +1508,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            if ("ScanningKeyInterval".equals(name)) {
-                factory = k -> {
-                    k = k.clone();
-                    final int unique = Sorting.sortIndices(k, k.length);
-                    return ScanningKeyInterval.of(k, unique);
-                };
-            } else if ("BinarySearchKeyInterval".equals(name)) {
-                factory = k -> {
-                    k = k.clone();
-                    final int unique = Sorting.sortIndices(k, k.length);
-                    return BinarySearchKeyInterval.of(k, unique);
-                };
-            } else if ("IndexSetInterval".equals(name)) {
-                factory = IndexSet::of;
-            } else if (name.equals("CompressedIndexSet2")) {
-                factory = CompressedIndexSet2::of;
-            } else if (name.startsWith("CompressedIndexSet")) {
-                // To use compression 2 requires CompressedIndexSet_2 otherwise
-                // a fixed compression set will be returned
-                final int c = getCompression(name);
-                factory = k -> CompressedIndexSet.of(c, k);
-            } else {
-                throw new IllegalStateException("Unknown SearchableInterval: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1724,15 +1531,18 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class UpdatingIntervalSource {
-        /** Name of the source. */
-        @Param({"KeyUpdatingInterval",
-            // Same speed as BitIndexUpdatingInterval
-            //"IndexSet",
-            "BitIndexUpdatingInterval",
-            })
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "KeyUpdatingInterval", // Same speed as BitIndexUpdatingInterval
+        //"IndexSet",
+        "BitIndexUpdatingInterval" })
         private String name;
 
-        /** The factory. */
+        /**
+         * The factory.
+         */
         private Function<int[], UpdatingInterval> factory;
 
         /**
@@ -1740,7 +1550,7 @@ public class SelectionPerformance {
          * @return {@link UpdatingInterval}
          */
         public UpdatingInterval create(int[] indices) {
-            return factory.apply(indices);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1748,20 +1558,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            if ("KeyUpdatingInterval".equals(name)) {
-                factory = k -> {
-                    k = k.clone();
-                    final int unique = Sorting.sortIndices(k, k.length);
-                    return KeyUpdatingInterval.of(k, unique);
-                };
-            } else if ("IndexSet".equals(name)) {
-                factory = k -> IndexSet.of(k).interval();
-            } else if (name.equals("BitIndexUpdatingInterval")) {
-                factory = k -> BitIndexUpdatingInterval.of(k, k.length);
-            } else {
-                throw new IllegalStateException("Unknown UpdatingInterval: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -1778,38 +1575,59 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class EdgeSource extends AbstractDataSource {
-        /** Data length. */
-        @Param({"1023"})
+
+        /**
+         * Data length.
+         */
+        @Param({ "1023" })
         private int length;
-        /** Mode. */
-        @Param({"SHIFT"})
+
+        /**
+         * Mode.
+         */
+        @Param({ "SHIFT" })
         private Mode mode;
-        /** Parameter to find k. Configured for 'shift' of the length. */
-        @Param({"1", "2", "3", "4", "5", "6", "7", "8", "9"})
+
+        /**
+         * Parameter to find k. Configured for 'shift' of the length.
+         */
+        @Param({ "1", "2", "3", "4", "5", "6", "7", "8", "9" })
         private int p;
-        /** Target indices (as pairs of {@code [ka, kb]} defining a range to select). */
+
+        /**
+         * Target indices (as pairs of {@code [ka, kb]} defining a range to select).
+         */
         private int[][] indices;
 
-        /** Define the method used to generated the edge k. */
+        /**
+         * Define the method used to generated the edge k.
+         */
         public enum Mode {
-            /** Create {@code k} using a right-shift {@code >>>} applied to the length. */
+
+            /**
+             * Create {@code k} using a right-shift {@code >>>} applied to the length.
+             */
             SHIFT,
-            /** Use the parameter {@code p} as an index. */
-            INDEX;
+            /**
+             * Use the parameter {@code p} as an index.
+             */
+            INDEX
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int size() {
-            return super.size() * 2;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public double[] getData(int index) {
-            // order = (data index) * repeats + repeat
-            // data index = order / repeats; repeats=2 divide by using a shift
-            return super.getDataSample(order[index] >> 1);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1820,15 +1638,15 @@ public class SelectionPerformance {
          * @return the target indices
          */
         public int[] getIndices(int index) {
-            // order = (data index) * repeats + repeat
-            // Directly look-up the indices for this repeat.
-            return indices[order[index]];
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected int getLength() {
-            return length;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1837,41 +1655,7 @@ public class SelectionPerformance {
         @Override
         @Setup(Level.Iteration)
         public void setup() {
-            // Data will be randomized per iteration
-            super.setup();
-            // Error for a bad configuration. Allow k=0 but not smaller.
-            // Uses the lower bound on the length.
-            int k;
-            if (mode == Mode.SHIFT) {
-                k = length >>> p;
-                if (k == 0 && length >>> (p - 1) == 0) {
-                    throw new IllegalStateException(length + " >>> (" + p + " - 1) == 0");
-                }
-            } else if (mode == Mode.INDEX) {
-                k = p;
-                if (k < 0 || k >= length) {
-                    throw new IllegalStateException("Invalid index [0, " + length + "): " + p);
-                }
-            } else {
-                throw new IllegalStateException("Unknown mode: " + mode);
-            }
-
-            if (indices == null) {
-                // First call, create objects
-                indices = new int[size()][];
-            }
-
-            // Create a single index at both ends.
-            // Note: Data has variable length so we have to compute the upper end for each sample.
-            // Re-use the constant lower but we do not bother to cache repeats of the upper.
-            final int[] lower = {k, k};
-            final int noOfSamples = super.size();
-            for (int i = 0; i < noOfSamples; i++) {
-                final int len = getDataSize(i);
-                final int k1 = len - 1 - k;
-                indices[i << 1] = lower;
-                indices[(i << 1) + 1] = new int[] {k1, k1};
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -1880,29 +1664,33 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class SortFunctionSource {
-        /** Name of the source. */
-        @Param({JDK, SP, BM, SBM, DP, DP5,
-            SBM2,
-            // Not run by default as it is slow on large data
-            //"InsertionSortIF", "InsertionSortIT", "InsertionSort", "InsertionSortB"
-            // Introsort methods with defaults, can configure using the name
-            // e.g. ISP_SBM_QS50.
-            ISP, IDP,
-            })
+
+        /**
+         * Name of the source.
+         */
+        @Param({ JDK, SP, BM, SBM, DP, DP5, SBM2, // Not run by default as it is slow on large data
+        //"InsertionSortIF", "InsertionSortIT", "InsertionSort", "InsertionSortB"
+        // Introsort methods with defaults, can configure using the name
+        // e.g. ISP_SBM_QS50.
+        ISP, IDP })
         private String name;
 
-        /** Override of minimum quickselect size. */
-        @Param({"0"})
+        /**
+         * Override of minimum quickselect size.
+         */
+        @Param({ "0" })
         private int qs;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private Consumer<double[]> function;
 
         /**
          * @return the function
          */
         public Consumer<double[]> getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -1910,86 +1698,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            if (JDK.equals(name)) {
-                function = Arrays::sort;
-            // First generation kth-selector functions (not configurable)
-            } else if (name.startsWith(SP)) {
-                function = PartitionFactory.createKthSelector(name, SP, qs)::sortSP;
-            } else if (name.startsWith(SBM)) {
-                function = PartitionFactory.createKthSelector(name, SBM, qs)::sortSBM;
-            } else if (name.startsWith(BM)) {
-                function = PartitionFactory.createKthSelector(name, BM, qs)::sortBM;
-            } else if (name.startsWith(DP)) {
-                function = PartitionFactory.createKthSelector(name, DP, qs)::sortDP;
-            } else if (name.startsWith(DP5)) {
-                function = PartitionFactory.createKthSelector(name, DP5, qs)::sortDP5;
-            // 2nd generation partition function
-            } else if (name.startsWith(SBM2)) {
-                function = PartitionFactory.createPartition(name, SBM2, qs, 0)::sortSBM;
-            // Introsort
-            } else if (name.startsWith(ISP)) {
-                function = PartitionFactory.createPartition(name, ISP, qs, 0)::sortISP;
-            } else if (name.startsWith(IDP)) {
-                function = PartitionFactory.createPartition(name, IDP, qs, 0)::sortIDP;
-            // Insertion sort variations.
-            // For parity with the internal version these all use the same (shorter) data
-            } else if ("InsertionSortIF".equals(name)) {
-                function = x -> {
-                    // Ignored sentinal
-                    x[0] = Double.NEGATIVE_INFINITY;
-                    Sorting.sort(x, 1, x.length - 1, false);
-                };
-            } else if ("InsertionSortIT".equals(name)) {
-                // Internal version
-                function = x -> {
-                    // Add a sentinal
-                    x[0] = Double.NEGATIVE_INFINITY;
-                    Sorting.sort(x, 1, x.length - 1, true);
-                };
-            } else if ("InsertionSort".equals(name)) {
-                function = x -> {
-                    x[0] = Double.NEGATIVE_INFINITY;
-                    Sorting.sort(x, 1, x.length - 1);
-                };
-            } else if (name.startsWith("PairedInsertionSort")) {
-                if (name.endsWith("1")) {
-                    function = x -> {
-                        x[0] = Double.NEGATIVE_INFINITY;
-                        Sorting.sortPairedInternal1(x, 1, x.length - 1);
-                    };
-                } else if (name.endsWith("2")) {
-                    function = x -> {
-                        x[0] = Double.NEGATIVE_INFINITY;
-                        Sorting.sortPairedInternal2(x, 1, x.length - 1);
-                    };
-                } else if (name.endsWith("3")) {
-                    function = x -> {
-                        x[0] = Double.NEGATIVE_INFINITY;
-                        Sorting.sortPairedInternal3(x, 1, x.length - 1);
-                    };
-                } else if (name.endsWith("4")) {
-                    function = x -> {
-                        x[0] = Double.NEGATIVE_INFINITY;
-                        Sorting.sortPairedInternal4(x, 1, x.length - 1);
-                    };
-                }
-            } else if ("InsertionSortB".equals(name)) {
-                function = x -> {
-                    x[0] = Double.NEGATIVE_INFINITY;
-                    Sorting.sortb(x, 1, x.length - 1);
-                };
-            // Not actually a sort. This is used to benchmark the speed of heapselect
-            // for a single k as a stopper function against a full sort of small data.
-            } else if (name.startsWith(HEAP_SELECT)) {
-                final char c = name.charAt(name.length() - 1);
-                // This offsets the start by 1 for comparison with insertion sort
-                final int k = Character.isDigit(c) ? Character.digit(c, 10) + 1 : 1;
-                function = x -> Partition.heapSelectLeft(x, 1, x.length - 1, k, 0);
-            }
-            if (function == null) {
-                throw new IllegalStateException("Unknown sort function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -1998,20 +1707,24 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class Sort5FunctionSource {
-        /** Name of the source. */
-        @Param({"sort5", "sort5b", "sort5c",
-            //"sort", "sort5head"
-            })
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "sort5", "sort5b", "sort5c" //"sort", "sort5head"
+        })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private Consumer<double[]> function;
 
         /**
          * @return the function
          */
         public Consumer<double[]> getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2019,50 +1732,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            // Note: We do not run this on input of length 5. We can run it on input of
-            // any length above 5. So we choose indices using a spacing of 1/4 of the range.
-            // Since we do this for all methods it is a fixed overhead. This allows use
-            // of a variety of data sizes.
-            if ("sort5".equals(name)) {
-                function = x -> {
-                    final int s = x.length >> 2;
-                    Sorting.sort5(x, 0, s, s << 1, x.length - 1 - s, x.length - 1);
-                };
-            } else if ("sort5b".equals(name)) {
-                function = x -> {
-                    final int s = x.length >> 2;
-                    Sorting.sort5b(x, 0, s, s << 1, x.length - 1 - s, x.length - 1);
-                };
-            } else if ("sort5c".equals(name)) {
-                function = x -> {
-                    final int s = x.length >> 2;
-                    Sorting.sort5c(x, 0, s, s << 1, x.length - 1 - s, x.length - 1);
-                };
-            } else if ("sort".equals(name)) {
-                function = x -> Sorting.sort(x, 0, 4);
-            } else if ("sort5head".equals(name)) {
-                function = x -> Sorting.sort5(x, 0, 1, 2, 3, 4);
-            // Median of 5. Ensure the median index is computed by storing it in x
-            } else if ("median5".equals(name)) {
-                function = x -> {
-                    final int s = x.length >> 2;
-                    x[0] = Sorting.median5(x, 0, s, s << 1, x.length - 1 - s, x.length - 1);
-                };
-            } else if ("median5head".equals(name)) {
-                function = x -> x[0] = Sorting.median5(x, 0, 1, 2, 3, 4);
-            // median of 5 continuous elements
-            } else if ("med5".equals(name)) {
-                function = x -> x[0] = Sorting.median5(x, 0);
-            } else if ("med5b".equals(name)) {
-                function = x -> x[0] = Sorting.median5b(x, 0);
-            } else if ("med5c".equals(name)) {
-                function = x -> x[0] = Sorting.median5c(x, 0);
-            } else if ("med5d".equals(name)) {
-                function = x -> Sorting.median5d(x, 0, 1, 2, 3, 4);
-            } else {
-                throw new IllegalStateException("Unknown sort5 function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -2071,22 +1741,25 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class Median4FunctionSource {
-        /** Name of the source. */
-        @Param({"lower4", "lower4b", "lower4c", "lower4d", "lower4e",
-            "upper4", "upper4c", "upper4d",
-            // Full sort is slower
-            //"sort4"
-            })
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "lower4", "lower4b", "lower4c", "lower4d", "lower4e", "upper4", "upper4c", "upper4d" // Full sort is slower
+        //"sort4"
+        })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private Consumer<double[]> function;
 
         /**
          * @return the function
          */
         public Consumer<double[]> getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2094,84 +1767,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            // Note: We run this across the entire input array to simulate a pass
-            // of the quickselect adaptive algorithm.
-            if ("lower4".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.lowerMedian4(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else if ("lower4b".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.lowerMedian4b(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else if ("lower4c".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.lowerMedian4c(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else if ("lower4d".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.lowerMedian4d(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else if ("lower4e".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.lowerMedian4e(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else if ("upper4".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.upperMedian4(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else if ("upper4c".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.upperMedian4c(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else if ("upper4d".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.upperMedian4d(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else if ("sort4".equals(name)) {
-                function = x -> {
-                    final int f = x.length >>> 2;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.sort4(x, i - f, i, i + f, i + f2);
-                    }
-                };
-            } else {
-                throw new IllegalStateException("Unknown median4 function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -2180,18 +1776,23 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class Median3FunctionSource {
-        /** Name of the source. */
-        @Param({"sort3", "sort3b", "sort3c"})
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "sort3", "sort3b", "sort3c" })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private Consumer<double[]> function;
 
         /**
          * @return the function
          */
         public Consumer<double[]> getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2199,36 +1800,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            // Note: We run this across the entire input array to simulate a pass
-            // of the quickselect adaptive algorithm.
-            if ("sort3".equals(name)) {
-                function = x -> {
-                    final int f = x.length / 3;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.sort3(x, i - f, i, i + f);
-                    }
-                };
-            } else if ("sort3b".equals(name)) {
-                function = x -> {
-                    final int f = x.length / 3;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.sort3b(x, i - f, i, i + f);
-                    }
-                };
-            } else if ("sort3c".equals(name)) {
-                function = x -> {
-                    final int f = x.length / 3;
-                    final int f2 = f + f;
-                    for (int i = f; i < f2; i++) {
-                        Sorting.sort3c(x, i - f, i, i + f);
-                    }
-                };
-            } else {
-                throw new IllegalStateException("Unknown sort3 function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -2237,31 +1809,35 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class DoubleKFunctionSource {
-        /** Name of the source. */
-        @Param({SORT + JDK, SPH,
-            SP, BM, SBM,
-            DP, DP5,
-            SBM2,
-            ISP, IDP,
-            LSP, LINEAR, SELECT})
+
+        /**
+         * Name of the source.
+         */
+        @Param({ SORT + JDK, SPH, SP, BM, SBM, DP, DP5, SBM2, ISP, IDP, LSP, LINEAR, SELECT })
         private String name;
 
-        /** Override of minimum quickselect size. */
-        @Param({"0"})
+        /**
+         * Override of minimum quickselect size.
+         */
+        @Param({ "0" })
         private int qs;
 
-        /** Override of minimum edgeselect constant. */
-        @Param({"0"})
+        /**
+         * Override of minimum edgeselect constant.
+         */
+        @Param({ "0" })
         private int ec;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private BiFunction<double[], int[], double[]> function;
 
         /**
          * @return the function
          */
         public BiFunction<double[], int[], double[]> getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2269,170 +1845,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            // Note: For parity in the test, each partition method that accepts the keys as any array
-            // receives a clone of the indices.
-            if (name.equals(BASELINE)) {
-                function = (data, indices) -> extractIndices(data, indices.clone());
-            } else  if (name.startsWith(SORT)) {
-                // Sort variants (do not clone the keys)
-                if (name.contains(ISP)) {
-                    final Partition part = PartitionFactory.createPartition(name.substring(SORT.length()), ISP, qs, ec);
-                    function = (data, indices) -> {
-                        part.sortISP(data);
-                        return extractIndices(data, indices);
-                    };
-                } else if (name.contains(IDP)) {
-                    final Partition part = PartitionFactory.createPartition(name.substring(SORT.length()), IDP, qs, ec);
-                    function = (data, indices) -> {
-                        part.sortIDP(data);
-                        return extractIndices(data, indices);
-                    };
-                } else if (name.contains(JDK)) {
-                    function = (data, indices) -> {
-                        Arrays.sort(data);
-                        return extractIndices(data, indices);
-                    };
-                }
-            // First generation kth-selector functions
-            } else if (name.startsWith(SPH)) {
-                // Ported CM implementation with a heap
-                final KthSelector selector = PartitionFactory.createKthSelector(name, SPH, qs);
-                function = (data, indices) -> {
-                    final int n = indices.length;
-                    // Note: Pivots heap is not optimal here but should be enough for most cases.
-                    // The size matches that in the Commons Math Percentile class
-                    final int[] pivots = n <= 1 ?
-                        KthSelector.NO_PIVOTS :
-                        new int[1023];
-                    final double[] x = new double[indices.length];
-                    for (int i = 0; i < indices.length; i++) {
-                        x[i] = selector.selectSPH(data, pivots, indices[i], null);
-                    }
-                    return x;
-                };
-            // The following methods clone the indices to avoid destructive modification
-            } else if (name.startsWith(SPN)) {
-                final KthSelector selector = PartitionFactory.createKthSelector(name, SPN, qs);
-                function = (data, indices) -> {
-                    selector.partitionSPN(data, indices.clone());
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(SP)) {
-                final KthSelector selector = PartitionFactory.createKthSelector(name, SP, qs);
-                function = (data, indices) -> {
-                    selector.partitionSP(data, indices.clone());
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(BM)) {
-                final KthSelector selector = PartitionFactory.createKthSelector(name, BM, qs);
-                function = (data, indices) -> {
-                    selector.partitionBM(data, indices.clone());
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(SBM)) {
-                final KthSelector selector = PartitionFactory.createKthSelector(name, SBM, qs);
-                function = (data, indices) -> {
-                    selector.partitionSBM(data, indices.clone());
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(DP)) {
-                final KthSelector selector = PartitionFactory.createKthSelector(name, DP, qs);
-                function = (data, indices) -> {
-                    selector.partitionDP(data, indices.clone());
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(DP5)) {
-                final KthSelector selector = PartitionFactory.createKthSelector(name, DP5, qs);
-                function = (data, indices) -> {
-                    selector.partitionDP5(data, indices.clone());
-                    return extractIndices(data, indices);
-                };
-            // Second generation partition function with configurable key strategy
-            } else if (name.startsWith(SBM2)) {
-                final Partition part = PartitionFactory.createPartition(name, SBM2, qs, ec);
-                function = (data, indices) -> {
-                    part.partitionSBM(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            // Floyd-Rivest partition functions
-            } else if (name.startsWith(FR)) {
-                final Partition part = PartitionFactory.createPartition(name, FR, qs, ec);
-                function = (data, indices) -> {
-                    part.partitionFR(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(KFR)) {
-                final Partition part = PartitionFactory.createPartition(name, KFR, qs, ec);
-                function = (data, indices) -> {
-                    part.partitionKFR(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            // Introselect implementations which are highly configurable
-            } else if (name.startsWith(ISP)) {
-                final Partition part = PartitionFactory.createPartition(name, ISP, qs, ec);
-                function = (data, indices) -> {
-                    part.partitionISP(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(IDP)) {
-                final Partition part = PartitionFactory.createPartition(name, IDP, qs, ec);
-                function = (data, indices) -> {
-                    part.partitionIDP(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(SELECT)) {
-                // Not configurable
-                function = (data, indices) -> {
-                    Selection.select(data, indices.clone());
-                    return extractIndices(data, indices);
-                };
-            // Linearselect (median-of-medians) implementation (stopper for quickselect)
-            } else if (name.startsWith(LSP)) {
-                final Partition part = PartitionFactory.createPartition(name, LSP, qs, ec);
-                function = (data, indices) -> {
-                    part.partitionLSP(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            // Linearselect (optimised median-of-medians) implementation (stopper for quickselect)
-            } else if (name.startsWith(LINEAR)) {
-                final Partition part = PartitionFactory.createPartition(name, LINEAR, qs, ec);
-                function = (data, indices) -> {
-                    part.partitionLinear(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(QA2)) {
-                // Configurable only by static properties.
-                // Default to FR sampling for the initial mode.
-                final int mode = PartitionFactory.getControlFlags(new String[] {name}, -1);
-                final int inc = PartitionFactory.getOptionFlags(new String[] {name}, 1);
-                Partition.configureQaAdaptive(mode, inc);
-                function = (data, indices) -> {
-                    Partition.partitionQA2(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            } else if (name.startsWith(QA)) {
-                final Partition part = PartitionFactory.createPartition(name, QA, qs, ec);
-                function = (data, indices) -> {
-                    part.partitionQA(data, indices.clone(), indices.length);
-                    return extractIndices(data, indices);
-                };
-            // Heapselect implementation (stopper for quickselect)
-            } else if (name.startsWith(HEAP_SELECT)) {
-                function = (data, indices) -> {
-                    int min = indices[indices.length - 1];
-                    int max = min;
-                    for (int i = indices.length - 1; --i >= 0;) {
-                        min = Math.min(min, indices[i]);
-                        max = Math.max(max, indices[i]);
-                    }
-                    Partition.heapSelectRange(data, 0, data.length - 1, min, max);
-                    return extractIndices(data, indices);
-                };
-            }
-            if (function == null) {
-                throw new IllegalStateException("Unknown selector function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2456,18 +1869,23 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class IntKFunctionSource {
-        /** Name of the source. */
-        @Param({SORT + JDK, SELECT})
+
+        /**
+         * Name of the source.
+         */
+        @Param({ SORT + JDK, SELECT })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private BiFunction<int[], int[], int[]> function;
 
         /**
          * @return the function
          */
         public BiFunction<int[], int[], int[]> getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2475,24 +1893,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            // Note: Always clone the indices
-            if (name.equals(BASELINE)) {
-                function = (data, indices) -> extractIndices(data, indices.clone());
-            } else  if (name.startsWith(SORT)) {
-                function = (data, indices) -> {
-                    Arrays.sort(data);
-                    return extractIndices(data, indices.clone());
-                };
-            } else if (name.startsWith(SELECT)) {
-                function = (data, indices) -> {
-                    Selection.select(data, indices.clone());
-                    return extractIndices(data, indices);
-                };
-            }
-            if (function == null) {
-                throw new IllegalStateException("Unknown int selector function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2520,18 +1921,23 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class SortNaNFunctionSource {
-        /** Name of the source. */
-        @Param({"RawZeroNaN", "ZeroSignNaN", "NaNRawZero", "NaNZeroSign"})
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "RawZeroNaN", "ZeroSignNaN", "NaNRawZero", "NaNZeroSign" })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private BiConsumer<double[], Blackhole> function;
 
         /**
          * @return the function
          */
         public BiConsumer<double[], Blackhole> getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2539,80 +1945,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            // Functions sort NaN and detect signed zeros.
-            // For convenience the function accepts the blackhole to handle any
-            // output from the processing.
-            if ("RawZeroNaN".equals(name)) {
-                function = (a, bh) -> {
-                    int cn = 0;
-                    int end = a.length;
-                    for (int i = end; --i >= 0;) {
-                        final double v = a[i];
-                        if (Double.doubleToRawLongBits(v) == Long.MIN_VALUE) {
-                            cn++;
-                            a[i] = 0.0;
-                        } else if (v != v) {
-                            a[i] = a[--end];
-                            a[end] = v;
-                        }
-                    }
-                    bh.consume(cn);
-                    bh.consume(end);
-                };
-            } else if ("ZeroSignNaN".equals(name)) {
-                function = (a, bh) -> {
-                    int cn = 0;
-                    int end = a.length;
-                    for (int i = end; --i >= 0;) {
-                        final double v = a[i];
-                        if (v == 0.0 && Double.doubleToRawLongBits(v) < 0) {
-                            cn++;
-                            a[i] = 0.0;
-                        } else if (v != v) {
-                            a[i] = a[--end];
-                            a[end] = v;
-                        }
-                    }
-                    bh.consume(cn);
-                    bh.consume(end);
-                };
-            } else if ("NaNRawZero".equals(name)) {
-                function = (a, bh) -> {
-                    int cn = 0;
-                    int end = a.length;
-                    for (int i = end; --i >= 0;) {
-                        final double v = a[i];
-                        if (v != v) {
-                            a[i] = a[--end];
-                            a[end] = v;
-                        } else if (Double.doubleToRawLongBits(v) == Long.MIN_VALUE) {
-                            cn++;
-                            a[i] = 0.0;
-                        }
-                    }
-                    bh.consume(cn);
-                    bh.consume(end);
-                };
-            } else if ("NaNZeroSign".equals(name)) {
-                function = (a, bh) -> {
-                    int cn = 0;
-                    int end = a.length;
-                    for (int i = end; --i >= 0;) {
-                        final double v = a[i];
-                        if (v != v) {
-                            a[i] = a[--end];
-                            a[end] = v;
-                        } else if (v == 0.0 && Double.doubleToRawLongBits(v) < 0) {
-                            cn++;
-                            a[i] = 0.0;
-                        }
-                    }
-                    bh.consume(cn);
-                    bh.consume(end);
-                };
-            } else {
-                throw new IllegalStateException("Unknown sort NaN function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -2625,23 +1958,27 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class EdgeFunctionSource {
-        /** Name of the source.
-         * For introselect methods this should effectively turn-off edgeselect. */
-        @Param({HEAP_SELECT, ISP + "_EC0", IDP + "_EC0",
-            // Only use for small length as sort insertion is worst case Order(k * (right - left))
-            // vs heap select() is O(k - left) + O((right - k) * log(k - left))
-            //SORT_SELECT
-            })
+
+        /**
+         * Name of the source.
+         * For introselect methods this should effectively turn-off edgeselect.
+         */
+        @Param({ HEAP_SELECT, ISP + "_EC0", IDP + "_EC0" // Only use for small length as sort insertion is worst case Order(k * (right - left))
+        // vs heap select() is O(k - left) + O((right - k) * log(k - left))
+        //SORT_SELECT
+        })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private BiFunction<double[], int[], double[]> function;
 
         /**
          * @return the function
          */
         public BiFunction<double[], int[], double[]> getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2649,67 +1986,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            // Direct use of heapselect. This has variations which use different
-            // optimisations for small heaps.
-            // Note: Optimisation for small heap size (n=1,2) is not observable on large data.
-            // It requires the use of small data (e.g. len=[16, 32)) to observe differences.
-            // The main overhead is the test for insertion against the current top of the
-            // heap which grows increasingly unlikely as the range is scanned.
-            // Optimisation for n=1 is negligible; for n=2 it is up to 10%. However using only
-            // heapSelectRange2 is not as fast as the non-optimised heapSelectRange0
-            // when the heap is size 1. For n=1 the heap insertion branch prediction
-            // can learn the heap has no children and skip descending the heap, whereas
-            // heap size n=2 can descend 1 level if the child is smaller/bigger. This is not
-            // as fast as dedicated code for the single child case.
-            // This benchmark requires repeating with variable heap size to avoid branch
-            // prediction learning what to do, i.e. use with an index source that has variable
-            // distance from the edge.
-            if (HEAP_SELECT.equals(name)) {
-                function = (data, indices) -> {
-                    heapSelectRange0(data, 0, data.length - 1, indices[0], indices[1]);
-                    return extractIndices(data, indices[0], indices[1]);
-                };
-            } else if ((HEAP_SELECT + "1").equals(name)) {
-                function = (data, indices) -> {
-                    heapSelectRange1(data, 0, data.length - 1, indices[0], indices[1]);
-                    return extractIndices(data, indices[0], indices[1]);
-                };
-            } else if ((HEAP_SELECT + "2").equals(name)) {
-                function = (data, indices) -> {
-                    heapSelectRange2(data, 0, data.length - 1, indices[0], indices[1]);
-                    return extractIndices(data, indices[0], indices[1]);
-                };
-            } else if ((HEAP_SELECT + "12").equals(name)) {
-                function = (data, indices) -> {
-                    heapSelectRange12(data, 0, data.length - 1, indices[0], indices[1]);
-                    return extractIndices(data, indices[0], indices[1]);
-                };
-            // Only use on small edge as insertion is Order(k)
-            } else if (SORT_SELECT.equals(name)) {
-                function = (data, indices) -> {
-                    Partition.sortSelectRange(data, 0, data.length - 1, indices[0], indices[1]);
-                    return extractIndices(data, indices[0], indices[1]);
-                };
-            // Introselect methods - these should be configured to not use edgeselect.
-            // These directly call the introselect method to skip NaN/signed zero processing.
-            } else if (name.startsWith(ISP)) {
-                final Partition part = PartitionFactory.createPartition(name, ISP);
-                function = (data, indices) -> {
-                    part.introselect(part.getSPFunction(), data,
-                        0, data.length - 1, IndexIntervals.interval(indices[0], indices[1]), 10000);
-                    return extractIndices(data, indices[0], indices[1]);
-                };
-            } else if (name.startsWith(IDP)) {
-                final Partition part = PartitionFactory.createPartition(name, IDP);
-                function = (data, indices) -> {
-                    part.introselect(Partition::partitionDP, data,
-                        0, data.length - 1, IndexIntervals.interval(indices[0], indices[1]), 10000);
-                    return extractIndices(data, indices[0], indices[1]);
-                };
-            } else {
-                throw new IllegalStateException("Unknown edge selector function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2728,15 +2005,7 @@ public class SelectionPerformance {
          * @param kb Upper index to select.
          */
         static void heapSelectRange0(double[] a, int left, int right, int ka, int kb) {
-            if (right - left < Partition.MIN_HEAPSELECT_SIZE) {
-                Sorting.sort(a, left, right);
-                return;
-            }
-            if (kb - left < right - ka) {
-                Partition.heapSelectLeft(a, left, right, kb, kb - ka);
-            } else {
-                Partition.heapSelectRight(a, left, right, ka, kb - ka);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2755,25 +2024,7 @@ public class SelectionPerformance {
          * @param kb Upper index to select.
          */
         static void heapSelectRange1(double[] a, int left, int right, int ka, int kb) {
-            if (right - left < Partition.MIN_HEAPSELECT_SIZE) {
-                Sorting.sort(a, left, right);
-                return;
-            }
-            if (kb - left < right - ka) {
-                // Optimise
-                if (kb == left) {
-                    Partition.selectMinIgnoreZeros(a, left, right);
-                } else {
-                    Partition.heapSelectLeft(a, left, right, kb, kb - ka);
-                }
-            } else {
-                // Optimise
-                if (ka == right) {
-                    Partition.selectMaxIgnoreZeros(a, left, right);
-                } else {
-                    Partition.heapSelectRight(a, left, right, ka, kb - ka);
-                }
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2792,25 +2043,7 @@ public class SelectionPerformance {
          * @param kb Upper index to select.
          */
         static void heapSelectRange2(double[] a, int left, int right, int ka, int kb) {
-            if (right - left < Partition.MIN_HEAPSELECT_SIZE) {
-                Sorting.sort(a, left, right);
-                return;
-            }
-            if (kb - left < right - ka) {
-                // Optimise
-                if (kb - 1 <= left) {
-                    Partition.selectMin2IgnoreZeros(a, left, right);
-                } else {
-                    Partition.heapSelectLeft(a, left, right, kb, kb - ka);
-                }
-            } else {
-                // Optimise
-                if (ka + 1 >= right) {
-                    Partition.selectMax2IgnoreZeros(a, left, right);
-                } else {
-                    Partition.heapSelectRight(a, left, right, ka, kb - ka);
-                }
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2829,33 +2062,7 @@ public class SelectionPerformance {
          * @param kb Upper index to select.
          */
         static void heapSelectRange12(double[] a, int left, int right, int ka, int kb) {
-            if (right - left < Partition.MIN_HEAPSELECT_SIZE) {
-                Sorting.sort(a, left, right);
-                return;
-            }
-            if (kb - left < right - ka) {
-                // Optimise
-                if (kb - 1 <= left) {
-                    if (kb == left) {
-                        Partition.selectMinIgnoreZeros(a, left, right);
-                    } else {
-                        Partition.selectMin2IgnoreZeros(a, left, right);
-                    }
-                } else {
-                    Partition.heapSelectLeft(a, left, right, kb, kb - ka);
-                }
-            } else {
-                // Optimise
-                if (ka + 1 >= right) {
-                    if (ka == right) {
-                        Partition.selectMaxIgnoreZeros(a, left, right);
-                    } else {
-                        Partition.selectMax2IgnoreZeros(a, left, right);
-                    }
-                } else {
-                    Partition.heapSelectRight(a, left, right, ka, kb - ka);
-                }
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2881,19 +2088,24 @@ public class SelectionPerformance {
      */
     @State(Scope.Benchmark)
     public static class IndexSearchFunctionSource {
-        /** Name of the source. */
-        @Param({"Binary",
-            //"binarySearch",
-            "Scan"})
+
+        /**
+         * Name of the source.
+         */
+        @Param({ "Binary", //"binarySearch",
+        "Scan" })
         private String name;
 
-        /** The action. */
+        /**
+         * The action.
+         */
         private SearchFunction function;
 
         /**
          * Define a search function.
          */
         public interface SearchFunction {
+
             /**
              * Find the index of the element {@code k}, or the closest index
              * to the element (implementation definitions may vary).
@@ -2909,7 +2121,7 @@ public class SelectionPerformance {
          * @return the function
          */
         public SearchFunction getFunction() {
-            return function;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -2917,23 +2129,7 @@ public class SelectionPerformance {
          */
         @Setup
         public void setup() {
-            Objects.requireNonNull(name);
-            if ("Binary".equals(name)) {
-                function = (keys, k) -> Partition.searchLessOrEqual(keys, 0, keys.length - 1, k);
-            } else if ("binarySearch".equals(name)) {
-                function = (keys, k) -> Arrays.binarySearch(keys, 0, keys.length, k);
-            } else if ("Scan".equals(name)) {
-                function = (keys, k) -> {
-                    // Assume that k >= keys[0]
-                    int i = keys.length;
-                    do {
-                        --i;
-                    } while (keys[i] > k);
-                    return i;
-                };
-            } else {
-                throw new IllegalStateException("Unknown index search function: " + name);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -2946,13 +2142,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void sort(SortFunctionSource function, SortSource source, Blackhole bh) {
-        final int size = source.size();
-        final Consumer<double[]> fun = function.getFunction();
-        for (int j = -1; ++j < size;) {
-            final double[] y = source.getData(j);
-            fun.accept(y);
-            bh.consume(y);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2965,13 +2155,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void fiveSort(Sort5FunctionSource function, SortSource source, Blackhole bh) {
-        final int size = source.size();
-        final Consumer<double[]> fun = function.getFunction();
-        for (int j = -1; ++j < size;) {
-            final double[] y = source.getData(j);
-            fun.accept(y);
-            bh.consume(y);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2984,13 +2168,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void fourMedian(Median4FunctionSource function, SortSource source, Blackhole bh) {
-        final int size = source.size();
-        final Consumer<double[]> fun = function.getFunction();
-        for (int j = -1; ++j < size;) {
-            final double[] y = source.getData(j);
-            fun.accept(y);
-            bh.consume(y);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3003,13 +2181,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void threeMedian(Median3FunctionSource function, SortSource source, Blackhole bh) {
-        final int size = source.size();
-        final Consumer<double[]> fun = function.getFunction();
-        for (int j = -1; ++j < size;) {
-            final double[] y = source.getData(j);
-            fun.accept(y);
-            bh.consume(y);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3021,13 +2193,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void doublePartition(DoubleKFunctionSource function, KSource source, Blackhole bh) {
-        final int size = source.size();
-        final BiFunction<double[], int[], double[]> fun = function.getFunction();
-        for (int j = -1; ++j < size;) {
-            // Note: This uses the indices without cloning. This is because some
-            // functions do not destructively modify the data.
-            bh.consume(fun.apply(source.getData(j), source.getIndices(j)));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3039,13 +2205,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void intPartition(IntKFunctionSource function, KSource source, Blackhole bh) {
-        final int size = source.size();
-        final BiFunction<int[], int[], int[]> fun = function.getFunction();
-        for (int j = -1; ++j < size;) {
-            // Note: This uses the indices without cloning. This is because some
-            // functions do not destructively modify the data.
-            bh.consume(fun.apply(source.getIntData(j), source.getIndices(j)));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3058,11 +2218,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void edgeSelect(EdgeFunctionSource function, EdgeSource source, Blackhole bh) {
-        final int size = source.size();
-        final BiFunction<double[], int[], double[]> fun = function.getFunction();
-        for (int j = -1; ++j < size;) {
-            bh.consume(fun.apply(source.getData(j), source.getIndices(j)));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3074,11 +2230,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void nanZero(SortNaNFunctionSource function, SortSource source, Blackhole bh) {
-        final int size = source.size();
-        final BiConsumer<double[], Blackhole> fun = function.getFunction();
-        for (int j = -1; ++j < size;) {
-            fun.accept(source.getData(j), bh);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3090,14 +2242,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public long indexSearch(IndexSearchFunctionSource function, SplitIndexSource source) {
-        final IndexSearchFunctionSource.SearchFunction fun = function.getFunction();
-        // Ensure we have something to consume during the benchmark
-        long sum = 0;
-        for (int i = source.samples(); --i >= 0;) {
-            // Single point in the range
-            sum += fun.find(source.getIndices(i), source.getPoint(i));
-        }
-        return sum;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3132,20 +2277,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public long searchableIntervalNextPrevious(SearchableIntervalSource function, SplitIndexSource source) {
-        final int[][] indices = source.getIndices();
-        final int[][] points = source.getPoints();
-        // Ensure we have something to consume during the benchmark
-        long sum = 0;
-        for (int i = 0; i < indices.length; i++) {
-            final int[] x = indices[i];
-            final int[] p = points[i];
-            final SearchableInterval interval = function.create(x);
-            for (final int k : p) {
-                sum += interval.nextIndex(k);
-                sum += interval.previousIndex(k);
-            }
-        }
-        return sum;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3164,28 +2296,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public long searchableIntervalSplit(SearchableIntervalSource function, SplitIndexSource source) {
-        final int[][] indices = source.getIndices();
-        final int[][] points = source.getPoints();
-        // Ensure we have something to consume during the benchmark
-        long sum = 0;
-        final int[] bound = {0};
-        for (int i = 0; i < indices.length; i++) {
-            final int[] x = indices[i];
-            final int[] p = points[i];
-            // Note: A partition algorithm would only call split if there are indices
-            // above and below the split point.
-            final SearchableInterval interval = function.create(x);
-            final int left = interval.left();
-            final int right = interval.right();
-            for (final int k : p) {
-                // Check k is in the open interval (left, right)
-                if (left < k && k < right) {
-                    sum += interval.split(k, k, bound);
-                    sum += bound[0];
-                }
-            }
-        }
-        return sum;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3205,10 +2316,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void createSearchableInterval(SearchableIntervalSource function, IndexSource source, Blackhole bh) {
-        final int[][] indices = source.getIndices();
-        for (final int[] x : indices) {
-            bh.consume(function.create(x));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3225,11 +2333,7 @@ public class SelectionPerformance {
      */
     @Benchmark
     public void updatingIntervalSplit(UpdatingIntervalSource function, IndexSource source, Blackhole bh) {
-        final int[][] indices = source.getIndices();
-        final int s = source.getMinSeparation();
-        for (int i = 0; i < indices.length; i++) {
-            split(function.create(indices[i]), s, bh);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**

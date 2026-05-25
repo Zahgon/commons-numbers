@@ -45,8 +45,12 @@ import org.apache.commons.numbers.fraction.GeneralizedContinuedFraction.Coeffici
  * with updates to the previous coefficients.
  */
 public abstract class ContinuedFraction {
-    /** Create an instance. */
-    public ContinuedFraction() {}
+
+    /**
+     * Create an instance.
+     */
+    public ContinuedFraction() {
+    }
 
     /**
      * Defines the <a href="https://mathworld.wolfram.com/ContinuedFraction.html">
@@ -81,7 +85,7 @@ public abstract class ContinuedFraction {
      * @see #evaluate(double,double,int)
      */
     public double evaluate(double x, double epsilon) {
-        return evaluate(x, epsilon, GeneralizedContinuedFraction.DEFAULT_ITERATIONS);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -110,53 +114,6 @@ public abstract class ContinuedFraction {
      * before the expected convergence is achieved.
      */
     public double evaluate(double x, double epsilon, int maxIterations) {
-        // Delegate to GeneralizedContinuedFraction
-
-        // Get the first coefficient
-        final double b0 = getB(0, x);
-
-        // Generate coefficients from (a1,b1)
-        final Supplier<Coefficient> gen = new Supplier<Coefficient>() {
-            /** Coefficient index. */
-            private int n;
-            @Override
-            public Coefficient get() {
-                n++;
-                final double a = getA(n, x);
-                final double b = getB(n, x);
-                return Coefficient.of(a, b);
-            }
-        };
-
-        // Invoke appropriate method based on magnitude of first term.
-
-        // If b0 is too small or zero it is set to a non-zero small number to allow
-        // magnitude updates. Avoid this by adding b0 at the end if b0 is small.
-        //
-        // This handles the use case of a negligible initial term. If b1 is also small
-        // then the evaluation starting at b0 or b1 may converge poorly.
-        // One solution is to manually compute the convergent until it is not small
-        // and then evaluate the fraction from the next term:
-        // h1 = b0 + a1 / b1
-        // h2 = b0 + a1 / (b1 + a2 / b2)
-        // ...
-        // hn not 'small', start generator at (n+1):
-        // value = GeneralizedContinuedFraction.value(hn, gen)
-        // This solution is not implemented to avoid recursive complexity.
-
-        if (Math.abs(b0) < GeneralizedContinuedFraction.SMALL) {
-            // Updates from initial convergent b1 and computes:
-            // b0 + a1 / [  b1 + a2 / (b2 + ... ) ]
-            return GeneralizedContinuedFraction.value(b0, gen, epsilon, maxIterations);
-        }
-
-        // Use the package-private evaluate method.
-        // Calling GeneralizedContinuedFraction.value(gen, epsilon, maxIterations)
-        // requires the generator to start from (a0,b0) and repeats computation of b0
-        // and wastes computation of a0.
-
-        // Updates from initial convergent b0:
-        // b0 + a1 / (b1 + ... )
-        return GeneralizedContinuedFraction.evaluate(b0, gen, epsilon, maxIterations);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

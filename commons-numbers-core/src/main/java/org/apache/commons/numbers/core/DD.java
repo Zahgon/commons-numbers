@@ -166,10 +166,8 @@ import java.util.function.DoubleUnaryOperator;
  *
  * @since 1.2
  */
-public final class DD
-    extends Number
-    implements NativeOperators<DD>,
-               Serializable {
+public final class DD extends Number implements NativeOperators<DD>, Serializable {
+
     // Caveat:
     //
     // The code below uses many additions/subtractions that may
@@ -207,11 +205,11 @@ public final class DD
     // Maintenance of 1 ULP precision in the round-off component for all double-double
     // operations is a performance burden. This class avoids this requirement to provide
     // a compromise between accuracy and performance.
-
     /**
      * A double-double number representing one.
      */
     public static final DD ONE = new DD(1, 0);
+
     /**
      * A double-double number representing zero.
      */
@@ -224,36 +222,75 @@ public final class DD
      * and the multiplier is {@code 2^27 + 1}.
      */
     private static final double MULTIPLIER = 1.0 + 0x1.0p27;
-    /** The mask to extract the raw 11-bit exponent.
-     * The value must be shifted 52-bits to remove the mantissa bits. */
+
+    /**
+     * The mask to extract the raw 11-bit exponent.
+     * The value must be shifted 52-bits to remove the mantissa bits.
+     */
     private static final int EXP_MASK = 0x7ff;
-    /** The value 2046 converted for use if using {@link Integer#compareUnsigned(int, int)}.
-     * This requires adding {@link Integer#MIN_VALUE} to 2046. */
+
+    /**
+     * The value 2046 converted for use if using {@link Integer#compareUnsigned(int, int)}.
+     * This requires adding {@link Integer#MIN_VALUE} to 2046.
+     */
     private static final int CMP_UNSIGNED_2046 = Integer.MIN_VALUE + 2046;
-    /** The value -1 converted for use if using {@link Integer#compareUnsigned(int, int)}.
-     * This requires adding {@link Integer#MIN_VALUE} to -1. */
+
+    /**
+     * The value -1 converted for use if using {@link Integer#compareUnsigned(int, int)}.
+     * This requires adding {@link Integer#MIN_VALUE} to -1.
+     */
     private static final int CMP_UNSIGNED_MINUS_1 = Integer.MIN_VALUE - 1;
-    /** The value 1022 converted for use if using {@link Integer#compareUnsigned(int, int)}.
-     * This requires adding {@link Integer#MIN_VALUE} to 1022. */
+
+    /**
+     * The value 1022 converted for use if using {@link Integer#compareUnsigned(int, int)}.
+     * This requires adding {@link Integer#MIN_VALUE} to 1022.
+     */
     private static final int CMP_UNSIGNED_1022 = Integer.MIN_VALUE + 1022;
-    /** 2^512. */
+
+    /**
+     * 2^512.
+     */
     private static final double TWO_POW_512 = 0x1.0p512;
-    /** 2^-512. */
+
+    /**
+     * 2^-512.
+     */
     private static final double TWO_POW_M512 = 0x1.0p-512;
-    /** 2^53. Any double with a magnitude above this is an even integer. */
+
+    /**
+     * 2^53. Any double with a magnitude above this is an even integer.
+     */
     private static final double TWO_POW_53 = 0x1.0p53;
-    /** Mask to extract the high 32-bits from a long. */
+
+    /**
+     * Mask to extract the high 32-bits from a long.
+     */
     private static final long HIGH32_MASK = 0xffff_ffff_0000_0000L;
-    /** Mask to remove the sign bit from a long. */
+
+    /**
+     * Mask to remove the sign bit from a long.
+     */
     private static final long UNSIGN_MASK = 0x7fff_ffff_ffff_ffffL;
-    /** Mask to extract the 52-bit mantissa from a long representation of a double. */
+
+    /**
+     * Mask to extract the 52-bit mantissa from a long representation of a double.
+     */
     private static final long MANTISSA_MASK = 0x000f_ffff_ffff_ffffL;
-    /** Exponent offset in IEEE754 representation. */
+
+    /**
+     * Exponent offset in IEEE754 representation.
+     */
     private static final int EXPONENT_OFFSET = 1023;
-    /** 0.5. */
+
+    /**
+     * 0.5.
+     */
     private static final double HALF = 0.5;
-    /** The limit for safe multiplication of {@code x*y}, assuming values above 1.
-     * Used to maintain positive values during the power computation. */
+
+    /**
+     * The limit for safe multiplication of {@code x*y}, assuming values above 1.
+     * Used to maintain positive values during the power computation.
+     */
     private static final double SAFE_MULTIPLY = 0x1.0p500;
 
     /**
@@ -265,19 +302,35 @@ public final class DD
      * allowing for formatting characters. The size is 64.
      */
     private static final int TO_STRING_SIZE = 64;
-    /** {@link #toString() String representation}. */
+
+    /**
+     * {@link #toString() String representation}.
+     */
     private static final char FORMAT_START = '(';
-    /** {@link #toString() String representation}. */
+
+    /**
+     * {@link #toString() String representation}.
+     */
     private static final char FORMAT_END = ')';
-    /** {@link #toString() String representation}. */
+
+    /**
+     * {@link #toString() String representation}.
+     */
     private static final char FORMAT_SEP = ',';
 
-    /** Serializable version identifier. */
+    /**
+     * Serializable version identifier.
+     */
     private static final long serialVersionUID = 20230701L;
 
-    /** The high part of the double-double number. */
+    /**
+     * The high part of the double-double number.
+     */
     private final double x;
-    /** The low part of the double-double number. */
+
+    /**
+     * The low part of the double-double number.
+     */
     private final double xx;
 
     /**
@@ -292,7 +345,6 @@ public final class DD
     }
 
     // Conversion constructors
-
     /**
      * Creates the double-double number as the value {@code (x, 0)}.
      *
@@ -300,7 +352,7 @@ public final class DD
      * @return the double-double
      */
     public static DD of(double x) {
-        return new DD(x, 0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -319,7 +371,7 @@ public final class DD
      * @see #twoSum(double, double)
      */
     static DD of(double x, double xx) {
-        return new DD(x, xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -334,7 +386,7 @@ public final class DD
      * @see #of(long)
      */
     public static DD of(int x) {
-        return new DD(x, 0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -349,16 +401,7 @@ public final class DD
      * @see #of(double)
      */
     public static DD of(long x) {
-        // Note: Casting the long to a double can lose bits due to rounding.
-        // These are not recoverable using lo = x - (long)((double) x)
-        // if the double is rounded outside the range of a long (i.e. 2^53).
-        // Split the long into two 32-bit numbers that are exactly representable
-        // and add them.
-        final long a = x & HIGH32_MASK;
-        final long b = x - a;
-        // When x is positive: a > b or a == 0
-        // When x is negative: |a| > |b|
-        return fastTwoSum(a, b);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -378,7 +421,7 @@ public final class DD
      * @since 1.3
      */
     public static DD ofUnsigned(int x) {
-        return new DD(Integer.toUnsignedLong(x), 0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -406,12 +449,7 @@ public final class DD
      * @since 1.3
      */
     public static DD ofUnsigned(long x) {
-        // Similar to of(long) but the high part is composed as an unsigned double
-        final long a = x & HIGH32_MASK;
-        final long b = x - a;
-        // Convert the unsigned magnitude to a double
-        final double aa = (a >>> 1) * 2.0;
-        return fastTwoSum(aa, b);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -432,15 +470,10 @@ public final class DD
      * @return the double-double
      */
     public static DD from(BigDecimal x) {
-        final double z = x.doubleValue();
-        // Guard against an infinite throwing a exception
-        final double zz = Double.isInfinite(z) ? 0 : x.subtract(new BigDecimal(z)).doubleValue();
-        // No normalisation here
-        return new DD(z, zz);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Arithmetic constructors:
-
     /**
      * Returns a {@code DD} whose value is {@code (x + y)}.
      * The values are not required to be ordered by magnitude,
@@ -466,7 +499,7 @@ public final class DD
      * @see #ofDifference(double, double)
      */
     public static DD ofSum(double x, double y) {
-        return twoSum(x, y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -487,7 +520,7 @@ public final class DD
      * @see #ofSum(double, double)
      */
     public static DD ofDifference(double x, double y) {
-        return twoDiff(x, y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -518,7 +551,7 @@ public final class DD
      * @return the product {@code x * y}.
      */
     public static DD ofProduct(double x, double y) {
-        return twoProd(x, y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -536,7 +569,7 @@ public final class DD
      * @see #ofProduct(double, double)
      */
     public static DD ofSquare(double x) {
-        return twoSquare(x);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -565,21 +598,10 @@ public final class DD
      * @return the quotient {@code x / y}.
      */
     public static DD fromQuotient(double x, double y) {
-        // Long division
-        // quotient q0 = x / y
-        final double q0 = x / y;
-        // remainder r = x - q0 * y
-        final double p0 = q0 * y;
-        final double p1 = twoProductLow(q0, y, p0);
-        final double r0 = x - p0;
-        final double r1 = twoDiffLow(x, p0, r0) - p1;
-        // correction term q1 = r0 / y
-        final double q1 = (r0 + r1) / y;
-        return new DD(q0, q1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Properties
-
     /**
      * Gets the first part {@code x} of the double-double number {@code (x, xx)}.
      * In a normalized double-double number this part will have the greatest magnitude.
@@ -590,7 +612,7 @@ public final class DD
      * @return the first part
      */
     public double hi() {
-        return x;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -603,7 +625,7 @@ public final class DD
      * @return the second part
      */
     public double lo() {
-        return xx;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -623,11 +645,10 @@ public final class DD
      * @see #bigDecimalValue()
      */
     public boolean isFinite() {
-        return Double.isFinite(x + xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Number conversions
-
     /**
      * Get the value as a {@code double}. This is the evaluated sum of the parts.
      *
@@ -642,7 +663,7 @@ public final class DD
      */
     @Override
     public double doubleValue() {
-        return x + xx;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -664,7 +685,7 @@ public final class DD
      */
     @Override
     public float floatValue() {
-        return (float) doubleValue();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -696,8 +717,7 @@ public final class DD
      */
     @Override
     public int intValue() {
-        // Clip the long value
-        return (int) Math.max(Integer.MIN_VALUE, Math.min(Integer.MAX_VALUE, longValue()));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -729,41 +749,7 @@ public final class DD
      */
     @Override
     public long longValue() {
-        // Assume |hi| > |lo|, i.e. the low part is the round-off
-        final long a = (long) x;
-        // The cast will truncate the value to the range [Long.MIN_VALUE, Long.MAX_VALUE].
-        // If the long converted back to a double is the same value then the high part
-        // was a representable integer and we must use the low part.
-        // Note: The floating-point comparison is intentional.
-        if (a == x) {
-            // Edge case: Any double value above 2^53 is even. To workaround representation
-            // of 2^63 as Long.MAX_VALUE (which is 2^63-1) we can split a into two parts.
-            final long a1;
-            final long a2;
-            if (Math.abs(x) > TWO_POW_53) {
-                a1 = (long) (x * 0.5);
-                a2 = a1;
-            } else {
-                a1 = a;
-                a2 = 0;
-            }
-
-            // To truncate the fractional part of the double-double towards zero we
-            // convert the low part to a whole number. This must be rounded towards zero
-            // with respect to the sign of the high part.
-            final long b = (long) (a < 0 ? Math.ceil(xx) : Math.floor(xx));
-
-            final long sum = a1 + b + a2;
-            // Avoid overflow. If the sum has changed sign then an overflow occurred.
-            // This happens when high == 2^63 and the low part is additional magnitude.
-            // The xor operation creates a negative if the signs are different.
-            if ((sum ^ a) >= 0) {
-                return sum;
-            }
-        }
-        // Here the high part had a fractional part, was non-finite or was 2^63.
-        // Ignore the low part.
-        return a;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -778,12 +764,11 @@ public final class DD
      * @see BigDecimal
      */
     public BigDecimal bigDecimalValue() {
-        return new BigDecimal(x).add(new BigDecimal(xx));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Static extended precision methods for computing the round-off component
     // for double addition and multiplication
-
     /**
      * Compute the sum of two numbers {@code a} and {@code b} using
      * Dekker's two-sum algorithm. The values are required to be ordered by magnitude:
@@ -799,8 +784,7 @@ public final class DD
      * Shewchuk (1997) Theorum 6</a>
      */
     static DD fastTwoSum(double a, double b) {
-        final double x = a + b;
-        return new DD(x, fastTwoSumLow(a, b, x));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -817,10 +801,7 @@ public final class DD
      * @see #fastTwoSum(double, double)
      */
     static double fastTwoSumLow(double a, double b, double x) {
-        // (x, xx) = a + b
-        // bVirtual = x - a
-        // xx = b - bVirtual
-        return b - (x - a);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -838,8 +819,7 @@ public final class DD
      * Shewchuk (1997) Theorum 6</a>
      */
     static DD fastTwoDiff(double a, double b) {
-        final double x = a - b;
-        return new DD(x, fastTwoDiffLow(a, b, x));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -873,8 +853,7 @@ public final class DD
      * Shewchuk (1997) Theorum 7</a>
      */
     static DD twoSum(double a, double b) {
-        final double x = a + b;
-        return new DD(x, twoSumLow(a, b, x));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -889,14 +868,7 @@ public final class DD
      * @see #twoSum(double, double)
      */
     static double twoSumLow(double a, double b, double x) {
-        // (x, xx) = a + b
-        // bVirtual = x - a
-        // aVirtual = x - bVirtual
-        // bRoundoff = b - bVirtual
-        // aRoundoff = a - aVirtual
-        // xx = aRoundoff + bRoundoff
-        final double bVirtual = x - a;
-        return (a - (x - bVirtual)) + (b - bVirtual);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -911,8 +883,7 @@ public final class DD
      * @see #twoSum(double, double)
      */
     static DD twoDiff(double a, double b) {
-        final double x = a - b;
-        return new DD(x, twoDiffLow(a, b, x));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -964,9 +935,7 @@ public final class DD
      * @return the product
      */
     static DD twoProd(double x, double y) {
-        final double xy = x * y;
-        // No checks for non-normal xy, or overflow during the split of the arguments
-        return new DD(xy, twoProductLow(x, y, xy));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -985,12 +954,7 @@ public final class DD
      * @see #highPart(double)
      */
     static double twoProductLow(double x, double y, double xy) {
-        // Split the numbers using Dekker's algorithm without scaling
-        final double hx = highPart(x);
-        final double lx = x - hx;
-        final double hy = highPart(y);
-        final double ly = y - hy;
-        return twoProductLow(hx, lx, hy, ly, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1007,12 +971,7 @@ public final class DD
      * @return the low part of the product double length number
      */
     static double twoProductLow(double hx, double lx, double hy, double ly, double xy) {
-        // Compute the multiply low part:
-        // err1 = xy - hx * hy
-        // err2 = err1 - lx * hy
-        // err3 = err2 - hx * ly
-        // low = lx * ly - err3
-        return lx * ly - (((xy - hx * hy) - lx * hy) - hx * ly);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1030,9 +989,7 @@ public final class DD
      * @see #twoProd(double, double)
      */
     static DD twoSquare(double x) {
-        final double xx = x * x;
-        // No checks for non-normal xy, or overflow during the split of the arguments
-        return new DD(xx, twoSquareLow(x, xx));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1051,10 +1008,7 @@ public final class DD
      * @see #twoProductLow(double, double, double)
      */
     static double twoSquareLow(double x, double x2) {
-        // See productLowUnscaled
-        final double hx = highPart(x);
-        final double lx = x - hx;
-        return twoSquareLow(hx, lx, x2);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1069,7 +1023,7 @@ public final class DD
      * @return the low part of the square double length number
      */
     static double twoSquareLow(double hx, double lx, double x2) {
-        return lx * lx - ((x2 - hx * hx) - 2 * lx * hx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1100,12 +1054,10 @@ public final class DD
      * @see Math#getExponent(double)
      */
     static double highPart(double value) {
-        final double c = MULTIPLIER * value;
-        return c - (c - value);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Public API operations
-
     /**
      * Returns a {@code DD} whose value is the negation of both parts of double-double number.
      *
@@ -1113,7 +1065,7 @@ public final class DD
      */
     @Override
     public DD negate() {
-        return new DD(-x, -xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1133,13 +1085,7 @@ public final class DD
      * @see #ZERO
      */
     public DD abs() {
-        // Assume |hi| > |lo|, i.e. the low part is the round-off
-        if (x < 0) {
-            return negate();
-        }
-        // NaN, positive or zero
-        // return a canonical absolute of zero
-        return x == 0 ? ZERO : this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1169,7 +1115,7 @@ public final class DD
      * @see #isFinite()
      */
     public DD floor() {
-        return floorOrCeil(x, xx, Math::floor);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1199,7 +1145,7 @@ public final class DD
      * @see #isFinite()
      */
     public DD ceil() {
-        return floorOrCeil(x, xx, Math::ceil);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1254,12 +1200,7 @@ public final class DD
      * @see #add(DD)
      */
     public DD add(double y) {
-        // (s0, s1) = x + y
-        final double s0 = x + y;
-        final double s1 = twoSumLow(x, y, s0);
-        // Note: if x + y cancel to a non-zero result then s0 is >= 1 ulp of x.
-        // This is larger than xx so fast-two-sum can be used.
-        return fastTwoSum(s0, s1 + xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1272,7 +1213,7 @@ public final class DD
      */
     @Override
     public DD add(DD y) {
-        return add(x, xx, y.x, y.xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1288,18 +1229,7 @@ public final class DD
      * @see #accurateAdd(double, double, double, double)
      */
     static DD add(double x, double xx, double y, double yy) {
-        // Sum parts and save
-        // (s0, s1) = x + y
-        final double s0 = x + y;
-        final double s1 = twoSumLow(x, y, s0);
-        // (t0, t1) = xx + yy
-        final double t0 = xx + yy;
-        final double t1 = twoSumLow(xx, yy, t0);
-        // result = s + t
-        // |s1| is >= 1 ulp of max(|x|, |y|)
-        // |t0| is >= 1 ulp of max(|xx|, |yy|)
-        final DD zz = fastTwoSum(s0, s1 + t0);
-        return fastTwoSum(zz.x, zz.xx + t1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1318,21 +1248,7 @@ public final class DD
      * @return the sum
      */
     static DD accurateAdd(double x, double xx, double y) {
-        // Grow expansion (Schewchuk): (x, xx) + y -> (s0, s1, s2)
-        DD s = twoSum(xx, y);
-        double s2 = s.xx;
-        s = twoSum(x, s.x);
-        final double s0 = s.x;
-        final double s1 = s.xx;
-        // Compress (Schewchuk Fig. 15): (s0, s1, s2) -> (s0, s1)
-        s = fastTwoSum(s1, s2);
-        s2 = s.xx;
-        s = fastTwoSum(s0, s.x);
-        // Here (s0, s1) = s
-        // e = exact 159-bit result
-        // |e - s0| <= ulp(s0)
-        // |s1 + s2| <= ulp(e - s0)
-        return fastTwoSum(s.x, s2 + s.xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1353,31 +1269,7 @@ public final class DD
      * @return the sum
      */
     static DD accurateAdd(double x, double xx, double y, double yy) {
-        // Expansion sum (Schewchuk Fig 7): (x, xx) + (x, yy) -> (s0, s1, s2, s3)
-        DD s = twoSum(xx, yy);
-        double s3 = s.xx;
-        s = twoSum(x, s.x);
-        // (s0, s1, s2) == (s.x, s.xx, s3)
-        double s0 = s.x;
-        s = twoSum(s.xx, y);
-        double s2 = s.xx;
-        s = twoSum(s0, s.x);
-        // s1 = s.xx
-        s0 = s.x;
-        // Compress (Schewchuk Fig. 15) (s0, s1, s2, s3) -> (s0, s1)
-        s = fastTwoSum(s.xx, s2);
-        final double s1 = s.x;
-        s = fastTwoSum(s.xx, s3);
-        // s2 = s.x
-        s3 = s.xx;
-        s = fastTwoSum(s1, s.x);
-        s2 = s.xx;
-        s = fastTwoSum(s0, s.x);
-        // Here (s0, s1) = s
-        // e = exact 212-bit result
-        // |e - s0| <= ulp(s0)
-        // |s1 + s2 + s3| <= ulp(e - s0)   (Sum magnitudes small to high)
-        return fastTwoSum(s.x, s3 + s2 + s.xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1392,7 +1284,7 @@ public final class DD
      * @see #subtract(DD)
      */
     public DD subtract(double y) {
-        return add(-y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1407,7 +1299,7 @@ public final class DD
      */
     @Override
     public DD subtract(DD y) {
-        return add(x, xx, -y.x, -y.xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1423,7 +1315,7 @@ public final class DD
      * @see #multiply(DD)
      */
     public DD multiply(double y) {
-        return multiply(x, xx, y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1460,7 +1352,7 @@ public final class DD
      */
     @Override
     public DD multiply(DD y) {
-        return multiply(x, xx, y.x, y.xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1493,7 +1385,7 @@ public final class DD
      * @see #multiply(DD)
      */
     public DD square() {
-        return square(x, xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1520,7 +1412,7 @@ public final class DD
      * @return {@code this / y}.
      */
     public DD divide(double y) {
-        return divide(x, xx, y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1566,7 +1458,7 @@ public final class DD
      */
     @Override
     public DD divide(DD y) {
-        return divide(x, xx, y.x, y.xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1612,7 +1504,7 @@ public final class DD
      */
     @Override
     public DD reciprocal() {
-        return reciprocal(x, xx);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1667,30 +1559,7 @@ public final class DD
      * @see Double#MIN_NORMAL
      */
     public DD sqrt() {
-        // Standard sqrt
-        final double c = Math.sqrt(x);
-
-        // Here we support {negative, +infinity, nan and zero} edge cases.
-        // This is required to avoid a divide by zero in the following
-        // computation, otherwise (0, 0).sqrt() = (NaN, NaN).
-        if (isNotNormal(c)) {
-            return new DD(c, 0);
-        }
-
-        // Here hi is positive, non-zero and finite; assume lo is also finite
-
-        // Dekker's double precision sqrt2 algorithm.
-        // See Dekker, 1971, pp 242.
-        final double hc = highPart(c);
-        final double lc = c - hc;
-        final double u = c * c;
-        final double uu = twoSquareLow(hc, lc, u);
-        final double cc = (x - u - uu + xx) * 0.5 / c;
-
-        // Extended precision result:
-        // y = c + cc
-        // yy = c - y + cc
-        return fastTwoSum(c, cc);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1704,13 +1573,7 @@ public final class DD
      * @return true if the value is not normal
      */
     static boolean isNotNormal(double a) {
-        // Sub-normal numbers have a biased exponent of 0.
-        // Inf/NaN numbers have a biased exponent of 2047.
-        // Catch both cases by extracting the raw exponent, subtracting 1
-        // and compare unsigned (so 0 underflows to a unsigned large value).
-        final int baisedExponent = ((int) (Double.doubleToRawLongBits(a) >>> 52)) & EXP_MASK;
-        // Pre-compute the additions used by Integer.compareUnsigned
-        return baisedExponent + CMP_UNSIGNED_MINUS_1 >= CMP_UNSIGNED_2046;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1737,71 +1600,7 @@ public final class DD
      * @see #frexp(int[])
      */
     public DD scalb(int exp) {
-        // Handle scaling when 2^n can be represented with a single normal number
-        // n >= -1022 && n <= 1023
-        // Using unsigned compare => n + 1022 <= 1023 + 1022
-        if (exp + CMP_UNSIGNED_1022 < CMP_UNSIGNED_2046) {
-            final double s = twoPow(exp);
-            return new DD(x * s, xx * s);
-        }
-
-        // Scale by multiples of 2^512 (largest representable power of 2).
-        // Scaling requires max 5 multiplications to under/overflow any normal value.
-        // Break this down into e.g.: 2^512^(exp / 512) * 2^(exp % 512)
-        // Number of multiples n = exp / 512   : exp >>> 9
-        // Remainder           m = exp % 512   : exp & 511  (exp must be positive)
-        final int n;
-        final int m;
-        double p;
-        if (exp < 0) {
-            // Downscaling
-            // (Note: Using an unsigned shift handles negation of min value: -2^31)
-            n = -exp >>> 9;
-            // m = exp % 512
-            m = -(-exp & 511);
-            p = TWO_POW_M512;
-        } else {
-            // Upscaling
-            n = exp >>> 9;
-            m = exp & 511;
-            p = TWO_POW_512;
-        }
-
-        // Multiply by the remainder scaling factor first. The remaining multiplications
-        // are either 2^512 or 2^-512.
-        // Down-scaling to sub-normal will use the final multiplication into a sub-normal result.
-        // Note here that n >= 1 as the n in [-1022, 1023] case has been handled.
-
-        final double z0;
-        final double z1;
-
-        // Handle n : 1, 2, 3, 4, 5
-        if (n >= 5) {
-            // n >= 5 will be over/underflow. Use an extreme scale factor.
-            // Do not use +/- infinity as this creates NaN if x = 0.
-            // p -> 2^1023 or 2^-1025
-            p *= p * 0.5;
-            z0 = x * p * p * p;
-            z1 = xx * p * p * p;
-            return new DD(z0, z1);
-        }
-
-        final double s = twoPow(m);
-        if (n == 4) {
-            z0 = x * s * p * p * p * p;
-            z1 = xx * s * p * p * p * p;
-        } else if (n == 3) {
-            z0 = x * s * p * p * p;
-            z1 = xx * s * p * p * p;
-        } else if (n == 2) {
-            z0 = x * s * p * p;
-            z1 = xx * s * p * p;
-        } else {
-            // n = 1. Occurs only if exp = -1023.
-            z0 = x * s * p;
-            z1 = xx * s * p;
-        }
-        return new DD(z0, z1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1813,7 +1612,7 @@ public final class DD
      * @return the double
      */
     static double twoPow(int n) {
-        return Double.longBitsToDouble(((long) (n + 1023)) << 52);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1844,28 +1643,7 @@ public final class DD
      * @see <a href="https://www.cplusplus.com/reference/cmath/frexp/">C math.h frexp</a>
      */
     public DD frexp(int[] exp) {
-        exp[0] = getScale(x);
-        // Handle non-scalable numbers
-        if (exp[0] == Double.MAX_EXPONENT + 1) {
-            // Returns +/-0.0, inf or nan
-            // Maintain the fractional part unchanged.
-            // Do not change the fractional part of inf/nan, and assume
-            // |xx| < |x| thus if x == 0 then xx == 0 (otherwise the double-double is invalid)
-            // Unspecified for NaN/inf so just return zero exponent.
-            exp[0] = 0;
-            return this;
-        }
-        // The scale will create the fraction in [1, 2) so increase by 1 for [0.5, 1)
-        exp[0] += 1;
-        DD f = scalb(-exp[0]);
-        // Return |(hi, lo)| = (1, -eps) if required.
-        // f.x * f.xx < 0 detects sign change unless the product underflows.
-        // Handle extreme case of |f.xx| being min value by doubling f.x to 1.
-        if (Math.abs(f.x) == HALF && 2 * f.x * f.xx < 0) {
-            f = new DD(f.x * 2, f.xx * 2);
-            exp[0] -= 1;
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1901,7 +1679,6 @@ public final class DD
         final long bits = Double.doubleToRawLongBits(a) & UNSIGN_MASK;
         // Get the unbiased exponent
         int exp = ((int) (bits >>> 52)) - EXPONENT_OFFSET;
-
         // No case to distinguish nan/inf (exp == 1024).
         // Handle sub-normal numbers
         if (exp == Double.MIN_EXPONENT - 1) {
@@ -1948,33 +1725,7 @@ public final class DD
      */
     @Override
     public DD pow(int n) {
-        // Edge cases.
-        if (n == 1) {
-            return this;
-        }
-        if (n == 0) {
-            return ONE;
-        }
-
-        // Handles {infinity, nan and zero} cases
-        if (isNotNormal(x)) {
-            // Assume the high part has the greatest magnitude
-            // so here the low part is irrelevant
-            return new DD(Math.pow(x, n), 0);
-        }
-
-        // Here hi is finite; assume lo is also finite
-        if (n == -1) {
-            return reciprocal();
-        }
-
-        // Extended precision computation is required.
-        // No checks for overflow.
-        if (n < 0) {
-            // Note: Correctly handles negating -2^31
-            return computePow(x, xx, -n).reciprocal();
-        }
-        return computePow(x, xx, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2002,24 +1753,19 @@ public final class DD
         //    - square the current result
         //    - if the current bit is 1 then multiply by x
         // In this scheme the factors to multiply by x can be pre-computed.
-
         // Split b
         final double xh = highPart(x);
         final double xl = x - xh;
-
         // Initialise the result as x^1
         double f0 = x;
         double f1 = xx;
-
         double u;
         double v;
         double w;
-
         // Shift the highest set bit off the top.
         // Any remaining bits are detected in the sign bit.
         final int shift = Integer.numberOfLeadingZeros(n) + 1;
         int bits = n << shift;
-
         // Multiplication is done without object allocation of DD intermediates.
         // The square can be optimised.
         // Process remaining bits below highest set bit.
@@ -2044,7 +1790,6 @@ public final class DD
                 f1 = fastTwoSumLow(w, u, f0);
             }
         }
-
         return new DD(f0, f1);
     }
 
@@ -2082,42 +1827,7 @@ public final class DD
      * @see #frexp(int[])
      */
     public DD pow(int n, long[] exp) {
-        // Edge cases.
-        if (n == 0) {
-            exp[0] = 1;
-            return new DD(0.5, 0);
-        }
-        // IEEE result for non-finite or zero
-        if (!Double.isFinite(x) || x == 0) {
-            exp[0] = 0;
-            return new DD(Math.pow(x, n), 0);
-        }
-        // Here the number is non-zero finite
-        final int[] ie = {0};
-        DD f = frexp(ie);
-        final long b = ie[0];
-        // Handle exact powers of 2
-        if (Math.abs(f.x) == HALF && f.xx == 0) {
-            // (f * 2^b)^n = (2f)^n * 2^(b-1)^n
-            // Use Math.pow to create the sign.
-            // Note the result must be scaled to the fractional representation
-            // by multiplication by 0.5 and addition of 1 to the exponent.
-            final double y0 = 0.5 * Math.pow(2 * f.x, n);
-            // Propagate sign change (y0*f.x) to the original zero (this.xx)
-            final double y1 = Math.copySign(0.0, y0 * f.x * this.xx);
-            exp[0] = 1 + (b - 1) * n;
-            return new DD(y0, y1);
-        }
-        if (n < 0) {
-            f = computePowScaled(b, f.x, f.xx, -n, exp);
-            // Result is a non-zero fraction part so inversion is safe
-            f = reciprocal(f.x, f.xx);
-            // Rescale to [0.5, 1.0)
-            f = f.frexp(ie);
-            exp[0] = ie[0] - exp[0];
-            return f;
-        }
-        return computePowScaled(b, f.x, f.xx, n, exp);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2147,7 +1857,6 @@ public final class DD
         //    - square the current result
         //    - if the current bit is 1 then multiply by x
         // In this scheme the factors to multiply by x can be pre-computed.
-
         // Scale the input in [0.5, 1) to be above 1. Represented as 2^be * b.
         final long be = b - 1;
         final double b0 = x * 2;
@@ -2155,21 +1864,17 @@ public final class DD
         // Split b
         final double b0h = highPart(b0);
         final double b0l = b0 - b0h;
-
         // Initialise the result as x^1. Represented as 2^fe * f.
         long fe = be;
         double f0 = b0;
         double f1 = b1;
-
         double u;
         double v;
         double w;
-
         // Shift the highest set bit off the top.
         // Any remaining bits are detected in the sign bit.
         final int shift = Integer.numberOfLeadingZeros(n) + 1;
         int bits = n << shift;
-
         // Multiplication is done without using DD.multiply as the arguments
         // are always finite and the product will not overflow. The square can be optimised.
         // Process remaining bits below highest set bit.
@@ -2208,8 +1913,7 @@ public final class DD
                 // Avoid rescale as x2 is in [1, 2)
             }
         }
-
-        final int[] e = {0};
+        final int[] e = { 0 };
         final DD f = new DD(f0, f1).frexp(e);
         exp[0] = fe + e[0];
         return f;
@@ -2264,14 +1968,7 @@ public final class DD
      */
     @Override
     public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other instanceof DD) {
-            final DD c = (DD) other;
-            return equals(x, c.x) && equals(xx, c.xx);
-        }
-        return false;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2291,7 +1988,7 @@ public final class DD
      */
     @Override
     public int hashCode() {
-        return 31 * (31 + Double.hashCode(x + 0.0)) + Double.hashCode(xx + 0.0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2330,12 +2027,7 @@ public final class DD
      */
     @Override
     public String toString() {
-        return new StringBuilder(TO_STRING_SIZE)
-            .append(FORMAT_START)
-            .append(x).append(FORMAT_SEP)
-            .append(xx)
-            .append(FORMAT_END)
-            .toString();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2347,14 +2039,15 @@ public final class DD
      */
     @Override
     public DD zero() {
-        return ZERO;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isZero() {
-        // we keep |x| > |xx| and Java provides 0.0 == -0.0
-        return x == 0.0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2366,13 +2059,15 @@ public final class DD
      */
     @Override
     public DD one() {
-        return ONE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean isOne() {
-        return x == 1.0 && xx == 0.0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2384,7 +2079,6 @@ public final class DD
      */
     @Override
     public DD multiply(int n) {
-        // Note: This method exists to support the NativeOperators interface
-        return multiply(x, xx, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

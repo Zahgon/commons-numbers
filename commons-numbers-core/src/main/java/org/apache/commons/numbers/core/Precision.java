@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.core;
 
 import java.math.BigDecimal;
@@ -24,6 +23,7 @@ import java.math.RoundingMode;
  * Utilities for comparing numbers.
  */
 public final class Precision {
+
     /**
      * <p>
      * Largest double-precision floating-point number such that
@@ -48,10 +48,14 @@ public final class Precision {
      */
     public static final double SAFE_MIN = Double.MIN_NORMAL;
 
-    /** Exponent offset in IEEE754 representation. */
+    /**
+     * Exponent offset in IEEE754 representation.
+     */
     private static final long EXPONENT_OFFSET = 1023L;
 
-    /** Positive zero. */
+    /**
+     * Positive zero.
+     */
     private static final double POSITIVE_ZERO = 0d;
 
     static {
@@ -66,7 +70,8 @@ public final class Precision {
     /**
      * Private constructor.
      */
-    private Precision() {}
+    private Precision() {
+    }
 
     /**
      * Compares two numbers given some amount of allowed error.
@@ -93,15 +98,7 @@ public final class Precision {
      * @see #equals(double, double, double)
      */
     public static int compareTo(double x, double y, double eps) {
-        if (equals(x, y, eps)) {
-            return 0;
-        } else if (x < y) {
-            return -1;
-        } else if (x > y) {
-            return 1;
-        }
-        // NaN input.
-        return Double.compare(x, y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -130,15 +127,7 @@ public final class Precision {
      * @see #equals(double, double, int)
      */
     public static int compareTo(final double x, final double y, final int maxUlps) {
-        if (equals(x, y, maxUlps)) {
-            return 0;
-        } else if (x < y) {
-            return -1;
-        } else if (x > y) {
-            return 1;
-        }
-        // NaN input.
-        return Double.compare(x, y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -150,7 +139,7 @@ public final class Precision {
      * @return {@code true} if the values are equal.
      */
     public static boolean equals(float x, float y) {
-        return equals(x, y, 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -162,12 +151,7 @@ public final class Precision {
      * @return {@code true} if the values are equal or both are NaN.
      */
     public static boolean equalsIncludingNaN(float x, float y) {
-        final boolean xIsNan = Float.isNaN(x);
-        final boolean yIsNan = Float.isNaN(y);
-        // Combine the booleans with bitwise OR
-        return (xIsNan | yIsNan) ?
-            xIsNan == yIsNan :
-            equals(x, y, 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -182,7 +166,7 @@ public final class Precision {
      * @return {@code true} if the values are equal or within range of each other.
      */
     public static boolean equals(float x, float y, float eps) {
-        return equals(x, y, 1) || Math.abs(y - x) <= eps;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -197,7 +181,7 @@ public final class Precision {
      * or both are NaN.
      */
     public static boolean equalsIncludingNaN(float x, float y, float eps) {
-        return equalsIncludingNaN(x, y, 1) || Math.abs(y - x) <= eps;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -222,24 +206,7 @@ public final class Precision {
      * point values between {@code x} and {@code y}.
      */
     public static boolean equals(final float x, final float y, final int maxUlps) {
-        final int xInt = Float.floatToRawIntBits(x);
-        final int yInt = Float.floatToRawIntBits(y);
-
-        final boolean isEqual;
-        if ((xInt ^ yInt) < 0) {
-            // Numbers have opposite signs, take care of overflow.
-            // Remove the sign bit to obtain the absolute ULP above zero.
-            final int deltaPlus = xInt & Integer.MAX_VALUE;
-            final int deltaMinus = yInt & Integer.MAX_VALUE;
-
-            // Avoid possible overflow from adding the deltas by using a long.
-            isEqual = (long) deltaPlus + deltaMinus <= maxUlps;
-        } else {
-            // Numbers have same sign, there is no risk of overflow.
-            isEqual = Math.abs(xInt - yInt) <= maxUlps;
-        }
-
-        return isEqual && !Float.isNaN(x) && !Float.isNaN(y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -254,12 +221,7 @@ public final class Precision {
      * {@code maxUlps} floating point values between {@code x} and {@code y}.
      */
     public static boolean equalsIncludingNaN(float x, float y, int maxUlps) {
-        final boolean xIsNan = Float.isNaN(x);
-        final boolean yIsNan = Float.isNaN(y);
-        // Combine the booleans with bitwise OR
-        return (xIsNan | yIsNan) ?
-            xIsNan == yIsNan :
-            equals(x, y, maxUlps);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -271,7 +233,7 @@ public final class Precision {
      * @return {@code true} if the values are equal.
      */
     public static boolean equals(double x, double y) {
-        return equals(x, y, 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -283,12 +245,7 @@ public final class Precision {
      * @return {@code true} if the values are equal or both are NaN.
      */
     public static boolean equalsIncludingNaN(double x, double y) {
-        final boolean xIsNan = Double.isNaN(x);
-        final boolean yIsNan = Double.isNaN(y);
-        // Combine the booleans with bitwise OR
-        return (xIsNan | yIsNan) ?
-            xIsNan == yIsNan :
-            equals(x, y, 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -303,7 +260,7 @@ public final class Precision {
      * @return {@code true} if the values are equal or within range of each other.
      */
     public static boolean equals(double x, double y, double eps) {
-        return equals(x, y, 1) || Math.abs(y - x) <= eps;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -319,14 +276,7 @@ public final class Precision {
      * numbers or they are within range of each other.
      */
     public static boolean equalsWithRelativeTolerance(double x, double y, double eps) {
-        if (equals(x, y, 1)) {
-            return true;
-        }
-
-        final double absoluteMax = Math.max(Math.abs(x), Math.abs(y));
-        final double relativeDifference = Math.abs((x - y) / absoluteMax);
-
-        return relativeDifference <= eps;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -341,7 +291,7 @@ public final class Precision {
      * or both are NaN.
      */
     public static boolean equalsIncludingNaN(double x, double y, double eps) {
-        return equalsIncludingNaN(x, y) || Math.abs(y - x) <= eps;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -366,26 +316,7 @@ public final class Precision {
      * point values between {@code x} and {@code y}.
      */
     public static boolean equals(final double x, final double y, final int maxUlps) {
-        final long xInt = Double.doubleToRawLongBits(x);
-        final long yInt = Double.doubleToRawLongBits(y);
-
-        if ((xInt ^ yInt) < 0) {
-            // Numbers have opposite signs, take care of overflow.
-            // Remove the sign bit to obtain the absolute ULP above zero.
-            final long deltaPlus = xInt & Long.MAX_VALUE;
-            final long deltaMinus = yInt & Long.MAX_VALUE;
-
-            // Note:
-            // If either value is NaN, the exponent bits are set to (2047L << 52) and the
-            // distance above 0.0 is always above an integer ULP error. So omit the test
-            // for NaN and return directly.
-
-            // Avoid possible overflow from adding the deltas by splitting the comparison
-            return deltaPlus <= maxUlps && deltaMinus <= (maxUlps - deltaPlus);
-        }
-
-        // Numbers have same sign, there is no risk of overflow.
-        return Math.abs(xInt - yInt) <= maxUlps && !Double.isNaN(x) && !Double.isNaN(y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -400,12 +331,7 @@ public final class Precision {
      * {@code maxUlps} floating point values between {@code x} and {@code y}.
      */
     public static boolean equalsIncludingNaN(double x, double y, int maxUlps) {
-        final boolean xIsNan = Double.isNaN(x);
-        final boolean yIsNan = Double.isNaN(y);
-        // Combine the booleans with bitwise OR
-        return (xIsNan | yIsNan) ?
-            xIsNan == yIsNan :
-            equals(x, y, maxUlps);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -422,7 +348,7 @@ public final class Precision {
      * @see #round(double, int, RoundingMode)
      */
     public static double round(double x, int scale) {
-        return round(x, scale, RoundingMode.HALF_UP);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -474,21 +400,8 @@ public final class Precision {
      * {@link RoundingMode#UNNECESSARY} and the specified scaling operation
      * would require rounding.
      */
-    public static double round(double x,
-                               int scale,
-                               RoundingMode roundingMode) {
-        try {
-            final double rounded = (new BigDecimal(Double.toString(x))
-                   .setScale(scale, roundingMode))
-                   .doubleValue();
-            // MATH-1089: negative values rounded to zero should result in negative zero
-            return rounded == POSITIVE_ZERO ? POSITIVE_ZERO * x : rounded;
-        } catch (NumberFormatException ex) {
-            if (Double.isInfinite(x)) {
-                return x;
-            }
-            return Double.NaN;
-        }
+    public static double round(double x, int scale, RoundingMode roundingMode) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -502,9 +415,8 @@ public final class Precision {
      * @return the machine-representable floating number closest to the
      * difference between {@code x + delta} and {@code x}.
      */
-    public static double representableDelta(double x,
-                                            double delta) {
-        return x + delta - x;
+    public static double representableDelta(double x, double delta) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -515,22 +427,7 @@ public final class Precision {
      * @return a new instance.
      */
     public static DoubleEquivalence doubleEquivalenceOfEpsilon(final double eps) {
-        if (!Double.isFinite(eps) ||
-            eps < 0d) {
-            throw new IllegalArgumentException("Invalid epsilon value: " + eps);
-        }
-
-        return new DoubleEquivalence() {
-            /** Epsilon value. */
-            private final double epsilon = eps;
-
-            /** {@inheritDoc} */
-            @Override
-            public int compare(double a,
-                               double b) {
-                return compareTo(a, b, epsilon);
-            }
-        };
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -541,6 +438,7 @@ public final class Precision {
      */
     @FunctionalInterface
     public interface DoubleEquivalence {
+
         /**
          * Indicates whether given values are considered equal to each other.
          *
@@ -549,7 +447,7 @@ public final class Precision {
          * @return true if the given values are considered equal.
          */
         default boolean eq(double a, double b) {
-            return compare(a, b) == 0;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -560,7 +458,7 @@ public final class Precision {
          * @return true if the argument is considered equal to zero.
          */
         default boolean eqZero(double a) {
-            return eq(a, 0d);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -571,7 +469,7 @@ public final class Precision {
          * @return true if {@code a < b}
          */
         default boolean lt(double a, double b) {
-            return compare(a, b) < 0;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -582,7 +480,7 @@ public final class Precision {
          * @return true if {@code a <= b}
          */
         default boolean lte(double a, double b) {
-            return compare(a, b) <= 0;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -593,7 +491,7 @@ public final class Precision {
          * @return true if {@code a > b}
          */
         default boolean gt(double a, double b) {
-            return compare(a, b) > 0;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -604,7 +502,7 @@ public final class Precision {
          * @return true if {@code a >= b}
          */
         default boolean gte(double a, double b) {
-            return compare(a, b) >= 0;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -625,12 +523,7 @@ public final class Precision {
          * @see #eqZero(double)
          */
         default double signum(double a) {
-            if (a == 0d || Double.isNaN(a)) {
-                return a;
-            }
-            return eqZero(a) ?
-                Math.copySign(0d, a) :
-                Math.copySign(1d, a);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**

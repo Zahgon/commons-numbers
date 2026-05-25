@@ -23,18 +23,35 @@ import java.util.function.DoubleUnaryOperator;
  * Represents the <a href="https://en.wikipedia.org/wiki/Angle">angle</a> concept.
  */
 public abstract class Angle implements DoubleSupplier {
-    /** 2&pi;. */
+
+    /**
+     * 2&pi;.
+     */
     public static final double TWO_PI = 2 * Math.PI;
-    /** &pi;/2. */
+
+    /**
+     * &pi;/2.
+     */
     public static final double PI_OVER_TWO = 0.5 * Math.PI;
-    /** Turns to degrees conversion factor. */
+
+    /**
+     * Turns to degrees conversion factor.
+     */
     private static final double TURN_TO_DEG = 360d;
-    /** Radians to degrees conversion factor. */
+
+    /**
+     * Radians to degrees conversion factor.
+     */
     private static final double RAD_TO_DEG = 180.0 / Math.PI;
-    /** Degrees to radians conversion factor. */
+
+    /**
+     * Degrees to radians conversion factor.
+     */
     private static final double DEG_TO_RAD = Math.PI / 180.0;
 
-    /** Value (unit depends on concrete instance). */
+    /**
+     * Value (unit depends on concrete instance).
+     */
     private final double value;
 
     /**
@@ -44,16 +61,20 @@ public abstract class Angle implements DoubleSupplier {
         this.value = value;
     }
 
-    /** @return the value. */
+    /**
+     * @return the value.
+     */
     @Override
     public double getAsDouble() {
-        return value;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode() {
-        return Double.hashCode(value);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -68,9 +89,7 @@ public abstract class Angle implements DoubleSupplier {
      */
     @Override
     public boolean equals(final Object other) {
-        return other != null &&
-                getClass().equals(other.getClass()) &&
-                Double.doubleToLongBits(value) == Double.doubleToLongBits(((Angle) other).value);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -98,9 +117,15 @@ public abstract class Angle implements DoubleSupplier {
      * Unit: <a href="https://en.wikipedia.org/wiki/Turn_%28geometry%29">turns</a>.
      */
     public static final class Turn extends Angle {
-        /** Zero. */
+
+        /**
+         * Zero.
+         */
         public static final Turn ZERO = of(0d);
-        /** Normalizing operator (result will be within the {@code [0, 1[} interval). */
+
+        /**
+         * Normalizing operator (result will be within the {@code [0, 1[} interval).
+         */
         public static final DoubleUnaryOperator WITHIN_0_AND_1 = normalizer(0d);
 
         /**
@@ -119,25 +144,31 @@ public abstract class Angle implements DoubleSupplier {
          * @return a new instance.
          */
         public static Turn of(final double angle) {
-            return new Turn(angle);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Turn toTurn() {
-            return this;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Rad toRad() {
-            return Rad.of(getAsDouble() * TWO_PI);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Deg toDeg() {
-            return Deg.of(getAsDouble() * TURN_TO_DEG);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -148,7 +179,7 @@ public abstract class Angle implements DoubleSupplier {
          * @return the normalization operator.
          */
         public static DoubleUnaryOperator normalizer(final double lo) {
-            return new Normalizer(lo, 1d);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -156,15 +187,30 @@ public abstract class Angle implements DoubleSupplier {
      * Unit: <a href="https://en.wikipedia.org/wiki/Radian">radians</a>.
      */
     public static final class Rad extends Angle {
-        /** Zero. */
+
+        /**
+         * Zero.
+         */
         public static final Rad ZERO = of(0d);
-        /** &pi;. */
+
+        /**
+         * &pi;.
+         */
         public static final Rad PI = of(Math.PI);
-        /** 2&pi;. */
+
+        /**
+         * 2&pi;.
+         */
         public static final Rad TWO_PI = of(Angle.TWO_PI);
-        /** Normalizing operator (result will be within the <code>[0, 2&pi;[</code> interval). */
+
+        /**
+         * Normalizing operator (result will be within the <code>[0, 2&pi;[</code> interval).
+         */
         public static final DoubleUnaryOperator WITHIN_0_AND_2PI = normalizer(0d);
-        /** Normalizing operator (result will be within the <code>[-&pi;, &pi;[</code> interval). */
+
+        /**
+         * Normalizing operator (result will be within the <code>[-&pi;, &pi;[</code> interval).
+         */
         public static final DoubleUnaryOperator WITHIN_MINUS_PI_AND_PI = normalizer(-Math.PI);
 
         /**
@@ -183,25 +229,31 @@ public abstract class Angle implements DoubleSupplier {
          * @return a new instance.
          */
         public static Rad of(final double angle) {
-            return new Rad(angle);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Turn toTurn() {
-            return Turn.of(getAsDouble() / Angle.TWO_PI);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Rad toRad() {
-            return this;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Deg toDeg() {
-            return Deg.of(getAsDouble() * RAD_TO_DEG);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -212,7 +264,7 @@ public abstract class Angle implements DoubleSupplier {
          * @return the normalization operator.
          */
         public static DoubleUnaryOperator normalizer(final double lo) {
-            return new Normalizer(lo, Angle.TWO_PI);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -220,9 +272,15 @@ public abstract class Angle implements DoubleSupplier {
      * Unit: <a href="https://en.wikipedia.org/wiki/Degree_%28angle%29">degrees</a>.
      */
     public static final class Deg extends Angle {
-        /** Zero. */
+
+        /**
+         * Zero.
+         */
         public static final Deg ZERO = of(0d);
-        /** Normalizing operator (result will be within the {@code [0, 360[} interval). */
+
+        /**
+         * Normalizing operator (result will be within the {@code [0, 360[} interval).
+         */
         public static final DoubleUnaryOperator WITHIN_0_AND_360 = normalizer(0d);
 
         /**
@@ -241,25 +299,31 @@ public abstract class Angle implements DoubleSupplier {
          * @return a new instance.
          */
         public static Deg of(final double angle) {
-            return new Deg(angle);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Turn toTurn() {
-            return Turn.of(getAsDouble() / TURN_TO_DEG);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Rad toRad() {
-            return Rad.of(getAsDouble() * DEG_TO_RAD);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public Deg toDeg() {
-            return this;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -270,7 +334,7 @@ public abstract class Angle implements DoubleSupplier {
          * @return the normalization operator.
          */
         public static DoubleUnaryOperator normalizer(final double lo) {
-            return new Normalizer(lo, TURN_TO_DEG);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -278,13 +342,25 @@ public abstract class Angle implements DoubleSupplier {
      * Normalizes an angle around a center value.
      */
     private static final class Normalizer implements DoubleUnaryOperator {
-        /** Lower bound. */
+
+        /**
+         * Lower bound.
+         */
         private final double lo;
-        /** Upper bound. */
+
+        /**
+         * Upper bound.
+         */
         private final double hi;
-        /** Period. */
+
+        /**
+         * Period.
+         */
         private final double period;
-        /** Normalizer. */
+
+        /**
+         * Normalizer.
+         */
         private final Reduce reduce;
 
         /**
@@ -293,8 +369,7 @@ public abstract class Angle implements DoubleSupplier {
          * @param lo Lower bound of the desired interval.
          * @param period Circonference of the circle.
          */
-        Normalizer(final double lo,
-                   final double period) {
+        Normalizer(final double lo, final double period) {
             this.period = period;
             this.lo = lo;
             this.hi = lo + period;
@@ -308,22 +383,7 @@ public abstract class Angle implements DoubleSupplier {
          */
         @Override
         public double applyAsDouble(final double a) {
-            if (lo <= a &&
-                a < hi) {
-                // Already within the main interval.
-                return a;
-            }
-
-            final double normalized = reduce.applyAsDouble(a) + lo;
-            return normalized < hi ?
-                normalized :
-                // If value is too small to be representable compared to the
-                // floor expression above (i.e. value + x = x), then we may
-                // end up with a number exactly equal to the upper bound.
-                // In that case, subtract one period from the normalized value
-                // so that the result is strictly less than the upper bound. (We also
-                // want to ensure that we do not return anything less than the lower bound.)
-                Math.max(lo, normalized - period);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

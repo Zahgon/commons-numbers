@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.arrays;
 
 /**
@@ -32,7 +31,6 @@ package org.apache.commons.numbers.arrays;
  *
  * <pre>
  * data    [0, 1, 2, 1, 2, 5, 2, 3, 3, 6, 7, 7, 7, 7]
- *
  *
  * k=4   : [0, 2, 1, 1], [2], [6, 3, 2, 3, 5, 7, 7, 7, 7]
  * k=4,8 : [0, 1, 2, 1], [2], [3, 3, 2], [5], [7, 7, 6, 7, 7]
@@ -133,8 +131,11 @@ package org.apache.commons.numbers.arrays;
  */
 public final class Selection {
 
-    /** No instances. */
-    private Selection() {}
+    /**
+     * No instances.
+     */
+    private Selection() {
+    }
 
     /**
      * Partition the array such that index {@code k} corresponds to its correctly
@@ -146,8 +147,7 @@ public final class Selection {
      * sub-range {@code [0, a.length)}
      */
     public static void select(double[] a, int k) {
-        IndexSupport.checkIndex(0, a.length, k);
-        doSelect(a, 0, a.length, k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -160,8 +160,7 @@ public final class Selection {
      * sub-range {@code [0, a.length)}
      */
     public static void select(double[] a, int[] k) {
-        IndexSupport.checkIndices(0, a.length, k);
-        doSelect(a, 0, a.length, k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -177,9 +176,7 @@ public final class Selection {
      * sub-range {@code [fromIndex, toIndex)}
      */
     public static void select(double[] a, int fromIndex, int toIndex, int k) {
-        IndexSupport.checkFromToIndex(fromIndex, toIndex, a.length);
-        IndexSupport.checkIndex(fromIndex, toIndex, k);
-        doSelect(a, fromIndex, toIndex, k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -195,9 +192,7 @@ public final class Selection {
      * sub-range {@code [fromIndex, toIndex)}
      */
     public static void select(double[] a, int fromIndex, int toIndex, int[] k) {
-        IndexSupport.checkFromToIndex(fromIndex, toIndex, a.length);
-        IndexSupport.checkIndices(fromIndex, toIndex, k);
-        doSelect(a, fromIndex, toIndex, k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -220,7 +215,7 @@ public final class Selection {
         // Caution: This loop contributes significantly to the runtime.
         int cn = 0;
         int end = toIndex;
-        for (int i = toIndex; --i >= fromIndex;) {
+        for (int i = toIndex; --i >= fromIndex; ) {
             final double v = a[i];
             // Count negative zeros using a sign bit check
             if (Double.doubleToRawLongBits(v) == Long.MIN_VALUE) {
@@ -234,16 +229,14 @@ public final class Selection {
                 a[end] = v;
             }
         }
-
         // Partition
         if (end - fromIndex > 1 && k < end) {
             QuickSelect.select(a, fromIndex, end - 1, k);
         }
-
         // Restore signed zeros
         if (cn != 0) {
             // Use partition index below zero to fast-forward to zero as much as possible
-            for (int j = a[k] < 0 ? k : -1;;) {
+            for (int j = a[k] < 0 ? k : -1; ; ) {
                 if (a[++j] == 0) {
                     a[j] = -0.0;
                     if (--cn == 0) {
@@ -274,7 +267,7 @@ public final class Selection {
         // Caution: This loop contributes significantly to the runtime for single indices.
         int cn = 0;
         int end = toIndex;
-        for (int i = toIndex; --i >= fromIndex;) {
+        for (int i = toIndex; --i >= fromIndex; ) {
             final double v = a[i];
             // Count negative zeros using a sign bit check
             if (Double.doubleToRawLongBits(v) == Long.MIN_VALUE) {
@@ -288,14 +281,13 @@ public final class Selection {
                 a[end] = v;
             }
         }
-
         // Partition
         int n = 0;
         if (end - fromIndex > 1) {
             n = k.length;
             // Filter indices invalidated by NaN check
             if (end < toIndex) {
-                for (int i = n; --i >= 0;) {
+                for (int i = n; --i >= 0; ) {
                     final int index = k[i];
                     if (index >= end) {
                         // Move to end
@@ -308,7 +300,6 @@ public final class Selection {
             // Use this to post-process zeros.
             n = QuickSelect.select(a, fromIndex, end - 1, k, n);
         }
-
         // Restore signed zeros
         if (cn != 0) {
             // Use partition indices below zero to fast-forward to zero as much as possible
@@ -328,13 +319,13 @@ public final class Selection {
                 }
             } else {
                 // Unsorted, process all indices
-                for (int i = n; --i >= 0;) {
+                for (int i = n; --i >= 0; ) {
                     if (a[k[i]] < 0) {
                         j = k[i];
                     }
                 }
             }
-            for (;;) {
+            for (; ; ) {
                 if (a[++j] == 0) {
                     a[j] = -0.0;
                     if (--cn == 0) {
@@ -355,11 +346,7 @@ public final class Selection {
      * sub-range {@code [0, a.length)}
      */
     public static void select(int[] a, int k) {
-        IndexSupport.checkIndex(0, a.length, k);
-        if (a.length <= 1) {
-            return;
-        }
-        QuickSelect.select(a, 0, a.length - 1, k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -372,11 +359,7 @@ public final class Selection {
      * sub-range {@code [0, a.length)}
      */
     public static void select(int[] a, int[] k) {
-        IndexSupport.checkIndices(0, a.length, k);
-        if (k.length == 0 || a.length <= 1) {
-            return;
-        }
-        QuickSelect.select(a, 0, a.length - 1, k, k.length);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -392,12 +375,7 @@ public final class Selection {
      * sub-range {@code [fromIndex, toIndex)}
      */
     public static void select(int[] a, int fromIndex, int toIndex, int k) {
-        IndexSupport.checkFromToIndex(fromIndex, toIndex, a.length);
-        IndexSupport.checkIndex(fromIndex, toIndex, k);
-        if (toIndex - fromIndex <= 1) {
-            return;
-        }
-        QuickSelect.select(a, fromIndex, toIndex - 1, k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -413,12 +391,7 @@ public final class Selection {
      * sub-range {@code [fromIndex, toIndex)}
      */
     public static void select(int[] a, int fromIndex, int toIndex, int[] k) {
-        IndexSupport.checkFromToIndex(fromIndex, toIndex, a.length);
-        IndexSupport.checkIndices(fromIndex, toIndex, k);
-        if (k.length == 0 || toIndex - fromIndex <= 1) {
-            return;
-        }
-        QuickSelect.select(a, fromIndex, toIndex - 1, k, k.length);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -432,11 +405,7 @@ public final class Selection {
      * @since 1.3
      */
     public static void select(long[] a, int k) {
-        IndexSupport.checkIndex(0, a.length, k);
-        if (a.length <= 1) {
-            return;
-        }
-        QuickSelect.select(a, 0, a.length - 1, k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -450,11 +419,7 @@ public final class Selection {
      * @since 1.3
      */
     public static void select(long[] a, int[] k) {
-        IndexSupport.checkIndices(0, a.length, k);
-        if (k.length == 0 || a.length <= 1) {
-            return;
-        }
-        QuickSelect.select(a, 0, a.length - 1, k, k.length);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -471,12 +436,7 @@ public final class Selection {
      * @since 1.3
      */
     public static void select(long[] a, int fromIndex, int toIndex, int k) {
-        IndexSupport.checkFromToIndex(fromIndex, toIndex, a.length);
-        IndexSupport.checkIndex(fromIndex, toIndex, k);
-        if (toIndex - fromIndex <= 1) {
-            return;
-        }
-        QuickSelect.select(a, fromIndex, toIndex - 1, k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -493,11 +453,6 @@ public final class Selection {
      * @since 1.3
      */
     public static void select(long[] a, int fromIndex, int toIndex, int[] k) {
-        IndexSupport.checkFromToIndex(fromIndex, toIndex, a.length);
-        IndexSupport.checkIndices(fromIndex, toIndex, k);
-        if (k.length == 0 || toIndex - fromIndex <= 1) {
-            return;
-        }
-        QuickSelect.select(a, fromIndex, toIndex - 1, k, k.length);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

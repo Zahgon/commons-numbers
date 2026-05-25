@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.complex;
 
 import org.apache.commons.numbers.complex.Complex;
@@ -50,17 +49,18 @@ import java.util.stream.Stream;
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-server", "-Xms512M", "-Xmx512M"})
+@Fork(value = 1, jvmArgs = { "-server", "-Xms512M", "-Xmx512M" })
 public class ComplexPerformance {
+
     /**
      * An array of edge numbers that will produce edge case results from functions:
      * {@code +/-inf, +/-max, +/-min, +/-0, nan}.
      */
-    private static final double[] EDGE_NUMBERS = {
-        Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.MAX_VALUE,
-        -Double.MAX_VALUE, Double.MIN_VALUE, -Double.MIN_VALUE, 0.0, -0.0, Double.NaN};
+    private static final double[] EDGE_NUMBERS = { Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, Double.MAX_VALUE, -Double.MAX_VALUE, Double.MIN_VALUE, -Double.MIN_VALUE, 0.0, -0.0, Double.NaN };
 
-    /** The range to use for uniform random numbers. */
+    /**
+     * The range to use for uniform random numbers.
+     */
     private static final double RANGE = 3.456789;
 
     /**
@@ -68,10 +68,11 @@ public class ComplexPerformance {
      */
     @State(Scope.Benchmark)
     public static class ComplexNumberSize {
+
         /**
          * The size of the data.
          */
-        @Param({"10000"})
+        @Param({ "10000" })
         private int size;
 
         /**
@@ -80,7 +81,7 @@ public class ComplexPerformance {
          * @return the size
          */
         public int getSize() {
-            return size;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -89,13 +90,16 @@ public class ComplexPerformance {
      */
     @State(Scope.Benchmark)
     public static class ComplexNumbers extends ComplexNumberSize {
-        /** The numbers. */
+
+        /**
+         * The numbers.
+         */
         protected Complex[] numbers;
 
         /**
          * The type of the data.
          */
-        @Param({"cis", "vector", "log-uniform", "uniform", "edge"})
+        @Param({ "cis", "vector", "log-uniform", "uniform", "edge" })
         private String type;
 
         /**
@@ -104,7 +108,7 @@ public class ComplexPerformance {
          * @return the numbers
          */
         public Complex[] getNumbers() {
-            return numbers;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -112,7 +116,7 @@ public class ComplexPerformance {
          */
         @Setup
         public void setup() {
-            numbers = createNumbers(RandomSource.XO_RO_SHI_RO_128_PP.create());
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -122,27 +126,7 @@ public class ComplexPerformance {
          * @return the random complex number
          */
         Complex[] createNumbers(UniformRandomProvider rng) {
-            Supplier<Complex> generator;
-            if ("cis".equals(type)) {
-                generator = () -> Complex.ofCis(rng.nextDouble() * 2 * Math.PI);
-            } else if ("vector".equals(type)) {
-                // An unnormalised random vector is created using a Gaussian sample
-                // for each dimension. Normalisation would create a cis number.
-                // This is effectively a polar complex number with random modulus
-                // in [-pi, pi] and random magnitude in a range defined by a Chi-squared
-                // distribution with 2 degrees of freedom.
-                final ZigguratNormalizedGaussianSampler s = ZigguratNormalizedGaussianSampler.of(rng);
-                generator = () -> Complex.ofCartesian(s.sample(), s.sample());
-            } else if ("log-uniform".equals(type)) {
-                generator = () -> Complex.ofCartesian(createLogUniformNumber(rng), createLogUniformNumber(rng));
-            } else if ("uniform".equals(type)) {
-                generator = () -> Complex.ofCartesian(createUniformNumber(rng), createUniformNumber(rng));
-            } else if ("edge".equals(type)) {
-                generator = () -> Complex.ofCartesian(createEdgeNumber(rng), createEdgeNumber(rng));
-            } else {
-                throw new IllegalStateException("Unknown number type: " + type);
-            }
-            return Stream.generate(generator).limit(getSize()).toArray(Complex[]::new);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -151,7 +135,10 @@ public class ComplexPerformance {
      */
     @State(Scope.Benchmark)
     public static class TwoComplexNumbers extends ComplexNumbers {
-        /** The numbers. */
+
+        /**
+         * The numbers.
+         */
         private Complex[] numbers2;
 
         /**
@@ -160,7 +147,7 @@ public class ComplexPerformance {
          * @return the numbers
          */
         public Complex[] getNumbers2() {
-            return numbers2;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -169,10 +156,7 @@ public class ComplexPerformance {
         @Override
         @Setup
         public void setup() {
-            // Do not call super.setup() so we recycle the RNG and avoid duplicates
-            final UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
-            numbers = createNumbers(rng);
-            numbers2 = createNumbers(rng);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -181,7 +165,10 @@ public class ComplexPerformance {
      */
     @State(Scope.Benchmark)
     public static class ComplexAndRealNumbers extends ComplexNumbers {
-        /** The numbers. */
+
+        /**
+         * The numbers.
+         */
         private double[] numbers2;
 
         /**
@@ -190,7 +177,7 @@ public class ComplexPerformance {
          * @return the numbers
          */
         public double[] getNumbers2() {
-            return numbers2;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -199,10 +186,7 @@ public class ComplexPerformance {
         @Override
         @Setup
         public void setup() {
-            // Do not call super.setup() so we recycle the RNG and avoid duplicates
-            final UniformRandomProvider rng = RandomSource.XO_RO_SHI_RO_128_PP.create();
-            numbers = createNumbers(rng);
-            numbers2 = Arrays.stream(createNumbers(rng)).mapToDouble(Complex::real).toArray();
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -210,6 +194,7 @@ public class ComplexPerformance {
      * Define a function between a complex and real number.
      */
     private interface ComplexRealFunction {
+
         /**
          * Applies this function to the given arguments.
          *
@@ -314,8 +299,7 @@ public class ComplexPerformance {
      * @param fun Function.
      * @param bh Data sink.
      */
-    private static void apply(Complex[] numbers, Complex[] numbers2,
-            BiFunction<Complex, Complex, Complex> fun, Blackhole bh) {
+    private static void apply(Complex[] numbers, Complex[] numbers2, BiFunction<Complex, Complex, Complex> fun, Blackhole bh) {
         for (int i = 0; i < numbers.length; i++) {
             bh.consume(fun.apply(numbers[i], numbers2[i]));
         }
@@ -329,8 +313,7 @@ public class ComplexPerformance {
      * @param fun Function.
      * @param bh Data sink.
      */
-    private static void apply(Complex[] numbers, double[] numbers2,
-            ComplexRealFunction fun, Blackhole bh) {
+    private static void apply(Complex[] numbers, double[] numbers2, ComplexRealFunction fun, Blackhole bh) {
         for (int i = 0; i < numbers.length; i++) {
             bh.consume(fun.apply(numbers[i], numbers2[i]));
         }
@@ -366,7 +349,6 @@ public class ComplexPerformance {
     // Benchmarks use function references to perform different operations on the complex numbers.
     // Tests show that explicit programming of the same benchmarks run in the same time.
     // For reference examples are provided for the fastest operations: real() and conj().
-
     /**
      * Explicit benchmark without using a method reference.
      * This should run in the same time as {@link #real(ComplexNumbers, Blackhole)}.
@@ -377,10 +359,7 @@ public class ComplexPerformance {
      */
     //@Benchmark
     public void real2(ComplexNumbers numbers, Blackhole bh) {
-        final Complex[] z = numbers.getNumbers();
-        for (int i = 0; i < z.length; i++) {
-            bh.consume(z[i].real());
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -393,10 +372,7 @@ public class ComplexPerformance {
      */
     //@Benchmark
     public void conj2(ComplexNumbers numbers, Blackhole bh) {
-        final Complex[] z = numbers.getNumbers();
-        for (int i = 0; i < z.length; i++) {
-            bh.consume(z[i].conj());
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -407,7 +383,7 @@ public class ComplexPerformance {
      */
     @Benchmark
     public void baselineIdentity(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), ComplexPerformance::identity, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -420,51 +396,49 @@ public class ComplexPerformance {
      */
     @Benchmark
     public void baselineCopy(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), ComplexPerformance::copy, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Unary operations that a boolean
-
     @Benchmark
     public void isNaN(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::isNaN, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void isInfinite(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::isInfinite, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void isFinite(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::isFinite, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Unary operations that a double
-
     @Benchmark
     public void real(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::real, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void imag(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::imag, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void abs(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::abs, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void arg(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::arg, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void norm(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::norm, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -478,7 +452,7 @@ public class ComplexPerformance {
      */
     @Benchmark
     public void sqrtNorm(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), (ToDoubleFunction<Complex>) z -> Math.sqrt(z.norm()), bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -490,131 +464,129 @@ public class ComplexPerformance {
      */
     @Benchmark
     public void absMathHypot(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), (ToDoubleFunction<Complex>) z -> Math.hypot(z.real(), z.imag()), bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Unary operations that a complex number
-
     @Benchmark
     public void conj(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::conj, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void negate(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::negate, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void proj(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::proj, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void cos(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::cos, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void cosh(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::cosh, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void exp(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::exp, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void log(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::log, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void log10(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::log10, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void sin(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::sin, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void sinh(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::sinh, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void sqrt(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::sqrt, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void tan(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::tan, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void tanh(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::tanh, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void acos(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::acos, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void acosh(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::acosh, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void asin(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::asin, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void asinh(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::asinh, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void atan(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::atan, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void atanh(ComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Complex::atanh, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Binary operations on two complex numbers.
-
     @Benchmark
     public void pow(TwoComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::pow, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void multiply(TwoComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::multiply, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void divide(TwoComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::divide, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void add(TwoComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::add, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void subtract(TwoComplexNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::subtract, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Binary operations on a complex and a real number.
@@ -627,29 +599,28 @@ public class ComplexPerformance {
     // - subtractImaginary
     // - subtractFrom
     // - subtractFromImaginary
-
     @Benchmark
     public void powReal(ComplexAndRealNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::pow, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void multiplyReal(ComplexAndRealNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::multiply, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void divideReal(ComplexAndRealNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::divide, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void addReal(ComplexAndRealNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::add, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Benchmark
     public void subtractReal(ComplexAndRealNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), numbers.getNumbers2(), Complex::subtract, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

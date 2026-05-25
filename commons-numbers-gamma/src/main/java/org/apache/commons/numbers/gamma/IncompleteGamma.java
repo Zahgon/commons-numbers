@@ -33,8 +33,12 @@ package org.apache.commons.numbers.gamma;
  * @since 1.1
  */
 public final class IncompleteGamma {
-    /** No instances. */
-    private IncompleteGamma() {}
+
+    /**
+     * No instances.
+     */
+    private IncompleteGamma() {
+    }
 
     /**
      * <a href="https://mathworld.wolfram.com/IncompleteGammaFunction.html">
@@ -44,8 +48,12 @@ public final class IncompleteGamma {
      * @since 1.1
      */
     public static final class Lower {
-        /** No instances. */
-        private Lower() {}
+
+        /**
+         * No instances.
+         */
+        private Lower() {
+        }
 
         /**
          * Computes the lower incomplete gamma function \( \gamma(a, x) \).
@@ -55,9 +63,8 @@ public final class IncompleteGamma {
          * @return \( \gamma(a, x) \).
          * @throws ArithmeticException if the series evaluation fails to converge.
          */
-        public static double value(double a,
-                                   double x) {
-            return BoostGamma.tgammaLower(a, x);
+        public static double value(double a, double x) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -70,11 +77,8 @@ public final class IncompleteGamma {
          * @return \( \gamma(a, x) \).
          * @throws ArithmeticException if the series evaluation fails to converge.
          */
-        public static double value(final double a,
-                                   double x,
-                                   double epsilon,
-                                   int maxIterations) {
-            return BoostGamma.tgammaLower(a, x, new Policy(epsilon, maxIterations));
+        public static double value(final double a, double x, double epsilon, int maxIterations) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -86,8 +90,12 @@ public final class IncompleteGamma {
      * @since 1.1
      */
     public static final class Upper {
-        /** No instances. */
-        private Upper() {}
+
+        /**
+         * No instances.
+         */
+        private Upper() {
+        }
 
         /**
          * Computes the upper incomplete gamma function \( \Gamma(a, x) \).
@@ -97,9 +105,8 @@ public final class IncompleteGamma {
          * @return \( \Gamma(a, x) \).
          * @throws ArithmeticException if the series evaluation fails to converge.
          */
-        public static double value(double a,
-                                   double x) {
-            return BoostGamma.tgamma(a, x);
+        public static double value(double a, double x) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -112,11 +119,8 @@ public final class IncompleteGamma {
          * @return \( \Gamma(a, x) \).
          * @throws ArithmeticException if the series evaluation fails to converge.
          */
-        public static double value(double a,
-                                   double x,
-                                   double epsilon,
-                                   int maxIterations) {
-            return BoostGamma.tgamma(a, x, new Policy(epsilon, maxIterations));
+        public static double value(double a, double x, double epsilon, int maxIterations) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

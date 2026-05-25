@@ -20,15 +20,27 @@ package org.apache.commons.numbers.field;
  * {@link Double} field.
  */
 public final class FP64Field extends AbstractField<FP64> {
-    /** 0d. */
+
+    /**
+     * 0d.
+     */
     private static final FP64 ZERO = FP64.of(0d);
-    /** 1d. */
+
+    /**
+     * 1d.
+     */
     private static final FP64 ONE = FP64.of(1d);
-    /** Singleton. */
+
+    /**
+     * Singleton.
+     */
     private static final FP64Field INSTANCE = new FP64Field();
 
-    /** Singleton. */
-    private FP64Field() {}
+    /**
+     * Singleton.
+     */
+    private FP64Field() {
+    }
 
     /**
      * Get the field instance.
@@ -36,18 +48,22 @@ public final class FP64Field extends AbstractField<FP64> {
      * @return the field instance.
      */
     public static FP64Field get() {
-        return INSTANCE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FP64 one() {
-        return ONE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public FP64 zero() {
-        return ZERO;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

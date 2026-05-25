@@ -82,12 +82,16 @@ import java.util.function.DoubleSupplier;
  * <p>Instances of this class are mutable and not safe for use by multiple
  * threads.
  */
-public final class Sum
-    implements DoubleSupplier,
-               DoubleConsumer {
-    /** Standard sum. */
+public final class Sum implements DoubleSupplier, DoubleConsumer {
+
+    /**
+     * Standard sum.
+     */
     private double sum;
-    /** Compensation value. */
+
+    /**
+     * Compensation value.
+     */
     private double comp;
 
     /**
@@ -106,11 +110,7 @@ public final class Sum
      * @return this instance.
      */
     public Sum add(final double t) {
-        final double newSum = sum + t;
-        comp += DD.twoSumLow(sum, t, newSum);
-        sum = newSum;
-
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -120,11 +120,7 @@ public final class Sum
      * @return this instance.
      */
     public Sum add(final double... terms) {
-        for (final double t : terms) {
-            add(t);
-        }
-
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -134,16 +130,8 @@ public final class Sum
      * @param b Factor.
      * @return this instance
      */
-    public Sum addProduct(final double a,
-                          final double b) {
-        final double ab = a * b;
-        final double pLow = ExtendedPrecision.productLow(a, b, ab);
-
-        final double newSum = sum + ab;
-        comp += DD.twoSumLow(sum, ab, newSum) + pLow;
-        sum = newSum;
-
-        return this;
+    public Sum addProduct(final double a, final double b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -154,19 +142,8 @@ public final class Sum
      * @return this instance.
      * @throws IllegalArgumentException if the arrays do not have the same length.
      */
-    public Sum addProducts(final double[] a,
-                           final double[] b) {
-        final int len = a.length;
-        if (len != b.length) {
-            throw new IllegalArgumentException("Dimension mismatch: " +
-                                               a.length + " != " + b.length);
-        }
-
-        for (int i = 0; i < len; ++i) {
-            addProduct(a[i], b[i]);
-        }
-
-        return this;
+    public Sum addProducts(final double[] a, final double[] b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -176,7 +153,7 @@ public final class Sum
      * @return this instance.
      */
     public Sum add(final Sum other) {
-        return add(other.sum, other.comp);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -187,7 +164,7 @@ public final class Sum
      * @since 1.2
      */
     public Sum subtract(final Sum other) {
-        return add(-other.sum, -other.comp);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -232,7 +209,7 @@ public final class Sum
      */
     @Override
     public void accept(final double value) {
-        add(value);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -242,11 +219,7 @@ public final class Sum
      */
     @Override
     public double getAsDouble() {
-        // High-precision value if it is finite, standard IEEE754 result otherwise.
-        final double hpsum = sum + comp;
-        return Double.isFinite(hpsum) ?
-                hpsum :
-                sum;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -255,7 +228,7 @@ public final class Sum
      * @return a new instance.
      */
     public static Sum create() {
-        return new Sum(0d);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -265,7 +238,7 @@ public final class Sum
      * @return a new instance.
      */
     public static Sum of(final double a) {
-        return new Sum(a);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -275,7 +248,7 @@ public final class Sum
      * @return a new instance.
      */
     public static Sum of(final double... values) {
-        return create().add(values);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -285,8 +258,7 @@ public final class Sum
      * @param b Factors.
      * @return a new instance.
      */
-    public static Sum ofProducts(final double[] a,
-                                 final double[] b) {
-        return create().addProducts(a, b);
+    public static Sum ofProducts(final double[] a, final double[] b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

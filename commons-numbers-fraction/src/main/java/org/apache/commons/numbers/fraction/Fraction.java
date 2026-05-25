@@ -30,36 +30,51 @@ import org.apache.commons.numbers.core.NativeOperators;
  *
  * <a href="https://en.wikipedia.org/wiki/Rational_number">Rational number</a>
  */
-public final class Fraction
-    extends Number
-    implements Comparable<Fraction>,
-               NativeOperators<Fraction>,
-               Serializable {
-    /** A fraction representing "0". */
+public final class Fraction extends Number implements Comparable<Fraction>, NativeOperators<Fraction>, Serializable {
+
+    /**
+     * A fraction representing "0".
+     */
     public static final Fraction ZERO = new Fraction(0);
 
-    /** A fraction representing "1". */
+    /**
+     * A fraction representing "1".
+     */
     public static final Fraction ONE = new Fraction(1);
 
-    /** Serializable version identifier. */
+    /**
+     * Serializable version identifier.
+     */
     private static final long serialVersionUID = 20190701L;
 
-    /** The default epsilon used for convergence. */
+    /**
+     * The default epsilon used for convergence.
+     */
     private static final double DEFAULT_EPSILON = 1e-5;
 
-    /** The default iterations used for convergence. */
+    /**
+     * The default iterations used for convergence.
+     */
     private static final int DEFAULT_MAX_ITERATIONS = 100;
 
-    /** Message for non-finite input double argument to factory constructors. */
+    /**
+     * Message for non-finite input double argument to factory constructors.
+     */
     private static final String NOT_FINITE = "Not finite: ";
 
-    /** The overflow limit for conversion from a double (2^31). */
+    /**
+     * The overflow limit for conversion from a double (2^31).
+     */
     private static final long OVERFLOW = 1L << 31;
 
-    /** The numerator of this fraction reduced to lowest terms. */
+    /**
+     * The numerator of this fraction reduced to lowest terms.
+     */
     private final int numerator;
 
-    /** The denominator of this fraction reduced to lowest terms. */
+    /**
+     * The denominator of this fraction reduced to lowest terms.
+     */
     private final int denominator;
 
     /**
@@ -77,7 +92,6 @@ public final class Fraction
         if (den == 0) {
             throw new FractionException(FractionException.ERROR_ZERO_DENOMINATOR);
         }
-
         if (num == den) {
             numerator = 1;
             denominator = 1;
@@ -85,7 +99,6 @@ public final class Fraction
             // Reduce numerator (p) and denominator (q) by greatest common divisor.
             final int p;
             final int q;
-
             // If num and den are both 2^-31, or if one is 0 and the other is 2^-31,
             // the calculation of the gcd below will fail. Ensure that this does not
             // happen by dividing both by 2 in case both are even.
@@ -96,7 +109,6 @@ public final class Fraction
                 p = num;
                 q = den;
             }
-
             // Will not throw.
             // Cannot return 0 as gcd(0, 0) has been eliminated.
             final int d = ArithmeticUtils.gcd(p, q);
@@ -155,14 +167,10 @@ public final class Fraction
      * @throws IllegalArgumentException if the given {@code value} is NaN or infinite.
      * @throws ArithmeticException if the continued fraction failed to converge.
      */
-    private Fraction(final double value,
-                     final double epsilon,
-                     final int maxDenominator,
-                     final int maxIterations) {
+    private Fraction(final double value, final double epsilon, final int maxDenominator, final int maxIterations) {
         if (!Double.isFinite(value)) {
             throw new IllegalArgumentException(NOT_FINITE + value);
         }
-
         // Remove sign, this is restored at the end.
         // (Assumes the value is not zero and thus signum(value) is not zero).
         final double absValue = Math.abs(value);
@@ -171,7 +179,6 @@ public final class Fraction
         if (a0 > OVERFLOW) {
             throw new FractionException(FractionException.ERROR_CONVERSION_OVERFLOW, value, a0, 1);
         }
-
         // check for (almost) integer arguments, which should not go to iterations.
         if (r0 - a0 <= epsilon) {
             int num = (int) a0;
@@ -188,19 +195,15 @@ public final class Fraction
             this.denominator = den;
             return;
         }
-
         // Support 2^31 as maximum denominator.
         // This is negative as an integer so convert to long.
         final long maxDen = Math.abs((long) maxDenominator);
-
         long p0 = 1;
         long q0 = 0;
         long p1 = a0;
         long q1 = 1;
-
         long p2;
         long q2;
-
         int n = 0;
         boolean stop = false;
         do {
@@ -209,9 +212,7 @@ public final class Fraction
             final long a1 = (long) Math.floor(r1);
             p2 = (a1 * p1) + p0;
             q2 = (a1 * q1) + q0;
-
-            if (Long.compareUnsigned(p2, OVERFLOW) > 0 ||
-                Long.compareUnsigned(q2, OVERFLOW) > 0) {
+            if (Long.compareUnsigned(p2, OVERFLOW) > 0 || Long.compareUnsigned(q2, OVERFLOW) > 0) {
                 // In maxDenominator mode, fall-back to the previous valid fraction.
                 if (epsilon == 0.0) {
                     p2 = p1;
@@ -220,11 +221,8 @@ public final class Fraction
                 }
                 throw new FractionException(FractionException.ERROR_CONVERSION_OVERFLOW, value, p2, q2);
             }
-
             final double convergent = (double) p2 / q2;
-            if (n < maxIterations &&
-                Math.abs(convergent - absValue) > epsilon &&
-                q2 < maxDen) {
+            if (n < maxIterations && Math.abs(convergent - absValue) > epsilon && q2 < maxDen) {
                 p0 = p1;
                 p1 = p2;
                 q0 = q1;
@@ -235,11 +233,9 @@ public final class Fraction
                 stop = true;
             }
         } while (!stop);
-
         if (n >= maxIterations) {
             throw new FractionException(FractionException.ERROR_CONVERSION, value, maxIterations);
         }
-
         // Use p2 / q2 or p1 / q1 if q2 has grown too large in maxDenominator mode
         // Note: Conversion of long 2^31 to an integer will create a negative. This could
         // be either the numerator or denominator. This is handled by restoring the sign.
@@ -252,7 +248,6 @@ public final class Fraction
             num = (int) p1;
             den = (int) q1;
         }
-
         // Restore the sign.
         if (Math.signum(num) * Math.signum(den) != Math.signum(value)) {
             if (num == Integer.MIN_VALUE) {
@@ -261,7 +256,6 @@ public final class Fraction
                 num = -num;
             }
         }
-
         this.numerator = num;
         this.denominator = den;
     }
@@ -275,7 +269,7 @@ public final class Fraction
      * @return a new instance.
      */
     public static Fraction from(final double value) {
-        return from(value, DEFAULT_EPSILON, DEFAULT_MAX_ITERATIONS);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -297,19 +291,8 @@ public final class Fraction
      * @throws ArithmeticException if the continued fraction failed to converge.
      * @return a new instance.
      */
-    public static Fraction from(final double value,
-                                final double epsilon,
-                                final int maxIterations) {
-        if (value == 0) {
-            return ZERO;
-        }
-        if (maxIterations < 1) {
-            throw new IllegalArgumentException("Max iterations must be strictly positive: " + maxIterations);
-        }
-        if (epsilon >= 0) {
-            return new Fraction(value, epsilon, Integer.MIN_VALUE, maxIterations);
-        }
-        throw new IllegalArgumentException("Epsilon must be positive: " + maxIterations);
+    public static Fraction from(final double value, final double epsilon, final int maxIterations) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -332,16 +315,8 @@ public final class Fraction
      * @throws ArithmeticException if the continued fraction failed to converge.
      * @return a new instance.
      */
-    public static Fraction from(final double value,
-                                final int maxDenominator) {
-        if (value == 0) {
-            return ZERO;
-        }
-        if (maxDenominator == 0) {
-            // Re-use the zero denominator message
-            throw new IllegalArgumentException(FractionException.ERROR_ZERO_DENOMINATOR);
-        }
-        return new Fraction(value, 0, maxDenominator, DEFAULT_MAX_ITERATIONS);
+    public static Fraction from(final double value, final int maxDenominator) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -351,10 +326,7 @@ public final class Fraction
      * @return a new instance.
      */
     public static Fraction of(final int num) {
-        if (num == 0) {
-            return ZERO;
-        }
-        return new Fraction(num);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -367,10 +339,7 @@ public final class Fraction
      * @return a new instance.
      */
     public static Fraction of(final int num, final int den) {
-        if (num == 0) {
-            return ZERO;
-        }
-        return new Fraction(num, den);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -407,20 +376,12 @@ public final class Fraction
      * @see #toString()
      */
     public static Fraction parse(String s) {
-        final String stripped = s.replace(",", "");
-        final int slashLoc = stripped.indexOf('/');
-        // if no slash, parse as single number
-        if (slashLoc == -1) {
-            return of(Integer.parseInt(stripped.trim()));
-        }
-        final int num = Integer.parseInt(stripped.substring(0, slashLoc).trim());
-        final int denom = Integer.parseInt(stripped.substring(slashLoc + 1).trim());
-        return of(num, denom);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public Fraction zero() {
-        return ZERO;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -430,12 +391,12 @@ public final class Fraction
      */
     @Override
     public boolean isZero() {
-        return numerator == 0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public Fraction one() {
-        return ONE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -445,7 +406,7 @@ public final class Fraction
      */
     @Override
     public boolean isOne() {
-        return numerator == denominator;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -454,7 +415,7 @@ public final class Fraction
      * @return the numerator as an {@code int}.
      */
     public int getNumerator() {
-        return numerator;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -463,7 +424,7 @@ public final class Fraction
      * @return the denominator as an {@code int}.
      */
     public int getDenominator() {
-        return denominator;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -473,7 +434,7 @@ public final class Fraction
      * positive, 0 if it is 0.
      */
     public int signum() {
-        return Integer.signum(numerator) * Integer.signum(denominator);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -482,16 +443,12 @@ public final class Fraction
      * @return the absolute value.
      */
     public Fraction abs() {
-        return signum() >= 0 ?
-            this :
-            negate();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public Fraction negate() {
-        return numerator == Integer.MIN_VALUE ?
-            new Fraction(numerator, -denominator) :
-            new Fraction(-numerator, denominator);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -503,7 +460,7 @@ public final class Fraction
      */
     @Override
     public Fraction reciprocal() {
-        return new Fraction(denominator, numerator);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -514,7 +471,7 @@ public final class Fraction
      */
     @Override
     public double doubleValue() {
-        return numerator / (double) denominator;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -525,7 +482,7 @@ public final class Fraction
      */
     @Override
     public float floatValue() {
-        return (float) doubleValue();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -535,9 +492,7 @@ public final class Fraction
      */
     @Override
     public int intValue() {
-        // Note: numerator / denominator fails for Integer.MIN_VALUE / -1.
-        // Casting the double value handles this case.
-        return (int) doubleValue();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -547,7 +502,7 @@ public final class Fraction
      */
     @Override
     public long longValue() {
-        return (long) numerator / denominator;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -560,15 +515,7 @@ public final class Fraction
      * cannot be represented in an {@code int}.
      */
     public Fraction add(final int value) {
-        if (value == 0) {
-            return this;
-        }
-        if (isZero()) {
-            return new Fraction(value);
-        }
-        // Convert to numerator with same effective denominator
-        final long num = (long) value * denominator;
-        return of(Math.toIntExact(numerator + num), denominator);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -582,7 +529,7 @@ public final class Fraction
      */
     @Override
     public Fraction add(Fraction value) {
-        return addSub(value, true /* add */);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -595,18 +542,7 @@ public final class Fraction
      * cannot be represented in an {@code int}.
      */
     public Fraction subtract(final int value) {
-        if (value == 0) {
-            return this;
-        }
-        if (isZero()) {
-            // Special case for min value
-            return value == Integer.MIN_VALUE ?
-                new Fraction(Integer.MIN_VALUE, -1) :
-                new Fraction(-value);
-        }
-        // Convert to numerator with same effective denominator
-        final long num = (long) value * denominator;
-        return of(Math.toIntExact(numerator - num), denominator);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -620,7 +556,7 @@ public final class Fraction
      */
     @Override
     public Fraction subtract(Fraction value) {
-        return addSub(value, false /* subtract */);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -640,7 +576,6 @@ public final class Fraction
         if (isZero()) {
             return isAdd ? value : value.negate();
         }
-
         /*
          * Let the two fractions be u/u' and v/v', and d1 = gcd(u', v').
          * First, compute t, defined as:
@@ -650,7 +585,6 @@ public final class Fraction
         final int d1 = ArithmeticUtils.gcd(denominator, value.denominator);
         final long uvp = (long) numerator * (value.denominator / d1);
         final long upv = (long) value.numerator * (denominator / d1);
-
         /*
          * The largest possible absolute value of a product of two ints is 2^62,
          * which can only happen as a result of -2^31 * -2^31 = 2^62, so a
@@ -661,7 +595,6 @@ public final class Fraction
          * are necessarily coprime.
          */
         final long t = isAdd ? uvp + upv : uvp - upv;
-
         /*
          * Because u is coprime to u' and v is coprime to v', t is necessarily
          * coprime to both v'/d1 and u'/d1. However, it might have a common
@@ -669,9 +602,7 @@ public final class Fraction
          */
         final long d2 = ArithmeticUtils.gcd(t, d1);
         // result is (t/d2) / (u'/d1)(v'/d2)
-        return of(Math.toIntExact(t / d2),
-                  Math.multiplyExact(denominator / d1,
-                                     value.denominator / (int) d2));
+        return of(Math.toIntExact(t / d2), Math.multiplyExact(denominator / d1, value.denominator / (int) d2));
     }
 
     /**
@@ -685,16 +616,7 @@ public final class Fraction
      */
     @Override
     public Fraction multiply(final int value) {
-        if (value == 0 || isZero()) {
-            return ZERO;
-        }
-
-        // knuth 4.5.1
-        // Make sure we don't overflow unless the result *must* overflow.
-        // (see multiply(Fraction) using value / 1 as the argument).
-        final int d2 = ArithmeticUtils.gcd(value, denominator);
-        return new Fraction(Math.multiplyExact(numerator, value / d2),
-                            denominator / d2);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -708,10 +630,7 @@ public final class Fraction
      */
     @Override
     public Fraction multiply(Fraction value) {
-        if (value.isZero() || isZero()) {
-            return ZERO;
-        }
-        return multiply(value.numerator, value.denominator);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -732,8 +651,7 @@ public final class Fraction
         // Make sure we don't overflow unless the result *must* overflow.
         final int d1 = ArithmeticUtils.gcd(numerator, den);
         final int d2 = ArithmeticUtils.gcd(num, denominator);
-        return new Fraction(Math.multiplyExact(numerator / d1, num / d2),
-                            Math.multiplyExact(denominator / d2, den / d1));
+        return new Fraction(Math.multiplyExact(numerator / d1, num / d2), Math.multiplyExact(denominator / d2, den / d1));
     }
 
     /**
@@ -747,20 +665,7 @@ public final class Fraction
      * by an {@code int}.
      */
     public Fraction divide(final int value) {
-        if (value == 0) {
-            throw new FractionException(FractionException.ERROR_DIVIDE_BY_ZERO);
-        }
-        if (isZero()) {
-            return ZERO;
-        }
-        // Multiply by reciprocal
-
-        // knuth 4.5.1
-        // Make sure we don't overflow unless the result *must* overflow.
-        // (see multiply(Fraction) using 1 / value as the argument).
-        final int d1 = ArithmeticUtils.gcd(numerator, value);
-        return new Fraction(numerator / d1,
-                            Math.multiplyExact(denominator, value / d1));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -775,14 +680,7 @@ public final class Fraction
      */
     @Override
     public Fraction divide(Fraction value) {
-        if (value.isZero()) {
-            throw new FractionException(FractionException.ERROR_DIVIDE_BY_ZERO);
-        }
-        if (isZero()) {
-            return ZERO;
-        }
-        // Multiply by reciprocal
-        return multiply(value.denominator, value.numerator);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -795,32 +693,7 @@ public final class Fraction
      */
     @Override
     public Fraction pow(final int exponent) {
-        if (exponent == 1) {
-            return this;
-        }
-        if (exponent == 0) {
-            return ONE;
-        }
-        if (isZero()) {
-            if (exponent < 0) {
-                throw new FractionException(FractionException.ERROR_ZERO_DENOMINATOR);
-            }
-            return ZERO;
-        }
-        if (exponent > 0) {
-            return new Fraction(ArithmeticUtils.pow(numerator, exponent),
-                                ArithmeticUtils.pow(denominator, exponent));
-        }
-        if (exponent == -1) {
-            return this.reciprocal();
-        }
-        if (exponent == Integer.MIN_VALUE) {
-            // MIN_VALUE can't be negated
-            return new Fraction(ArithmeticUtils.pow(denominator, Integer.MAX_VALUE) * denominator,
-                                ArithmeticUtils.pow(numerator, Integer.MAX_VALUE) * numerator);
-        }
-        return new Fraction(ArithmeticUtils.pow(denominator, -exponent),
-                            ArithmeticUtils.pow(numerator, -exponent));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -836,15 +709,7 @@ public final class Fraction
      */
     @Override
     public String toString() {
-        final String str;
-        if (isZero()) {
-            str = "0";
-        } else if (denominator == 1) {
-            str = Integer.toString(numerator);
-        } else {
-            str = numerator + " / " + denominator;
-        }
-        return str;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -855,30 +720,7 @@ public final class Fraction
      */
     @Override
     public int compareTo(Fraction other) {
-        // Compute the sign of each part
-        final int lns = Integer.signum(numerator);
-        final int lds = Integer.signum(denominator);
-        final int rns = Integer.signum(other.numerator);
-        final int rds = Integer.signum(other.denominator);
-
-        final int lhsSigNum = lns * lds;
-        final int rhsSigNum = rns * rds;
-
-        if (lhsSigNum != rhsSigNum) {
-            return (lhsSigNum > rhsSigNum) ? 1 : -1;
-        }
-        // Same sign.
-        // Avoid a multiply if both fractions are zero
-        if (lhsSigNum == 0) {
-            return 0;
-        }
-        // Compare absolute magnitude.
-        // Multiplication by the signum is equal to the absolute.
-        final long nOd = ((long) numerator) * lns * other.denominator * rds;
-        final long dOn = ((long) denominator) * lds * other.numerator * rns;
-        return lhsSigNum > 0 ?
-            Long.compare(nOd, dOn) :
-            Long.compare(dOn, nOd);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -890,34 +732,11 @@ public final class Fraction
      */
     @Override
     public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-
-        if (other instanceof Fraction) {
-            // Since fractions are always in lowest terms, numerators and
-            // denominators can be compared directly for equality.
-            final Fraction rhs = (Fraction) other;
-            if (signum() == rhs.signum()) {
-                return Math.abs(numerator) == Math.abs(rhs.numerator) &&
-                       Math.abs(denominator) == Math.abs(rhs.denominator);
-            }
-        }
-
-        return false;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int hashCode() {
-        // Incorporate the sign and absolute values of the numerator and denominator.
-        // Equivalent to:
-        // int hash = 1;
-        // hash = 31 * hash + Math.abs(numerator);
-        // hash = 31 * hash + Math.abs(denominator);
-        // hash = hash * signum()
-        // Note: x * Integer.signum(x) == Math.abs(x).
-        final int numS = Integer.signum(numerator);
-        final int denS = Integer.signum(denominator);
-        return (31 * (31 + numerator * numS) + denominator * denS) * numS * denS;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

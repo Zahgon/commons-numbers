@@ -22,8 +22,12 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 final class DoubleMath {
-    /** No instances. */
-    private DoubleMath() {}
+
+    /**
+     * No instances.
+     */
+    private DoubleMath() {
+    }
 
     /**
      * Return {@code true} if {@code x > y}.
@@ -39,16 +43,7 @@ final class DoubleMath {
      * @return {@code x > y}
      */
     static boolean greaterThan(double x, double y) {
-        if (x > y) {
-            return true;
-        }
-        if (x < y) {
-            return false;
-        }
-        // Equal numbers; signed zeros (-0.0, 0.0); or NaNs
-        final long a = Double.doubleToLongBits(x);
-        final long b = Double.doubleToLongBits(y);
-        return a > b;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -65,15 +60,6 @@ final class DoubleMath {
      * @return {@code x < y}
      */
     static boolean lessThan(double x, double y) {
-        if (x < y) {
-            return true;
-        }
-        if (x > y) {
-            return false;
-        }
-        // Equal numbers; signed zeros (-0.0, 0.0); or NaNs
-        final long a = Double.doubleToLongBits(x);
-        final long b = Double.doubleToLongBits(y);
-        return a < b;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

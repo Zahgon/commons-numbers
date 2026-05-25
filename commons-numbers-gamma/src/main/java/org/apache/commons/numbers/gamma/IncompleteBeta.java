@@ -32,7 +32,9 @@ package org.apache.commons.numbers.gamma;
  */
 public final class IncompleteBeta {
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private IncompleteBeta() {
         // intentionally empty.
     }
@@ -50,10 +52,8 @@ public final class IncompleteBeta {
      * @return the incomplete beta function \( B_x(a, b) \).
      * @throws ArithmeticException if the series evaluation fails to converge.
      */
-    public static double value(double x,
-                               double a,
-                               double b) {
-        return BoostBeta.beta(a, b, x);
+    public static double value(double x, double a, double b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -71,12 +71,8 @@ public final class IncompleteBeta {
      * @return the incomplete beta function \( B_x(a, b) \).
      * @throws ArithmeticException if the series evaluation fails to converge.
      */
-    public static double value(double x,
-                               final double a,
-                               final double b,
-                               double epsilon,
-                               int maxIterations) {
-        return BoostBeta.beta(a, b, x, new Policy(epsilon, maxIterations));
+    public static double value(double x, final double a, final double b, double epsilon, int maxIterations) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -94,10 +90,8 @@ public final class IncompleteBeta {
      * @return the complement of the incomplete beta function \( B(a, b) - B_x(a, b) \).
      * @throws ArithmeticException if the series evaluation fails to converge.
      */
-    public static double complement(double x,
-                                    double a,
-                                    double b) {
-        return BoostBeta.betac(a, b, x);
+    public static double complement(double x, double a, double b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -117,11 +111,7 @@ public final class IncompleteBeta {
      * @return the complement of the incomplete beta function \( B(a, b) - B_x(a, b) \).
      * @throws ArithmeticException if the series evaluation fails to converge.
      */
-    public static double complement(double x,
-                                    final double a,
-                                    final double b,
-                                    double epsilon,
-                                    int maxIterations) {
-        return BoostBeta.betac(a, b, x, new Policy(epsilon, maxIterations));
+    public static double complement(double x, final double a, final double b, double epsilon, int maxIterations) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

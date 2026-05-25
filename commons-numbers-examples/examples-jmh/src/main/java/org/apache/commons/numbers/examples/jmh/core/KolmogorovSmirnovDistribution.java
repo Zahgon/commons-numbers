@@ -28,8 +28,12 @@ import org.apache.commons.numbers.core.DDMath;
  * @since 1.2
  */
 final class KolmogorovSmirnovDistribution {
-    /** No instances. */
-    private KolmogorovSmirnovDistribution() {}
+
+    /**
+     * No instances.
+     */
+    private KolmogorovSmirnovDistribution() {
+    }
 
     /**
      * Computes the complementary probability {@code P[D_n^+ >= x]} for the one-sided
@@ -70,15 +74,26 @@ final class KolmogorovSmirnovDistribution {
      * @since 1.1
      */
     static final class One {
-        /** "Very large" n to use a asymptotic limiting form.
+
+        /**
+         * "Very large" n to use a asymptotic limiting form.
          * [1] suggests 1e12 but this is reduced to avoid excess
-         * computation time. */
+         * computation time.
+         */
         private static final int VERY_LARGE_N = 1000000;
-        /** Maximum number of term for the Smirnov-Dwass algorithm. */
+
+        /**
+         * Maximum number of term for the Smirnov-Dwass algorithm.
+         */
         private static final int SD_MAX_TERMS = 3;
-        /** Minimum sample size for the Smirnov-Dwass algorithm. */
+
+        /**
+         * Minimum sample size for the Smirnov-Dwass algorithm.
+         */
         private static final int SD_MIN_N = 8;
-        /** Number of bits of precision in the sum of terms Aj.
+
+        /**
+         * Number of bits of precision in the sum of terms Aj.
          * This does not have to be the full 106 bits of a double-double as the final result
          * is used as a double. The terms are represented as fractions with an exponent:
          * <pre>
@@ -88,17 +103,22 @@ final class KolmogorovSmirnovDistribution {
          * </pre>
          * <p>The terms can be added if their exponents overlap. The bits of precision must
          * account for the extra range of the fractional part of Aj by 1 bit. Note that
-         * additional bits are added to this dynamically based on the number of terms. */
+         * additional bits are added to this dynamically based on the number of terms.
+         */
         private static final int SUM_PRECISION_BITS = 53;
-        /** Number of bits of precision in the sum of terms Aj.
+
+        /**
+         * Number of bits of precision in the sum of terms Aj.
          * For Smirnov-Dwass we use the full 106 bits of a double-double due to the summation
-         * of terms that cancel. Account for the extra range of the fractional part of Aj by 1 bit. */
+         * of terms that cancel. Account for the extra range of the fractional part of Aj by 1 bit.
+         */
         private static final int SD_SUM_PRECISION_BITS = 107;
 
         /**
          * Defines a scaled power function.
          */
         private interface StaticScaledPower {
+
             /**
              * Compute the number {@code x} raised to the power {@code n}.
              *
@@ -124,6 +144,7 @@ final class KolmogorovSmirnovDistribution {
          * Defines a scaled power function.
          */
         private interface ScaledPower {
+
             /**
              * Compute the number {@code x} raised to the power {@code n}.
              *
@@ -147,6 +168,7 @@ final class KolmogorovSmirnovDistribution {
          * Defines an addition of two double-double numbers.
          */
         private interface StatisDDAdd {
+
             /**
              * Compute the sum of {@code (x,xx)} and {@code (y,yy)}.
              *
@@ -161,8 +183,11 @@ final class KolmogorovSmirnovDistribution {
             SDD add(double x, double xx, double y, double yy, SDD s);
         }
 
-        /** No instances. */
-        private One() {}
+        /**
+         * No instances.
+         */
+        private One() {
+        }
 
         /**
          * Calculates complementary probability {@code P[D_n^+ >= x]}, or survival
@@ -173,17 +198,7 @@ final class KolmogorovSmirnovDistribution {
          * @return \(P(D_n^+ &ge; x)\)
          */
         static double sfMutable(double x, int n) {
-            final double p = sfExact(x, n);
-            if (p >= 0) {
-                return p;
-            }
-            // Note: This is not referring to N = floor(n*x).
-            // Here n is the sample size and a suggested limit 10^12 is noted on pp.15 in [1].
-            // This uses a lower threshold where the full computation takes ~ 1 second.
-            if (n > VERY_LARGE_N) {
-                return sfAsymptotic(x, n);
-            }
-            return sfSDD(x, n, false);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -195,17 +210,7 @@ final class KolmogorovSmirnovDistribution {
          * @return \(P(D_n^+ &ge; x)\)
          */
         static double sfMutableFullPow(double x, int n) {
-            final double p = sfExact(x, n);
-            if (p >= 0) {
-                return p;
-            }
-            // Note: This is not referring to N = floor(n*x).
-            // Here n is the sample size and a suggested limit 10^12 is noted on pp.15 in [1].
-            // This uses a lower threshold where the full computation takes ~ 1 second.
-            if (n > VERY_LARGE_N) {
-                return sfAsymptotic(x, n);
-            }
-            return sfSDD(x, n, true);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -325,21 +330,10 @@ final class KolmogorovSmirnovDistribution {
          * @return \(P(D_n^+ &ge; x)\)
          */
         static double sfOO(double x, int n) {
-            final double p = sfExact(x, n);
-            if (p >= 0) {
-                return p;
-            }
-            // Note: This is not referring to N = floor(n*x).
-            // Here n is the sample size and a suggested limit 10^12 is noted on pp.15 in [1].
-            // This uses a lower threshold where the full computation takes ~ 1 second.
-            if (n > VERY_LARGE_N) {
-                return sfAsymptotic(x, n);
-            }
-            return sfDD(x, n);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         // @CHECKSTYLE: stop MethodLength
-
         /**
          * Calculates complementary probability {@code P[D_n^+ >= x]}, or survival
          * function (SF), for the one-sided one-sample Kolmogorov-Smirnov distribution.
@@ -362,11 +356,9 @@ final class KolmogorovSmirnovDistribution {
             // Compute only the SF using Algorithm 1 pp 12.
             // Only require 1 double-double for all intermediate computations.
             final SDD z = SDD.create();
-
             // Compute: k = floor(n*x), alpha = nx - k; x = (k+alpha)/n with 0 <= alpha < 1
             final int k = splitX(n, x, z);
             final double alpha = z.hi();
-
             // Choose the algorithm:
             // Eq (13) Smirnov/Birnbaum-Tingey; or Smirnov/Dwass Eq (31)
             // Eq. 13 sums j = 0 : floor( n(1-x) )  = n - 1 - floor(nx) iff alpha != 0; else n - floor(nx)
@@ -378,7 +370,6 @@ final class KolmogorovSmirnovDistribution {
             // a SD term when it should be zero (to working precision).
             final int regN = n - k - 1;
             final int sdN = k - ((alpha == 0) ? 1 : 0);
-
             // SD : Figure 3 (c) (pp. 6)
             // Terms Aj (j = n -> 0) have alternating signs through the range and may involve
             // numbers much bigger than 1 causing cancellation; magnitudes increase then decrease.
@@ -408,13 +399,10 @@ final class KolmogorovSmirnovDistribution {
                 // Otherwise when x < 4 / n
                 sd |= sdN <= SD_MAX_TERMS && n >= SD_MIN_N;
             }
-
             final int maxN = sd ? sdN : regN;
-
             // Note: if N > "very large" use the asymptotic approximation.
             // Currently this check is done on n (sample size) in the calling function.
             // This provides a monotonic p-value for all x with the same n.
-
             // Configure the algorithm.
             // The error of double-double addition and multiplication is low (< 2^-102).
             // The error in Aj is mainly from the power function.
@@ -428,10 +416,8 @@ final class KolmogorovSmirnovDistribution {
             // These guards bits are conservative and > ~99% of terms are typically used.
             final StatisDDAdd fadd = sd ? SDD::add : SDD::fastAdd;
             final int sumBits = sd ? SD_SUM_PRECISION_BITS : SUM_PRECISION_BITS + log2(maxN >> 1);
-
             // Working variable for the exponent of scaled values
             long e;
-
             // Compute A0. The terms Aj may over/underflow.
             // This is handled by maintaining the sum(Aj) using a fractional representation.
             if (sd) {
@@ -446,7 +432,6 @@ final class KolmogorovSmirnovDistribution {
                 SDD.divide(z.hi(), z.lo(), x, 0, z);
                 e += SDD.frexp(z.hi(), z.lo(), z);
             }
-
             // sum(Aj) maintained as 2^e * f with f in [0.5, 1)
             final SDD sum = z.copy();
             long esum = e;
@@ -494,11 +479,9 @@ final class KolmogorovSmirnovDistribution {
                     // Effectively Aj -> eps * sum, and most of the computation is done.
                     break;
                 }
-
                 // Re-scale the sum
                 esum += SDD.frexp(sum.hi(), sum.lo(), sum);
             }
-
             // p = x * sum(Ai). Since the sum is normalized
             // this is safe as long as x does not approach a sub-normal.
             // Typically x in (1/n, 1 - 1/n).
@@ -531,15 +514,12 @@ final class KolmogorovSmirnovDistribution {
          */
         private static double sfDD(double x, int n) {
             // Same initialisation as: double sf(double x, int n, ScaledPower power)
-
             // Compute only the SF using Algorithm 1 pp 12.
             // Only require 1 double-double for all intermediate computations.
             final SDD zz = SDD.create();
-
             // Compute: k = floor(n*x), alpha = nx - k; x = (k+alpha)/n with 0 <= alpha < 1
             final int k = splitX(n, x, zz);
             final double alpha = zz.hi();
-
             // Choose the algorithm:
             // Eq (13) Smirnov/Birnbaum-Tingey; or Smirnov/Dwass Eq (31)
             // Eq. 13 sums j = 0 : floor( n(1-x) )  = n - 1 - floor(nx) iff alpha != 0; else n - floor(nx)
@@ -551,7 +531,6 @@ final class KolmogorovSmirnovDistribution {
             // a SD term when it should be zero (to working precision).
             final int regN = n - k - 1;
             final int sdN = k - ((alpha == 0) ? 1 : 0);
-
             // SD : Figure 3 (c) (pp. 6)
             // Terms Aj (j = n -> 0) have alternating signs through the range and may involve
             // numbers much bigger than 1 causing cancellation; magnitudes increase then decrease.
@@ -581,13 +560,10 @@ final class KolmogorovSmirnovDistribution {
                 // Otherwise when x < 4 / n
                 sd |= sdN <= SD_MAX_TERMS && n >= SD_MIN_N;
             }
-
             final int maxN = sd ? sdN : regN;
-
             // Note: if N > "very large" use the asymptotic approximation.
             // Currently this check is done on n (sample size) in the calling function.
             // This provides a monotonic p-value for all x with the same n.
-
             // Configure the algorithm.
             // The error of double-double addition and multiplication is low (< 2^-102).
             // The error in Aj is mainly from the power function.
@@ -600,13 +576,11 @@ final class KolmogorovSmirnovDistribution {
             // of required bits to sum remaining terms of the same magnitude is log2(N/2).
             // These guards bits are conservative and > ~99% of terms are typically used.
             final int sumBits = sd ? SD_SUM_PRECISION_BITS : SUM_PRECISION_BITS + log2(maxN >> 1);
-
             // Working variable for the exponent of scaled values
             long e;
-            int[] ie = {0};
-            long[] le = {0};
+            int[] ie = { 0 };
+            long[] le = { 0 };
             DD z;
-
             // Compute A0. The terms Aj may over/underflow.
             // This is handled by maintaining the sum(Aj) using a fractional representation.
             if (sd) {
@@ -626,7 +600,6 @@ final class KolmogorovSmirnovDistribution {
                 z = z.frexp(ie);
                 e += ie[0];
             }
-
             // sum(Aj) maintained as 2^e * f with f in [0.5, 1)
             DD sum = z;
             long esum = e;
@@ -674,12 +647,10 @@ final class KolmogorovSmirnovDistribution {
                     // Effectively Aj -> eps * sum, and most of the computation is done.
                     break;
                 }
-
                 // Re-scale the sum
                 sum = sum.frexp(ie);
                 esum += ie[0];
             }
-
             // p = x * sum(Ai). Since the sum is normalized
             // this is safe as long as x does not approach a sub-normal.
             // Typically x in (1/n, 1 - 1/n).
@@ -701,6 +672,6 @@ final class KolmogorovSmirnovDistribution {
      * @return p in [0, 1]
      */
     static double clipProbability(double p) {
-        return Math.min(1, Math.max(0, p));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

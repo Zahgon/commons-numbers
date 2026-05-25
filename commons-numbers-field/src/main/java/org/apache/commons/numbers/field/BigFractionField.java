@@ -22,11 +22,17 @@ import org.apache.commons.numbers.fraction.BigFraction;
  * {@link BigFraction} field.
  */
 public final class BigFractionField extends AbstractField<BigFraction> {
-    /** Singleton. */
+
+    /**
+     * Singleton.
+     */
     private static final BigFractionField INSTANCE = new BigFractionField();
 
-    /** Singleton. */
-    private BigFractionField() {}
+    /**
+     * Singleton.
+     */
+    private BigFractionField() {
+    }
 
     /**
      * Get the field instance.
@@ -34,18 +40,22 @@ public final class BigFractionField extends AbstractField<BigFraction> {
      * @return the field instance.
      */
     public static BigFractionField get() {
-        return INSTANCE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BigFraction one() {
-        return BigFraction.ONE;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BigFraction zero() {
-        return BigFraction.ZERO;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

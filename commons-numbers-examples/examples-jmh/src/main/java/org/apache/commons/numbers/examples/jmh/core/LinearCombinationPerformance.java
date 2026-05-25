@@ -14,14 +14,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.core;
 
 import java.math.MathContext;
 import java.util.Arrays;
 import java.util.concurrent.TimeUnit;
 import java.util.function.IntFunction;
-
 import org.apache.commons.numbers.core.Sum;
 import org.apache.commons.numbers.examples.jmh.core.LinearCombination.FourD;
 import org.apache.commons.numbers.examples.jmh.core.LinearCombination.ND;
@@ -50,8 +48,9 @@ import org.openjdk.jmh.infra.Blackhole;
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-server", "-Xms512M", "-Xmx512M"})
+@Fork(value = 1, jvmArgs = { "-server", "-Xms512M", "-Xmx512M" })
 public class LinearCombinationPerformance {
+
     /**
      * The seed to use to create the factors.
      * Using a fixed seed ensures the same factors are created for the variable
@@ -64,22 +63,27 @@ public class LinearCombinationPerformance {
      */
     @State(Scope.Benchmark)
     public static class Factors {
+
         /**
          * The condition number of the generated data.
          */
-        @Param({"1e20"})
+        @Param({ "1e20" })
         private double c;
 
         /**
          * The number of factors.
          */
-        @Param({"1000"})
+        @Param({ "1000" })
         private int size;
 
-        /** Factors a. */
+        /**
+         * Factors a.
+         */
         private double[][] a;
 
-        /** Factors b. */
+        /**
+         * Factors b.
+         */
         private double[][] b;
 
         /**
@@ -91,7 +95,7 @@ public class LinearCombinationPerformance {
          * @return the length
          */
         public int getLength() {
-            return 4;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -100,7 +104,7 @@ public class LinearCombinationPerformance {
          * @return the size
          */
         public int getSize() {
-            return size;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -110,7 +114,7 @@ public class LinearCombinationPerformance {
          * @return Factors b.
          */
         public double[] getA(int index) {
-            return a[index];
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -119,8 +123,8 @@ public class LinearCombinationPerformance {
          * @param index the index
          * @return Factors b.
          */
-        public double[]  getB(int index) {
-            return b[index];
+        public double[] getB(int index) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -128,22 +132,7 @@ public class LinearCombinationPerformance {
          */
         @Setup
         public void setup() {
-            final UniformRandomProvider rng =
-                    RandomSource.XO_RO_SHI_RO_1024_PP.create(SEED);
-            // Use the ill conditioned data generation method.
-            // This requires an array of at least 6.
-            final int n = Math.max(6, getLength());
-            final double[] x = new double[n];
-            final double[] y = new double[n];
-            a = new double[size][];
-            b = new double[size][];
-            // Limit precision to allow large array lengths to be generated.
-            final MathContext mathContext = new MathContext(100);
-            for (int i = 0; i < size; i++) {
-                LinearCombinationUtils.genDot(c, rng, x, y, null, mathContext);
-                a[i] = Arrays.copyOf(x, getLength());
-                b[i] = Arrays.copyOf(y, getLength());
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -152,16 +141,19 @@ public class LinearCombinationPerformance {
      */
     @State(Scope.Benchmark)
     public static class LengthFactors extends Factors {
+
         /**
          * The length of each factors array.
          */
-        @Param({"2", "3", "4", "8", "16", "32", "64"})
+        @Param({ "2", "3", "4", "8", "16", "32", "64" })
         private int length;
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         public int getLength() {
-            return length;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -170,58 +162,63 @@ public class LinearCombinationPerformance {
      */
     @State(Scope.Benchmark)
     public static class Calculator {
+
         /**
          * The implementation name.
          */
-        @Param({"standard",
-                "current",
-                "dekker",
-                "dot2s",
-                "dot2", "dot3", "dot4", "dot5", "dot6", "dot7",
-                "exact",
-                "extended", "extended2", "extended_exact", "extended_exact2",
-                // Cached working double[] array.
-                // Only faster when 'length' is >16. Below this the array
-                // is small enough to be allocated locally
-                // (Search for Thread Local Allocation Buffer (TLAB))
-                "dot3c", "extendedc"})
+        @Param({ "standard", "current", "dekker", "dot2s", "dot2", "dot3", "dot4", "dot5", "dot6", "dot7", "exact", "extended", "extended2", "extended_exact", "extended_exact2", // Cached working double[] array.
+        // Only faster when 'length' is >16. Below this the array
+        // is small enough to be allocated locally
+        // (Search for Thread Local Allocation Buffer (TLAB))
+        "dot3c", "extendedc" })
         private String name;
 
-        /** The 2D implementation. */
+        /**
+         * The 2D implementation.
+         */
         private TwoD twod;
-        /** The 3D implementation. */
+
+        /**
+         * The 3D implementation.
+         */
         private ThreeD threed;
-        /** The 4D implementation. */
+
+        /**
+         * The 4D implementation.
+         */
         private FourD fourd;
-        /** The ND implementation. */
+
+        /**
+         * The ND implementation.
+         */
         private ND nd;
 
         /**
          * @return the 2D implementation
          */
         public TwoD getTwoD() {
-            return twod;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
          * @return the 3D implementation
          */
         public ThreeD getThreeD() {
-            return threed;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
          * @return the 4D implementation
          */
         public FourD getFourD() {
-            return fourd;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
          * @return the ND implementation
          */
         public ND getND() {
-            return nd;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -229,66 +226,7 @@ public class LinearCombinationPerformance {
          */
         @Setup
         public void setup() {
-            if ("current".endsWith(name)) {
-                twod = (a1, b1, a2, b2) ->
-                    Sum.create()
-                        .addProduct(a1, b1)
-                        .addProduct(a2, b2).getAsDouble();
-                threed = (a1, b1, a2, b2, a3, b3) ->
-                    Sum.create()
-                        .addProduct(a1, b1)
-                        .addProduct(a2, b2)
-                        .addProduct(a3, b3).getAsDouble();
-                fourd = (a1, b1, a2, b2, a3, b3, a4, b4) ->
-                    Sum.create()
-                        .addProduct(a1, b1)
-                        .addProduct(a2, b2)
-                        .addProduct(a3, b3)
-                        .addProduct(a4, b4).getAsDouble();
-                nd = (a, b) -> Sum.ofProducts(a, b).getAsDouble();
-                return;
-            }
-            // All implementations below are expected to implement all the interfaces.
-            if ("standard".endsWith(name)) {
-                nd = LinearCombinations.StandardPrecision.INSTANCE;
-            } else if ("dekker".equals(name)) {
-                nd = LinearCombinations.Dekker.INSTANCE;
-            } else if ("dot2s".equals(name)) {
-                nd = LinearCombinations.Dot2s.INSTANCE;
-            } else if ("dot2".equals(name)) {
-                nd = new LinearCombinations.DotK(2);
-            } else if ("dot3".equals(name)) {
-                nd = LinearCombinations.DotK.DOT_3;
-            } else if ("dot4".equals(name)) {
-                nd = LinearCombinations.DotK.DOT_4;
-            } else if ("dot5".equals(name)) {
-                nd = LinearCombinations.DotK.DOT_5;
-            } else if ("dot6".equals(name)) {
-                nd = LinearCombinations.DotK.DOT_6;
-            } else if ("dot7".equals(name)) {
-                nd = LinearCombinations.DotK.DOT_7;
-            } else if ("exact".equals(name)) {
-                nd = LinearCombinations.Exact.INSTANCE;
-            } else if ("extended".equals(name)) {
-                nd = LinearCombinations.ExtendedPrecision.INSTANCE;
-            } else if ("extended2".equals(name)) {
-                nd = LinearCombinations.ExtendedPrecision.DOUBLE;
-            } else if ("extended_exact".equals(name)) {
-                nd = LinearCombinations.ExtendedPrecision.EXACT;
-            } else if ("extended_exact2".equals(name)) {
-                nd = LinearCombinations.ExtendedPrecision.EXACT2;
-            } else if ("dot3c".equals(name)) {
-                nd = new LinearCombinations.DotK(3, new CachedArrayFactory());
-            } else if ("extendedc".equals(name)) {
-                nd = LinearCombinations.ExtendedPrecision.of(
-                        LinearCombinations.ExtendedPrecision.Summation.STANDARD, new CachedArrayFactory());
-            } else {
-                throw new IllegalStateException("Unknown implementation: " + name);
-            }
-            // Possible class-cast exception for partial implementations...
-            twod = (TwoD) nd;
-            threed = (ThreeD) nd;
-            fourd = (FourD) nd;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -296,19 +234,20 @@ public class LinearCombinationPerformance {
      * Create or return a cached array.
      */
     static final class CachedArrayFactory implements IntFunction<double[]> {
-        /** An empty double array. */
+
+        /**
+         * An empty double array.
+         */
         private static final double[] EMPTY = new double[0];
 
-        /** The cached array. */
+        /**
+         * The cached array.
+         */
         private double[] array = EMPTY;
 
         @Override
         public double[] apply(int value) {
-            double[] a = array;
-            if (a.length < value) {
-                array = a = new double[value];
-            }
-            return a;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -321,12 +260,7 @@ public class LinearCombinationPerformance {
      */
     @Benchmark
     public void twoD(Factors factors, Blackhole bh, Calculator calc) {
-        final TwoD fun = calc.getTwoD();
-        for (int i = 0; i < factors.getSize(); i++) {
-            final double[] a = factors.getA(i);
-            final double[] b = factors.getB(i);
-            bh.consume(fun.value(a[0], b[0], a[1], b[1]));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -338,12 +272,7 @@ public class LinearCombinationPerformance {
      */
     @Benchmark
     public void threeD(Factors factors, Blackhole bh, Calculator calc) {
-        final ThreeD fun = calc.getThreeD();
-        for (int i = 0; i < factors.getSize(); i++) {
-            final double[] a = factors.getA(i);
-            final double[] b = factors.getB(i);
-            bh.consume(fun.value(a[0], b[0], a[1], b[1], a[2], b[2]));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -355,12 +284,7 @@ public class LinearCombinationPerformance {
      */
     @Benchmark
     public void fourD(Factors factors, Blackhole bh, Calculator calc) {
-        final FourD fun = calc.getFourD();
-        for (int i = 0; i < factors.getSize(); i++) {
-            final double[] a = factors.getA(i);
-            final double[] b = factors.getB(i);
-            bh.consume(fun.value(a[0], b[0], a[1], b[1], a[2], b[2], a[3], b[3]));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -372,12 +296,6 @@ public class LinearCombinationPerformance {
      */
     @Benchmark
     public void nD(LengthFactors factors, Blackhole bh, Calculator calc) {
-        final ND fun = calc.getND();
-        for (int i = 0; i < factors.getSize(); i++) {
-            // These should be pre-computed to the correct length
-            final double[] a = factors.getA(i);
-            final double[] b = factors.getB(i);
-            bh.consume(fun.value(a, b));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.arrays;
 
 import java.util.Arrays;
@@ -48,16 +47,26 @@ import java.util.BitSet;
  * @since 1.2
  */
 class KthSelector {
-    /** Empty pivots array. */
+
+    /**
+     * Empty pivots array.
+     */
     static final int[] NO_PIVOTS = {};
-    /** Minimum selection size for insertion sort rather than selection.
-     * Dual-pivot quicksort used 27 in the original paper. */
+
+    /**
+     * Minimum selection size for insertion sort rather than selection.
+     * Dual-pivot quicksort used 27 in the original paper.
+     */
     private static final int MIN_SELECT_SIZE = 17;
 
-    /** A {@link PivotingStrategy} used for pivoting. */
+    /**
+     * A {@link PivotingStrategy} used for pivoting.
+     */
     private final PivotingStrategy pivotingStrategy;
 
-    /** Minimum selection size for insertion sort rather than selection. */
+    /**
+     * Minimum selection size for insertion sort rather than selection.
+     */
     private final int minSelectSize;
 
     /**
@@ -101,30 +110,7 @@ class KthSelector {
      * @return K<sup>th</sup> value
      */
     double selectSP(double[] data, int k, double[] kp1) {
-        int begin = 0;
-        int end = data.length;
-        while (end - begin > minSelectSize) {
-            // Select a pivot and partition data array around it
-            final int pivot = partitionSP(data, begin, end,
-                pivotingStrategy.pivotIndex(data, begin, end - 1, k));
-            if (k == pivot) {
-                // The pivot was exactly the element we wanted
-                return finalSelection(data, k, kp1, end);
-            } else if (k < pivot) {
-                // The element is in the left partition
-                end = pivot;
-            } else {
-                // The element is in the right partition
-                begin = pivot + 1;
-            }
-        }
-        sortRange(data, begin, end);
-        if (kp1 != null) {
-            // Either end == data.length and k+1 is sorted; or
-            // end == pivot where data[k] <= data[pivot] <= data[pivot+j] for all j
-            kp1[0] = data[k + 1];
-        }
-        return data[k];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -141,45 +127,7 @@ class KthSelector {
      * @return K<sup>th</sup> value
      */
     double selectSPN(double[] data, int k, double[] kp1) {
-        // Handle NaN
-        final int length = sortNaN(data);
-        if (k >= length) {
-            if (kp1 != null) {
-                kp1[0] = Double.NaN;
-            }
-            return Double.NaN;
-        }
-
-        int begin = 0;
-        int end = length;
-        while (end - begin > minSelectSize) {
-            // Select a pivot and partition data array around it
-            final int pivot = partitionSPN(data, begin, end,
-                pivotingStrategy.pivotIndex(data, begin, end - 1, k));
-            if (k == pivot) {
-                // The pivot was exactly the element we wanted
-                if (data[k] == 0) {
-                    orderSignedZeros(data, 0, length);
-                }
-                return finalSelection(data, k, kp1, end);
-            } else if (k < pivot) {
-                // The element is in the left partition
-                end = pivot;
-            } else {
-                // The element is in the right partition
-                begin = pivot + 1;
-            }
-        }
-        insertionSort(data, begin, end, begin != 0);
-        if (data[k] == 0) {
-            orderSignedZeros(data, 0, length);
-        }
-        if (kp1 != null) {
-            // Either end == data.length and k+1 is sorted; or
-            // end == pivot where data[k] <= data[pivot] <= data[pivot+j] for all j
-            kp1[0] = data[k + 1];
-        }
-        return data[k];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -199,54 +147,7 @@ class KthSelector {
      * @return K<sup>th</sup> value
      */
     double selectSPH(double[] data, int[] pivotsHeap, int k, double[] kp1) {
-        final int heapLength = pivotsHeap.length;
-        if (heapLength == 0) {
-            // No pivots
-            return selectSP(data, k, kp1);
-        }
-        int begin = 0;
-        int end = data.length;
-        int node = 0;
-        while (end - begin > minSelectSize) {
-            int pivot;
-
-            if (node < heapLength && pivotsHeap[node] >= 0) {
-                // The pivot has already been found in a previous call
-                // and the array has already been partitioned around it
-                pivot = pivotsHeap[node];
-            } else {
-                // Select a pivot and partition data array around it
-                pivot = partitionSP(data, begin, end,
-                    pivotingStrategy.pivotIndex(data, begin, end - 1, k));
-                if (node < heapLength) {
-                    pivotsHeap[node] = pivot;
-                }
-            }
-
-            if (k == pivot) {
-                // The pivot was exactly the element we wanted
-                return finalSelection(data, k, kp1, end);
-            } else if (k < pivot) {
-                // The element is in the left partition
-                end = pivot;
-                if (node < heapLength) {
-                    node = Math.min((node << 1) + 1, heapLength);
-                }
-            } else {
-                // The element is in the right partition
-                begin = pivot + 1;
-                if (node < heapLength) {
-                    node = Math.min((node << 1) + 2, heapLength);
-                }
-            }
-        }
-        sortRange(data, begin, end);
-        if (kp1 != null) {
-            // Either end == data.length and k+1 is sorted; or
-            // end == pivot where data[k] <= data[pivot] <= data[pivot+j] for all j
-            kp1[0] = data[k + 1];
-        }
-        return data[k];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -295,38 +196,7 @@ class KthSelector {
      * @param k Indices.
      */
     void partitionSP(double[] data, int... k) {
-        final int n = k.length;
-        if (n <= 1) {
-            if (n == 1) {
-                selectSP(data, k[0], null);
-            }
-            return;
-        }
-        // Multiple pivots
-        final int length = data.length;
-        final BitSet pivots = new BitSet(length);
-
-        for (int i = 0; i < n; i++) {
-            final int kk = k[i];
-            if (pivots.get(kk)) {
-                // Already sorted
-                continue;
-            }
-            int begin;
-            int end;
-            if (i == 0) {
-                begin = 0;
-                end = length;
-            } else {
-                // Start inclusive
-                begin = pivots.previousSetBit(kk) + 1;
-                end = pivots.nextSetBit(kk + 1);
-                if (end < 0) {
-                    end = length;
-                }
-            }
-            partitionSP(data, begin, end, pivots, kk);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -347,8 +217,7 @@ class KthSelector {
         // Find the unsorted range containing k
         while (end - begin > minSelectSize) {
             // Select a value and partition data array around it
-            final int pivot = partitionSP(data, begin, end,
-                pivotingStrategy.pivotIndex(data, begin, end - 1, k));
+            final int pivot = partitionSP(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, k));
             pivots.set(pivot);
             if (k == pivot) {
                 // The pivot was exactly the element we wanted
@@ -381,7 +250,6 @@ class KthSelector {
     private static int partitionSP(double[] data, int begin, int end, int pivot) {
         final double value = data[pivot];
         data[pivot] = data[begin];
-
         int i = begin + 1;
         int j = end - 1;
         while (i < j) {
@@ -397,7 +265,6 @@ class KthSelector {
                 data[j--] = tmp;
             }
         }
-
         if (i >= end || DoubleMath.greaterThan(data[i], value)) {
             --i;
         }
@@ -421,52 +288,7 @@ class KthSelector {
      * @param k Indices.
      */
     void partitionSPN(double[] data, int... k) {
-        final int n = k.length;
-        if (n <= 1) {
-            if (n == 1) {
-                selectSPN(data, k[0], null);
-            }
-            return;
-        }
-        // Multiple pivots
-
-        // Handle NaN
-        final int length = sortNaN(data);
-        if (length < 1) {
-            return;
-        }
-
-        final BitSet pivots = new BitSet(length);
-
-        // Flag any pivots that are zero
-        boolean zeros = false;
-        for (int i = 0; i < n; i++) {
-            final int kk = k[i];
-            if (kk >= length || pivots.get(kk)) {
-                // Already sorted
-                continue;
-            }
-            int begin;
-            int end;
-            if (i == 0) {
-                begin = 0;
-                end = length;
-            } else {
-                // Start inclusive
-                begin = pivots.previousSetBit(kk) + 1;
-                end = pivots.nextSetBit(kk + 1);
-                if (end < 0) {
-                    end = length;
-                }
-            }
-            partitionSPN(data, begin, end, pivots, kk);
-            zeros = zeros || data[kk] == 0;
-        }
-
-        // Handle signed zeros
-        if (zeros) {
-            orderSignedZeros(data, 0, length);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -490,8 +312,7 @@ class KthSelector {
         // Find the unsorted range containing k
         while (end - begin > minSelectSize) {
             // Select a value and partition data array around it
-            final int pivot = partitionSPN(data, begin, end,
-                pivotingStrategy.pivotIndex(data, begin, end - 1, k));
+            final int pivot = partitionSPN(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, k));
             pivots.set(pivot);
             if (k == pivot) {
                 // The pivot was exactly the element we wanted
@@ -527,7 +348,6 @@ class KthSelector {
     private static int partitionSPN(double[] data, int begin, int end, int pivot) {
         final double value = data[pivot];
         data[pivot] = data[begin];
-
         int i = begin + 1;
         int j = end - 1;
         while (i < j) {
@@ -543,7 +363,6 @@ class KthSelector {
                 data[j--] = tmp;
             }
         }
-
         if (i >= end || data[i] > value) {
             --i;
         }
@@ -600,7 +419,7 @@ class KthSelector {
             }
         }
         end++;
-        for (int i = end; i > 0;) {
+        for (int i = end; i > 0; ) {
             final double v = data[--i];
             if (Double.isNaN(v)) {
                 data[i] = data[--end];
@@ -673,14 +492,7 @@ class KthSelector {
      * @return the count
      */
     static int countSignedZeros(double[] data, int begin, int end) {
-        // Count negative zeros
-        int c = 0;
-        for (int i = begin; i < end; i++) {
-            if (data[i] == 0 && Double.doubleToRawLongBits(data[i]) < 0) {
-                c++;
-            }
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -692,23 +504,7 @@ class KthSelector {
      * @param end Upper bound (exclusive).
      */
     static void sortZero(double[] data, int begin, int end) {
-        // Count negative zeros
-        int c = 0;
-        for (int i = begin; i < end; i++) {
-            if (Double.doubleToRawLongBits(data[i]) < 0) {
-                c++;
-            }
-        }
-        // Replace
-        if (c != 0) {
-            int i = begin;
-            while (c-- > 0) {
-                data[i++] = -0.0;
-            }
-            while (i < end) {
-                data[i++] = 0.0;
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -741,76 +537,7 @@ class KthSelector {
      * @param k Indices.
      */
     void partitionSBM(double[] data, int... k) {
-        final int n = k.length;
-        if (n < 1) {
-            return;
-        }
-
-        // Handle NaN
-        final int length = sortNaN(data);
-        if (length < 1) {
-            return;
-        }
-
-        if (n == 1) {
-            if (k[0] < length) {
-                partitionSBM(data, 0, length, k[0]);
-            }
-            return;
-        }
-        // Special case for partition around adjacent indices (for interpolation)
-        if (n == 2 && k[0] + 1 == k[1]) {
-            if (k[0] < length) {
-                final int p = partitionSBM(data, 0, length, k[0]);
-                if (p > k[1]) {
-                    partitionMin(data, k[1], p);
-                }
-            }
-            return;
-        }
-
-        // To partition all k requires not moving any pivot k after it has been
-        // processed. This is supported using two strategies:
-        //
-        // 1. Processing k in sorted order:
-        // (k1, end), (k2, end), (k3, end), ... , k1 <= k2 <= k3
-        // This can reorder each region during processing without destroying sorted k.
-        //
-        // 2. Processing unique k and visiting array regions only once:
-        // Pre-process the pivots to make them unique and store the entire sorted
-        // region between the end pivots (k1, kn) in a BitSet type structure:
-        // |k1|......|k2|....|p|k3|k4|pppp|......|kn|
-        // k can be processed in any order, e.g. k3. We use already sorted regions
-        // |p| to bracket the search for each k, and skip k that are already sorted (k4).
-        // Worst case storage cost is Order(N / 64).
-        // The advantage is never visiting any part of the array twice. If the pivots
-        // saturate the entire range then performance degrades to the speed of
-        // the sort of the entire array.
-
-        // Multiple pivots
-        final BitSet pivots = new BitSet(length);
-
-        for (int i = 0; i < n; i++) {
-            final int kk = k[i];
-            if (kk >= length || pivots.get(kk)) {
-                // Already sorted
-                continue;
-            }
-            int begin;
-            int end;
-            if (i == 0) {
-                begin = 0;
-                end = length;
-            } else {
-                // Start inclusive
-                begin = pivots.previousSetBit(kk) + 1;
-                end = pivots.nextSetBit(kk + 1);
-                if (end < 0) {
-                    end = length;
-                }
-            }
-            partitionSBM(data, begin, end, pivots, kk);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -824,18 +551,7 @@ class KthSelector {
      * @param end Upper bound (exclusive).
      */
     static void partitionMin(double[] data, int begin, int end) {
-        int i = begin;
-        double min = data[i];
-        int j = i;
-        while (++i < end) {
-            if (data[i] < min) {
-                min = data[i];
-                j = i;
-            }
-        }
-        //swap(data, begin, j)
-        data[j] = data[begin];
-        data[begin] = min;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -849,18 +565,7 @@ class KthSelector {
      * @param end Upper bound (exclusive).
      */
     static void partitionMax(double[] data, int begin, int end) {
-        int i = end - 1;
-        double max = data[i];
-        int j = i;
-        while (--i >= begin) {
-            if (data[i] > max) {
-                max = data[i];
-                j = i;
-            }
-        }
-        //swap(data, end - 1, j)
-        data[j] = data[end - 1];
-        data[end - 1] = max;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -881,11 +586,10 @@ class KthSelector {
      */
     private void partitionSBM(double[] data, int begin, int end, BitSet pivots, int k) {
         // Find the unsorted range containing k
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         while (end - begin > minSelectSize) {
             // Select a value and partition data array around it
-            final int from = partitionSBM(data, begin, end,
-                pivotingStrategy.pivotIndex(data, begin, end - 1, k), upper);
+            final int from = partitionSBM(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, k), upper);
             final int to = upper[0];
             setPivots(from, to, pivots);
             if (k >= to) {
@@ -945,24 +649,19 @@ class KthSelector {
         //   The end is then assumed to be the equal value. This would not work with
         //   object references. Equivalent swap calls are commented.
         // - Added a fast-forward over initial range containing the pivot.
-
         final int l = begin;
         final int r = end - 1;
-
         int p = l;
         int q = r;
-
         // Use the pivot index to set the upper sentinal value
         final double v = data[pivot];
         data[pivot] = data[r];
         data[r] = v;
-
         // Special case: count signed zeros
         int c = 0;
         if (v == 0) {
             c = countSignedZeros(data, begin, end);
         }
-
         // Fast-forward over equal regions to reduce swaps
         while (data[p] == v) {
             if (++p == q) {
@@ -978,11 +677,9 @@ class KthSelector {
         while (data[q - 1] == v) {
             q--;
         }
-
         int i = p - 1;
         int j = q;
-
-        for (;;) {
+        for (; ; ) {
             do {
                 ++i;
             } while (data[i] < v);
@@ -1022,23 +719,19 @@ class KthSelector {
             }
         }
         // i is at the end (exclusive) of the less-than region
-
         // Place pivot value in centre
         //swap(data, r, i)
         data[r] = data[i];
         data[i] = v;
-
         // Move equal regions to the centre.
         // Set the pivot range [j, i) and move this outward for equal values.
         j = i++;
-
         // less-equal:
         //   for (int k = l; k < p; k++):
         //     swap(data, k, --j)
         // greater-equal:
         //   for (int k = r; k-- > q; i++) {
         //     swap(data, k, i)
-
         // Move the minimum of less-equal or less-than
         int move = Math.min(p - l, j - p);
         final int lower = j - (p - l);
@@ -1053,7 +746,6 @@ class KthSelector {
             data[--k] = data[i];
             data[i] = v;
         }
-
         // Special case: fixed signed zeros
         if (c != 0) {
             p = lower;
@@ -1064,7 +756,6 @@ class KthSelector {
                 data[p++] = 0.0;
             }
         }
-
         return lower;
     }
 
@@ -1090,11 +781,10 @@ class KthSelector {
      */
     private int partitionSBM(double[] data, int begin, int end, int k) {
         // Find the unsorted range containing k
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         while (end - begin > minSelectSize) {
             // Select a value and partition data array around it
-            final int from = partitionSBM(data, begin, end,
-                pivotingStrategy.pivotIndex(data, begin, end - 1, k), upper);
+            final int from = partitionSBM(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, k), upper);
             final int to = upper[0];
             if (k >= to) {
                 // The element is in the right partition
@@ -1129,54 +819,7 @@ class KthSelector {
      * @param k Indices.
      */
     void partitionBM(double[] data, int... k) {
-        final int n = k.length;
-        if (n < 1) {
-            return;
-        }
-
-        // Handle NaN
-        final int length = sortNaN(data);
-        if (length < 1) {
-            return;
-        }
-
-        if (n == 1) {
-            partitionBM(data, 0, length, k[0]);
-            return;
-        }
-        // Special case for partition around adjacent indices (for interpolation)
-        if (n == 2 && k[0] + 1 == k[1]) {
-            final int p = partitionBM(data, 0, length, k[0]);
-            if (p > k[1]) {
-                partitionMin(data, k[1], p);
-            }
-            return;
-        }
-
-        // Multiple pivots
-        final BitSet pivots = new BitSet(length);
-
-        for (int i = 0; i < n; i++) {
-            final int kk = k[i];
-            if (kk >= length || pivots.get(kk)) {
-                // Already sorted
-                continue;
-            }
-            int begin;
-            int end;
-            if (i == 0) {
-                begin = 0;
-                end = length;
-            } else {
-                // Start inclusive
-                begin = pivots.previousSetBit(kk) + 1;
-                end = pivots.nextSetBit(kk + 1);
-                if (end < 0) {
-                    end = length;
-                }
-            }
-            partitionBM(data, begin, end, pivots, kk);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1197,11 +840,10 @@ class KthSelector {
      */
     private void partitionBM(double[] data, int begin, int end, BitSet pivots, int k) {
         // Find the unsorted range containing k
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         while (end - begin > minSelectSize) {
             // Select a value and partition data array around it
-            final int from = partitionBM(data, begin, end,
-                pivotingStrategy.pivotIndex(data, begin, end - 1, k), upper);
+            final int from = partitionBM(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, k), upper);
             final int to = upper[0];
             setPivots(from, to, pivots);
             if (k >= to) {
@@ -1258,24 +900,19 @@ class KthSelector {
         //
         // Then the equal values are copied from the ends to the centre:
         // | less        |        equal      |     greater |
-
         final int l = begin;
         final int r = end - 1;
-
         int i = l;
         int j = r;
         int p = l;
         int q = r;
-
         final double v = data[pivot];
-
         // Special case: count signed zeros
         int c = 0;
         if (v == 0) {
             c = countSignedZeros(data, begin, end);
         }
-
-        for (;;) {
+        for (; ; ) {
             while (i <= j && data[i] <= v) {
                 if (data[i] == v) {
                     //swap(data, i, p++)
@@ -1297,7 +934,6 @@ class KthSelector {
             }
             swap(data, i++, j--);
         }
-
         // Move equal regions to the centre.
         int s = Math.min(p - l, i - p);
         for (int k = l; s > 0; k++, s--) {
@@ -1311,12 +947,10 @@ class KthSelector {
             data[end - s] = data[k];
             data[k] = v;
         }
-
         // Set output range
         i = i - p + l;
         j = j - q + end;
         upper[0] = j;
-
         // Special case: fixed signed zeros
         if (c != 0) {
             p = i;
@@ -1327,7 +961,6 @@ class KthSelector {
                 data[p++] = 0.0;
             }
         }
-
         return i;
     }
 
@@ -1353,11 +986,10 @@ class KthSelector {
      */
     private int partitionBM(double[] data, int begin, int end, int k) {
         // Find the unsorted range containing k
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         while (end - begin > minSelectSize) {
             // Select a value and partition data array around it
-            final int from = partitionBM(data, begin, end,
-                pivotingStrategy.pivotIndex(data, begin, end - 1, k), upper);
+            final int from = partitionBM(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, k), upper);
             final int to = upper[0];
             if (k >= to) {
                 // The element is in the right partition
@@ -1392,54 +1024,7 @@ class KthSelector {
      * @param k Indices.
      */
     void partitionDP(double[] data, int... k) {
-        final int n = k.length;
-        if (n < 1) {
-            return;
-        }
-
-        // Handle NaN
-        final int length = sortNaN(data);
-        if (length < 1) {
-            return;
-        }
-
-        if (n == 1) {
-            partitionDP(data, 0, length, (BitSet) null, k[0]);
-            return;
-        }
-        // Special case for partition around adjacent indices (for interpolation)
-        if (n == 2 && k[0] + 1 == k[1]) {
-            final int p = partitionDP(data, 0, length, (BitSet) null, k[0]);
-            if (p > k[1]) {
-                partitionMin(data, k[1], p);
-            }
-            return;
-        }
-
-        // Multiple pivots
-        final BitSet pivots = new BitSet(length);
-
-        for (int i = 0; i < n; i++) {
-            final int kk = k[i];
-            if (kk >= length || pivots.get(kk)) {
-                // Already sorted
-                continue;
-            }
-            int begin;
-            int end;
-            if (i == 0) {
-                begin = 0;
-                end = length;
-            } else {
-                // Start inclusive
-                begin = pivots.previousSetBit(kk) + 1;
-                end = pivots.nextSetBit(kk + 1);
-                if (end < 0) {
-                    end = length;
-                }
-            }
-            partitionDP(data, begin, end, pivots, kk);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1564,12 +1149,9 @@ class KthSelector {
         // - Fix signed zeros within the region between pivots
         // - Change to fast-forward over initial ascending / descending runs
         // - Change to a single-pivot partition method if the pivots are equal
-
         final int right = end - 1;
         final int len = right - left;
-
         // Find pivots:
-
         // Original method: Guess medians using 1/3 and 2/3 of range
         final int third = len / div;
         int m1 = left + third;
@@ -1590,7 +1172,6 @@ class KthSelector {
         // pivots
         final double pivot1 = a[left];
         final double pivot2 = a[right];
-
         // Single pivot sort
         if (pivot1 == pivot2) {
             final int lower = partitionSBM(a, left, end, m1, bounds);
@@ -1603,17 +1184,14 @@ class KthSelector {
             bounds[2] = upper - 1;
             return div;
         }
-
         // Special case: Handle signed zeros
         int c = 0;
         if (pivot1 == 0 || pivot2 == 0) {
             c = countSignedZeros(a, left, end);
         }
-
         // pointers
         int less = left + 1;
         int great = right - 1;
-
         // Fast-forward ascending / descending runs to reduce swaps
         while (a[less] < pivot1) {
             less++;
@@ -1621,10 +1199,8 @@ class KthSelector {
         while (a[great] > pivot2) {
             great--;
         }
-
         // sorting
-        SORTING:
-        for (int k = less; k <= great; k++) {
+        SORTING: for (int k = less; k <= great; k++) {
             final double v = a[k];
             if (v < pivot1) {
                 //swap(a, k, less++)
@@ -1674,15 +1250,12 @@ class KthSelector {
         a[less - 1] = pivot1;
         a[right] = a[great + 1];
         a[great + 1] = pivot2;
-
         // unsorted in [less, great]
-
         // Set the pivots
         bounds[0] = less - 1;
         bounds[3] = great + 1;
         //partitionDP(a, left, less - 2, div)
         //partitionDP(a, great + 2, right, div)
-
         // equal elements
         // Original paper: If middle partition (dist) is bigger
         // than (length - 13) then check for equal elements, i.e.
@@ -1698,8 +1271,7 @@ class KthSelector {
                 great--;
             }
             // This copies the logic in the sorting loop using == comparisons
-            EQUAL:
-            for (int k = less; k <= great; k++) {
+            EQUAL: for (int k = less; k <= great; k++) {
                 final double v = a[k];
                 if (v == pivot1) {
                     //swap(a, k, less++)
@@ -1736,7 +1308,6 @@ class KthSelector {
             bounds[1] = bounds[3] + 1;
             bounds[2] = bounds[3];
         }
-
         // Fix signed zeros
         if (c != 0) {
             int i;
@@ -1761,7 +1332,6 @@ class KthSelector {
                 }
             }
         }
-
         return div;
     }
 
@@ -1780,54 +1350,7 @@ class KthSelector {
      * @param k Indices.
      */
     void partitionDP5(double[] data, int... k) {
-        final int n = k.length;
-        if (n < 1) {
-            return;
-        }
-
-        // Handle NaN
-        final int length = sortNaN(data);
-        if (length < 1) {
-            return;
-        }
-
-        if (n == 1) {
-            partitionDP5(data, 0, length, (BitSet) null, k[0]);
-            return;
-        }
-        // Special case for partition around adjacent indices (for interpolation)
-        if (n == 2 && k[0] + 1 == k[1]) {
-            final int p = partitionDP5(data, 0, length, (BitSet) null, k[0]);
-            if (p > k[1]) {
-                partitionMin(data, k[1], p);
-            }
-            return;
-        }
-
-        // Multiple pivots
-        final BitSet pivots = new BitSet(length);
-
-        for (int i = 0; i < n; i++) {
-            final int kk = k[i];
-            if (kk >= length || pivots.get(kk)) {
-                // Already sorted
-                continue;
-            }
-            int begin;
-            int end;
-            if (i == 0) {
-                begin = 0;
-                end = length;
-            } else {
-                // Start inclusive
-                begin = pivots.previousSetBit(kk) + 1;
-                end = pivots.nextSetBit(kk + 1);
-                if (end < 0) {
-                    end = length;
-                }
-            }
-            partitionDP5(data, begin, end, pivots, kk);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1940,12 +1463,9 @@ class KthSelector {
         // - Fix signed zeros within the region between pivots
         // - Change to fast-forward over initial ascending / descending runs
         // - Change to a single-pivot partition method if the pivots are equal
-
         final int right = end - 1;
         final int len = right - left;
-
         // Find pivots:
-
         // Original method: Guess medians using 1/3 and 2/3 of range.
         // Here we sort 5 points and choose 2 and 4 as the pivots: 1/6, 1/3, 1/2, 2/3, 5/6
         // 1/6 ~ 1/8 + 1/32. Ensure the value is above zero to choose different points!
@@ -1957,16 +1477,12 @@ class KthSelector {
         final int p4 = p3 + sixth;
         final int p5 = p4 + sixth;
         Sorting.sort5(a, p1, p2, p3, p4, p5);
-
         // For testing
         //p2 = DualPivotingStrategy.SORT_5.pivotIndex(a, left, end - 1, bounds);
         //p4 = bounds[0];
-
         final double pivot1 = a[p2];
         final double pivot2 = a[p4];
-
         // Add property to control this switch so we can benchmark not using it.
-
         if (pivot1 == pivot2) {
             // pivots == median !
             // Switch to a single pivot sort around the estimated median
@@ -1980,13 +1496,11 @@ class KthSelector {
             bounds[2] = upper - 1;
             return;
         }
-
         // Special case: Handle signed zeros
         int c = 0;
         if (pivot1 == 0 || pivot2 == 0) {
             c = countSignedZeros(a, left, end);
         }
-
         // Move ends to the pivot locations.
         // After sorting the final pivot locations are overwritten.
         a[p2] = a[left];
@@ -1994,11 +1508,9 @@ class KthSelector {
         // It is assumed
         //a[left] = pivot1
         //a[right] = pivot2
-
         // pointers
         int less = left + 1;
         int great = right - 1;
-
         // Fast-forward ascending / descending runs to reduce swaps
         while (a[less] < pivot1) {
             less++;
@@ -2006,10 +1518,8 @@ class KthSelector {
         while (a[great] > pivot2) {
             great--;
         }
-
         // sorting
-        SORTING:
-        for (int k = less; k <= great; k++) {
+        SORTING: for (int k = less; k <= great; k++) {
             final double v = a[k];
             if (v < pivot1) {
                 //swap(a, k, less++)
@@ -2050,25 +1560,20 @@ class KthSelector {
         a[less - 1] = pivot1;
         a[right] = a[great + 1];
         a[great + 1] = pivot2;
-
         // unsorted in [less, great]
-
         // Set the pivots
         bounds[0] = less - 1;
         bounds[3] = great + 1;
         //partitionDP5(a, left, less - 2)
         //partitionDP5(a, great + 2, right)
-
         // equal elements
         // Original paper: If middle partition (dist) is bigger
         // than (length - 13) then check for equal elements, i.e.
         // if the middle was very large there may be many repeated elements.
         // 13 = 27 / 2 where 27 is the threshold for quicksort.
-
         // Look for equal elements if the centre is more than 2/3 the length
         // We always do this if the pivots are signed zeros.
         if ((less < p1 && great > p5 || c != 0) && pivot1 != pivot2) {
-
             // Fast-forward to reduce swaps
             while (a[less] == pivot1) {
                 less++;
@@ -2076,10 +1581,8 @@ class KthSelector {
             while (a[great] == pivot2) {
                 great--;
             }
-
             // This copies the logic in the sorting loop using == comparisons
-            EQUAL:
-            for (int k = less; k <= great; k++) {
+            EQUAL: for (int k = less; k <= great; k++) {
                 final double v = a[k];
                 if (v == pivot1) {
                     //swap(a, k, less++)
@@ -2116,7 +1619,6 @@ class KthSelector {
             bounds[1] = bounds[3] + 1;
             bounds[2] = bounds[3];
         }
-
         // Fix signed zeros
         if (c != 0) {
             int i;
@@ -2164,7 +1666,7 @@ class KthSelector {
      * @param data Values.
      */
     void sortSP(double[] data) {
-        sortSP(data, 0, data.length);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2178,8 +1680,7 @@ class KthSelector {
         if (end - begin <= 1) {
             return;
         }
-        final int i = partitionSP(data, begin, end,
-            pivotingStrategy.pivotIndex(data, begin, end - 1, begin));
+        final int i = partitionSP(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, begin));
         sortSP(data, begin, i);
         sortSP(data, i + 1, end);
     }
@@ -2192,7 +1693,7 @@ class KthSelector {
      * @param data Values.
      */
     void sortSBM(double[] data) {
-        sortSBM(data, 0, sortNaN(data));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2210,9 +1711,8 @@ class KthSelector {
             }
             return;
         }
-        final int[] to = {0};
-        final int from = partitionSBM(data, begin, end,
-            pivotingStrategy.pivotIndex(data, begin, end - 1, begin), to);
+        final int[] to = { 0 };
+        final int from = partitionSBM(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, begin), to);
         sortSBM(data, begin, from);
         sortSBM(data, to[0], end);
     }
@@ -2225,7 +1725,7 @@ class KthSelector {
      * @param data Values.
      */
     void sortBM(double[] data) {
-        sortBM(data, 0, sortNaN(data));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2243,9 +1743,8 @@ class KthSelector {
             }
             return;
         }
-        final int[] to = {0};
-        final int from = partitionBM(data, begin, end,
-            pivotingStrategy.pivotIndex(data, begin, end - 1, begin), to);
+        final int[] to = { 0 };
+        final int from = partitionBM(data, begin, end, pivotingStrategy.pivotIndex(data, begin, end - 1, begin), to);
         sortBM(data, begin, from);
         sortBM(data, to[0], end);
     }
@@ -2258,7 +1757,7 @@ class KthSelector {
      * @param data Values.
      */
     void sortDP(double[] data) {
-        sortDP(data, 0, sortNaN(data), 3);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2297,7 +1796,7 @@ class KthSelector {
      * @param data Values.
      */
     void sortDP5(double[] data) {
-        sortDP5(data, 0, sortNaN(data));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2334,17 +1833,7 @@ class KthSelector {
      * @return the pivots heap
      */
     static int[] createPivotsHeap(int length) {
-        if (length <= MIN_SELECT_SIZE) {
-            return NO_PIVOTS;
-        }
-        // Size should be x^2 - 1, where x is the layers in the heap.
-        // Do not create more pivots than the array length. When partitions are small
-        // the pivots are no longer used so this does not have to contain all indices.
-        // Default size in Commons Math Percentile class was 1023 (10 layers).
-        final int n = nextPow2(length >>> 1);
-        final int[] pivotsHeap = new int[Math.min(n, 1 << 10) - 1];
-        Arrays.fill(pivotsHeap, -1);
-        return pivotsHeap;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**

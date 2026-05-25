@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.arrays;
 
 import java.util.Arrays;
@@ -39,22 +38,27 @@ import java.util.Arrays;
  * </ul>
  */
 public final class MultidimensionalCounter {
+
     /**
      * Number of dimensions.
      */
     private final int dimension;
+
     /**
      * Offset for each dimension.
      */
     private final int[] uniCounterOffset;
+
     /**
      * Counter sizes.
      */
     private final int[] size;
+
     /**
      * Total number of (one-dimensional) slots.
      */
     private final int totalSize;
+
     /**
      * Index of last dimension.
      */
@@ -70,12 +74,9 @@ public final class MultidimensionalCounter {
     private MultidimensionalCounter(int... size) {
         dimension = size.length;
         this.size = Arrays.copyOf(size, size.length);
-
         uniCounterOffset = new int[dimension];
-
         last = dimension - 1;
         uniCounterOffset[last] = 1;
-
         int tS = 1;
         for (int i = last - 1; i >= 0; i--) {
             final int index = i + 1;
@@ -84,7 +85,6 @@ public final class MultidimensionalCounter {
             checkStrictlyPositive("cumulative size", tS);
             uniCounterOffset[i] = tS;
         }
-
         totalSize = tS * size[0];
         checkStrictlyPositive("total size", totalSize);
     }
@@ -98,7 +98,7 @@ public final class MultidimensionalCounter {
      * or zero.
      */
     public static MultidimensionalCounter of(int... size) {
-        return new MultidimensionalCounter(size);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -107,7 +107,7 @@ public final class MultidimensionalCounter {
      * @return the number of dimensions.
      */
     public int getDimension() {
-        return dimension;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -119,23 +119,7 @@ public final class MultidimensionalCounter {
      * {@code 0} and the value returned by {@link #getSize()} (excluded).
      */
     public int[] toMulti(int index) {
-        if (index < 0 ||
-            index >= totalSize) {
-            throw new IndexOutOfBoundsException(createIndexOutOfBoundsMessage(totalSize, index));
-        }
-
-        final int[] indices = new int[dimension];
-
-        int pos = index;
-        for (int i = 0; i < last; i++) {
-            indices[i] = pos / uniCounterOffset[i];
-            // pos = pos % uniCounterOffset[i]
-            pos = pos - indices[i] * uniCounterOffset[i];
-        }
-
-        indices[last] = pos;
-
-        return indices;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -150,20 +134,7 @@ public final class MultidimensionalCounter {
      * {@link MultidimensionalCounter#of(int...) constructor}.
      */
     public int toUni(int... c) {
-        if (c.length != dimension) {
-            throw new IllegalArgumentException("Wrong number of arguments: " + c.length +
-                                               "(expected: " + dimension + ")");
-        }
-        int count = 0;
-        for (int i = 0; i < dimension; i++) {
-            final int index = c[i];
-            if (index < 0 ||
-                index >= size[i]) {
-                throw new IndexOutOfBoundsException(createIndexOutOfBoundsMessage(size[i], index));
-            }
-            count += uniCounterOffset[i] * index;
-        }
-        return count;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -172,7 +143,7 @@ public final class MultidimensionalCounter {
      * @return the total size of the unidimensional counter.
      */
     public int getSize() {
-        return totalSize;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -181,13 +152,15 @@ public final class MultidimensionalCounter {
      * @return the number of slots in each dimension.
      */
     public int[] getSizes() {
-        return Arrays.copyOf(size, size.length);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String toString() {
-        return Arrays.toString(size);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**

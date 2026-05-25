@@ -36,6 +36,7 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 interface SearchableInterval {
+
     /**
      * The start (inclusive) of the range of indices supported.
      *
@@ -106,7 +107,6 @@ interface SearchableInterval {
      * @return the lower index
      */
     default int split(int ka, int kb, int[] upper) {
-        upper[0] = nextIndex(kb + 1);
-        return previousIndex(ka - 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

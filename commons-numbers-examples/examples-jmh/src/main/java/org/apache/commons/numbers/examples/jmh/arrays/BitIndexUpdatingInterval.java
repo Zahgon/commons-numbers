@@ -32,19 +32,35 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInterval, IntervalAnalysis {
-    /** All 64-bits bits set. */
+
+    /**
+     * All 64-bits bits set.
+     */
     private static final long LONG_MASK = -1L;
-    /** A bit shift to apply to an integer to divided by 64 (2^6). */
+
+    /**
+     * A bit shift to apply to an integer to divided by 64 (2^6).
+     */
     private static final int DIVIDE_BY_64 = 6;
 
-    /** Bit indexes. */
+    /**
+     * Bit indexes.
+     */
     private final long[] data;
 
-    /** Index offset. */
+    /**
+     * Index offset.
+     */
     private final int offset;
-    /** Left bound of the support. */
+
+    /**
+     * Left bound of the support.
+     */
     private int left;
-    /** Right bound of the support. */
+
+    /**
+     * Right bound of the support.
+     */
     private int right;
 
     /**
@@ -90,17 +106,7 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
      * {@code right == Integer.MAX_VALUE}
      */
     static BitIndexUpdatingInterval ofRange(int left, int right) {
-        if (left < 0) {
-            throw new IllegalArgumentException("Invalid lower index: " + left);
-        }
-        if (right == Integer.MAX_VALUE) {
-            throw new IllegalArgumentException("Invalid upper index: " + right);
-        }
-        if (right < left) {
-            throw new IllegalArgumentException(
-                String.format("Invalid range: [%d, %d]", left, right));
-        }
-        return new BitIndexUpdatingInterval(left, right);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -113,20 +119,7 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
      * @throws IllegalArgumentException if {@code n == 0}
      */
     static BitIndexUpdatingInterval of(int[] indices, int n) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("No indices to define the range");
-        }
-        int min = indices[0];
-        int max = min;
-        for (int i = 1; i < n; i++) {
-            min = Math.min(min, indices[i]);
-            max = Math.max(max, indices[i]);
-        }
-        final BitIndexUpdatingInterval set = BitIndexUpdatingInterval.ofRange(min, max);
-        for (int i = -1; ++i < n;) {
-            set.set(indices[i]);
-        }
-        return set;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -145,7 +138,7 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
      * @return the memory footprint
      */
     static long memoryFootprint(int left, int right) {
-        return (getLongIndex(right - left) + 1L) * Long.BYTES;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -200,11 +193,7 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
      * @param bitIndex the bit index (assumed to be positive)
      */
     void set(int bitIndex) {
-        // WARNING: No range checks !!!
-        final int index = bitIndex - offset;
-        final int i = getLongIndex(index);
-        final long m = getLongBit(index);
-        data[i] |= m;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -219,14 +208,12 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
      */
     private int nextIndex(int k) {
         // left <= k <= right
-
         final int index = k - offset;
         int i = getLongIndex(index);
-
         // Mask bits after the bit index
         // mask = 11111000 = -1L << (index % 64)
         long bits = data[i] & (LONG_MASK << index);
-        for (;;) {
+        for (; ; ) {
             if (bits != 0) {
                 //(i+1)       i
                 // |    index |
@@ -253,14 +240,12 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
      */
     private int previousIndex(int k) {
         // left <= k <= right
-
         final int index = k - offset;
         int i = getLongIndex(index);
-
         // Mask bits before the bit index
         // mask = 00011111 = -1L >>> (64 - ((index + 1) % 64))
         long bits = data[i] & (LONG_MASK >>> -(index + 1));
-        for (;;) {
+        for (; ; ) {
             if (bits != 0) {
                 //(i+1)       i
                 // |  index   |
@@ -277,70 +262,42 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
 
     @Override
     public int left() {
-        return left;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int right() {
-        return right;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int updateLeft(int k) {
-        // Assume left < k= < right
-        return left = nextIndex(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int updateRight(int k) {
-        // Assume left <= k < right
-        return right = previousIndex(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public UpdatingInterval splitLeft(int ka, int kb) {
-        // Assume left < ka <= kb < right
-        final int lower = left;
-        left = nextIndex(kb + 1);
-        return new BitIndexUpdatingInterval(data, offset, lower, previousIndex(ka - 1));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public UpdatingInterval splitRight(int ka, int kb) {
-        // Assume left < ka <= kb < right
-        final int upper = right;
-        right = previousIndex(ka - 1);
-        return new BitIndexUpdatingInterval(data, offset, nextIndex(kb + 1), upper);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public boolean empty() {
-        // Empty when the interval is invalid. Signalled by a negative right bound.
-        return right < 0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public SplittingInterval split(int ka, int kb) {
-        if (ka <= left) {
-            // No left interval
-            if (kb >= right) {
-                // No right interval
-                invalidate();
-            } else if (kb >= left) {
-                // Update the left bound
-                left = nextIndex(kb + 1);
-            }
-            return null;
-        }
-        if (kb >= right) {
-            // No right interval.
-            // Find new right bound for the left-side.
-            final int r = ka <= right ? previousIndex(ka - 1) : right;
-            invalidate();
-            return new BitIndexUpdatingInterval(data, offset, left, r);
-        }
-        // Split
-        return (SplittingInterval) splitLeft(ka, kb);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -352,15 +309,7 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
 
     @Override
     public boolean saturated(int separation) {
-        // Support saturation analysis at separation relevant to the
-        // quickselect implementations
-        if (separation == 3) {
-            return saturated3();
-        }
-        if (separation == 4) {
-            return saturated4();
-        }
-        return false;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -400,8 +349,10 @@ final class BitIndexUpdatingInterval implements UpdatingInterval, SplittingInter
             // x = mask:
             // 0000000000000001000000000000001000000000000000100000000000000010  (x += (x >>> 16))
             // 0000000100000001000000100000001000000011000000110000010000000100  (x += (x >>> 32))
-            x = x + (x >>> 16); // put count of each 32 bits into their lowest 2 bits
-            x = x + (x >>> 32); // put count of each 64 bits into their lowest 3 bits
+            // put count of each 32 bits into their lowest 2 bits
+            x = x + (x >>> 16);
+            // put count of each 64 bits into their lowest 3 bits
+            x = x + (x >>> 32);
             // Add [0, 4]
             c += (int) x & 0b111;
         }

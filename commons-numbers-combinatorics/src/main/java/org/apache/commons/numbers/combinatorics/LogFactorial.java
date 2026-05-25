@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.combinatorics;
 
 import org.apache.commons.numbers.gamma.LogGamma;
@@ -26,11 +25,13 @@ import org.apache.commons.numbers.gamma.LogGamma;
  * {@link LogGamma#value(double)}.
  */
 public final class LogFactorial {
+
     /**
      * Size of precomputed factorials.
      * @see Factorial
      */
     private static final int FACTORIALS_CACHE_SIZE = 21;
+
     /**
      * Precomputed values of the function: {@code logFactorials[i] = Math.log(i!)}.
      */
@@ -43,14 +44,11 @@ public final class LogFactorial {
      * @param cache Cached values.
      * @throws IllegalArgumentException if {@code n < 0}.
      */
-    private LogFactorial(int numValues,
-                         double[] cache) {
+    private LogFactorial(int numValues, double[] cache) {
         if (numValues < 0) {
             throw new CombinatoricsException(CombinatoricsException.NEGATIVE, numValues);
         }
-
         logFactorials = new double[numValues];
-
         final int beginCopy = 2;
         final int endCopy;
         if (cache == null || cache.length <= beginCopy) {
@@ -58,13 +56,10 @@ public final class LogFactorial {
         } else {
             endCopy = Math.min(cache.length, numValues);
         }
-
-
         // Copy available values.
         if (endCopy - beginCopy > 0) {
             System.arraycopy(cache, beginCopy, logFactorials, beginCopy, endCopy - beginCopy);
         }
-
         // Precompute.
         for (int i = endCopy; i < numValues; i++) {
             logFactorials[i] = logFactorials[i - 1] + Math.log(i);
@@ -76,7 +71,7 @@ public final class LogFactorial {
      * @return instance with no precomputed values
      */
     public static LogFactorial create() {
-        return new LogFactorial(0, null);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -88,7 +83,7 @@ public final class LogFactorial {
      * @throws IllegalArgumentException if {@code cacheSize < 0}.
      */
     public LogFactorial withCache(final int cacheSize) {
-        return new LogFactorial(cacheSize, logFactorials);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -99,21 +94,6 @@ public final class LogFactorial {
      * @throws IllegalArgumentException if {@code n < 0}.
      */
     public double value(int n) {
-        if (n < 0) {
-            throw new CombinatoricsException(CombinatoricsException.NEGATIVE, n);
-        }
-
-        // Use cache of precomputed values.
-        if (n < logFactorials.length) {
-            return logFactorials[n];
-        }
-
-        // Use cache of precomputed factorial values.
-        if (n < FACTORIALS_CACHE_SIZE) {
-            return Math.log(Factorial.value(n));
-        }
-
-        // Delegate.
-        return LogGamma.value(n + 1.0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

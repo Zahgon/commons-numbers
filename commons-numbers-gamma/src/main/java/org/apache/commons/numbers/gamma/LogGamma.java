@@ -29,7 +29,10 @@ package org.apache.commons.numbers.gamma;
  * Boost C++ Log Gamma functions</a>
  */
 public final class LogGamma {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private LogGamma() {
         // intentionally empty.
     }
@@ -43,7 +46,7 @@ public final class LogGamma {
      * and is an integer.
      */
     public static double value(double x) {
-        return BoostGamma.lgamma(x);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -61,6 +64,6 @@ public final class LogGamma {
      * @since 1.1
      */
     public static double value(double x, int[] sign) {
-        return BoostGamma.lgamma(x, sign);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

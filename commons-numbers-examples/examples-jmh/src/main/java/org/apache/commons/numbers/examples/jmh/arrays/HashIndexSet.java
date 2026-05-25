@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.arrays;
 
 /**
@@ -42,12 +41,22 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 final class HashIndexSet {
-    /** Message for an invalid index. */
+
+    /**
+     * Message for an invalid index.
+     */
     private static final String INVALID_INDEX = "Invalid index: ";
-    /** The maximum capacity of the set. */
+
+    /**
+     * The maximum capacity of the set.
+     */
     private static final int MAX_CAPACITY = 1 << 29;
-    /** The minimum size of the backing array. */
+
+    /**
+     * The minimum size of the backing array.
+     */
     private static final int MIN_SIZE = 16;
+
     /**
      * Unsigned 32-bit integer numerator of the golden ratio (0.618) with an assumed
      * denominator of 2^32.
@@ -59,9 +68,14 @@ final class HashIndexSet {
      */
     private static final int PHI = 0x9e3779b9;
 
-    /** The set. */
+    /**
+     * The set.
+     */
     private final int[] set;
-    /** The size. */
+
+    /**
+     * The size.
+     */
     private int size;
 
     /**
@@ -95,13 +109,7 @@ final class HashIndexSet {
      * @return the memory footprint
      */
     static long memoryFootprint(int capacity) {
-        if (capacity <= (MIN_SIZE >> 1)) {
-            // 4 bytes/int
-            return MIN_SIZE << 2;
-        }
-        // Double the next power of 2, then convert integer count to bytes (4 bytes/int)
-        // * 2 * 4 == * 2^3
-        return Integer.toUnsignedLong(nextPow2(capacity)) << 3;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -134,37 +142,7 @@ final class HashIndexSet {
      * @throws IndexOutOfBoundsException if the index is negative
      */
     boolean add(int index) {
-        if (index < 0) {
-            throw new IndexOutOfBoundsException(INVALID_INDEX + index);
-        }
-        final int[] keys = set;
-        final int key = ~index;
-        final int mask = keys.length - 1;
-        int pos = mix(index) & mask;
-        int curr = keys[pos];
-        if (curr < 0) {
-            if (curr == key) {
-                // Already present
-                return false;
-            }
-            // Probe
-            while ((curr = keys[pos = (pos + 1) & mask]) < 0) {
-                if (curr == key) {
-                    // Already present
-                    return false;
-                }
-            }
-        }
-        // Insert
-        keys[pos] = key;
-        // Here the load factor is 0.5: Test if size > keys.length * 0.5
-        if (++size > (mask + 1) >>> 1) {
-            // This is where we should grow the size of the set and re-insert
-            // all current keys into the new key storage. Here we are using a
-            // fixed capacity so raise an exception.
-            throw new IllegalStateException("Functional capacity exceeded: " + (keys.length >>> 1));
-        }
-        return true;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -178,32 +156,7 @@ final class HashIndexSet {
      * @throws IndexOutOfBoundsException if the index is negative
      */
     boolean contains(int index) {
-        if (index < 0) {
-            throw new IndexOutOfBoundsException(INVALID_INDEX + index);
-        }
-        final int[] keys = set;
-        final int mask = keys.length - 1;
-        int pos = mix(index) & mask;
-        int curr = keys[pos];
-        if (curr == 0) {
-            return false;
-        }
-        final int key = ~index;
-        if (curr == key) {
-            return true;
-        }
-        // Probe
-        while (true) {
-            pos = (pos + 1) & mask;
-            curr = keys[pos];
-            if (curr == 0) {
-                // No more entries
-                return false;
-            }
-            if (curr == key) {
-                return true;
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -226,7 +179,7 @@ final class HashIndexSet {
      * @return the size
      */
     int size() {
-        return size;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -246,14 +199,6 @@ final class HashIndexSet {
      * @see #size()
      */
     int toArray(int[] a) {
-        final int[] keys = set;
-        int c = 0;
-        for (final int key : keys) {
-            if (key < 0) {
-                a[c++] = ~key;
-            }
-        }
-        // assert c == size
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

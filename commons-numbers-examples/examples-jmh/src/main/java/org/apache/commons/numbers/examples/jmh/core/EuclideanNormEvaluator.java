@@ -29,80 +29,47 @@ import java.util.function.ToDoubleFunction;
  */
 public class EuclideanNormEvaluator {
 
-    /** Map of names to norm computation methods. */
+    /**
+     * Map of names to norm computation methods.
+     */
     private final Map<String, ToDoubleFunction<double[]>> methods = new LinkedHashMap<>();
 
-    /** Add a computation method to be evaluated.
+    /**
+     * Add a computation method to be evaluated.
      * @param name method name
      * @param method computation method
      * @return this instance
      */
     public EuclideanNormEvaluator addMethod(final String name, final ToDoubleFunction<double[]> method) {
-        methods.put(name, method);
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** Evaluate the configured computation methods against the given array of input vectors.
+    /**
+     * Evaluate the configured computation methods against the given array of input vectors.
      * @param inputs array of input vectors
      * @return map of evaluation results keyed by method name
      */
     public Map<String, Stats> evaluate(final double[][] inputs) {
-
-        final Map<String, StatsAccumulator> accumulators = new HashMap<>();
-        for (final String name : methods.keySet()) {
-            accumulators.put(name, new StatsAccumulator(inputs.length * 2));
-        }
-
-        for (int i = 0; i < inputs.length; ++i) {
-            // compute the norm in a forward and reverse directions to include
-            // summation artifacts
-            final double[] vec = inputs[i];
-
-            final double[] reverseVec = new double[vec.length];
-            for (int j = 0; j < vec.length; ++j) {
-                reverseVec[vec.length - 1 - j] = vec[j];
-            }
-
-            final double exact = computeExact(vec);
-
-            for (final Map.Entry<String, ToDoubleFunction<double[]>> entry : methods.entrySet()) {
-                final ToDoubleFunction<double[]> fn = entry.getValue();
-
-                final StatsAccumulator acc = accumulators.get(entry.getKey());
-
-                final double forwardSample = fn.applyAsDouble(vec);
-                acc.report(exact, forwardSample);
-
-                final double reverseSample = fn.applyAsDouble(reverseVec);
-                acc.report(exact, reverseSample);
-            }
-        }
-
-        final Map<String, Stats> stats = new LinkedHashMap<>();
-        for (final String name : methods.keySet()) {
-            stats.put(name, accumulators.get(name).computeStats());
-        }
-
-        return stats;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** Compute the exact double value of the vector norm using BigDecimals
+    /**
+     * Compute the exact double value of the vector norm using BigDecimals
      * with a math context of {@link MathContext#DECIMAL128}.
      * @param vec input vector
      * @return euclidean norm
      */
     private static double computeExact(final double[] vec) {
         final MathContext ctx = MathContext.DECIMAL128;
-
         BigDecimal sum = BigDecimal.ZERO;
         for (final double v : vec) {
             sum = sum.add(new BigDecimal(v).pow(2), ctx);
         }
-
         return sum.sqrt(ctx).doubleValue();
     }
 
-    /** Compute the ulp difference between two values of the same sign.
+    /**
+     * Compute the ulp difference between two values of the same sign.
      * @param a first input
      * @param b second input
      * @return ulp difference between the arguments
@@ -111,34 +78,45 @@ public class EuclideanNormEvaluator {
         return (int) (Double.doubleToLongBits(a) - Double.doubleToLongBits(b));
     }
 
-    /** Class containing evaluation statistics for a single computation method.
+    /**
+     * Class containing evaluation statistics for a single computation method.
      */
     public static final class Stats {
 
-        /** Mean ulp error. */
+        /**
+         * Mean ulp error.
+         */
         private final double ulpErrorMean;
 
-        /** Ulp error standard deviation. */
+        /**
+         * Ulp error standard deviation.
+         */
         private final double ulpErrorStdDev;
 
-        /** Ulp error minimum value. */
+        /**
+         * Ulp error minimum value.
+         */
         private final double ulpErrorMin;
 
-        /** Ulp error maximum value. */
+        /**
+         * Ulp error maximum value.
+         */
         private final double ulpErrorMax;
 
-        /** Number of failed computations. */
+        /**
+         * Number of failed computations.
+         */
         private final int failCount;
 
-        /** Construct a new instance.
+        /**
+         * Construct a new instance.
          * @param ulpErrorMean ulp error mean
          * @param ulpErrorStdDev ulp error standard deviation
          * @param ulpErrorMin ulp error minimum value
          * @param ulpErrorMax ulp error maximum value
          * @param failCount number of failed computations
          */
-        Stats(final double ulpErrorMean, final double ulpErrorStdDev, final double ulpErrorMin,
-                final double ulpErrorMax, final int failCount) {
+        Stats(final double ulpErrorMean, final double ulpErrorStdDev, final double ulpErrorMin, final double ulpErrorMax, final int failCount) {
             this.ulpErrorMean = ulpErrorMean;
             this.ulpErrorStdDev = ulpErrorStdDev;
             this.ulpErrorMin = ulpErrorMin;
@@ -146,104 +124,86 @@ public class EuclideanNormEvaluator {
             this.failCount = failCount;
         }
 
-        /** Get the ulp error mean.
+        /**
+         * Get the ulp error mean.
          * @return ulp error mean
          */
         public double getUlpErrorMean() {
-            return ulpErrorMean;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** Get the ulp error standard deviation.
+        /**
+         * Get the ulp error standard deviation.
          * @return ulp error standard deviation
          */
         public double getUlpErrorStdDev() {
-            return ulpErrorStdDev;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** Get the ulp error minimum value.
+        /**
+         * Get the ulp error minimum value.
          * @return ulp error minimum value
          */
         public double getUlpErrorMin() {
-            return ulpErrorMin;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** Get the ulp error maximum value.
+        /**
+         * Get the ulp error maximum value.
          * @return ulp error maximum value
          */
         public double getUlpErrorMax() {
-            return ulpErrorMax;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** Get the number of failed computations, meaning the number of
+        /**
+         * Get the number of failed computations, meaning the number of
          * computations that overflowed or underflowed.
          * @return number of failed computations
          */
         public int getFailCount() {
-            return failCount;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
-    /** Class used to accumulate statistics during a norm evaluation run.
+    /**
+     * Class used to accumulate statistics during a norm evaluation run.
      */
     private static final class StatsAccumulator {
 
-        /** Sample index. */
+        /**
+         * Sample index.
+         */
         private int sampleIdx;
 
-        /** Array of ulp errors for each sample. */
+        /**
+         * Array of ulp errors for each sample.
+         */
         private final double[] ulpErrors;
 
-        /** Construct a new instance.
+        /**
+         * Construct a new instance.
          * @param count number of samples to be accumulated
          */
         StatsAccumulator(final int count) {
             ulpErrors = new double[count];
         }
 
-        /** Report a computation result.
+        /**
+         * Report a computation result.
          * @param expected expected result
          * @param actual actual result
          */
         public void report(final double expected, final double actual) {
-            ulpErrors[sampleIdx++] = Double.isFinite(actual) && actual != 0.0 ?
-                    computeUlpDifference(expected, actual) :
-                    Double.NaN;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
-        /** Compute the final statistics for the run.
+        /**
+         * Compute the final statistics for the run.
          * @return statistics object
          */
         public Stats computeStats() {
-            int successCount = 0;
-            double sum = 0d;
-            double min = Double.POSITIVE_INFINITY;
-            double max = Double.NEGATIVE_INFINITY;
-
-            for (double ulpError : ulpErrors) {
-                if (Double.isFinite(ulpError)) {
-                    ++successCount;
-                    min = Math.min(ulpError, min);
-                    max = Math.max(ulpError, max);
-                    sum += ulpError;
-                }
-            }
-
-            final double mean = sum / successCount;
-
-            double diffSumSq = 0d;
-            double diff;
-            for (double ulpError : ulpErrors) {
-                if (Double.isFinite(ulpError)) {
-                    diff = ulpError - mean;
-                    diffSumSq += diff * diff;
-                }
-            }
-
-            final double stdDev = successCount > 1 ?
-                    Math.sqrt(diffSumSq / (successCount - 1)) :
-                    0d;
-
-            return new Stats(mean, stdDev, min, max, ulpErrors.length - successCount);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

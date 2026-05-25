@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 //  (C) Copyright John Maddock 2006.
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
 package org.apache.commons.numbers.gamma;
 
 /**
@@ -30,7 +28,10 @@ package org.apache.commons.numbers.gamma;
  * All work is copyright John Maddock 2006 and subject to the Boost Software License.
  */
 final class BoostMath {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private BoostMath() {
         // intentionally empty.
     }
@@ -47,30 +48,6 @@ final class BoostMath {
      * @return {@code pow(x, y) - 1}
      */
     static double powm1(double x, double y) {
-        if (x > 0) {
-            // Check for small y or x close to 1.
-            // Require term < 0.5
-            // => log(x) * y < 0.5
-            // Assume log(x) ~ (x - 1) [true when x is close to 1]
-            // => |(x-1) * y| < 0.5
-
-            if (Math.abs(y * (x - 1)) < 0.5 || Math.abs(y) < 0.2) {
-                // We don't have any good/quick approximation for log(x) * y
-                // so just try it and see:
-                final double l = y * Math.log(x);
-                if (l < 0.5) {
-                    return Math.expm1(l);
-                }
-                // fall through....
-            }
-        } else if (x < 0 &&
-                   // y had better be an integer:
-                   // x is negative.
-                   // pow(x, y) only allowed if y is an integer.
-                   // if y is even then we can invert non-zero finite x.
-                   Math.rint(y * 0.5) == y * 0.5) {
-            return powm1(-x, y);
-        }
-        return Math.pow(x, y) - 1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

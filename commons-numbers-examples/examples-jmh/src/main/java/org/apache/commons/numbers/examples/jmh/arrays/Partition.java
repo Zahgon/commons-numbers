@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.arrays;
 
 import java.util.Arrays;
@@ -41,7 +40,6 @@ import org.apache.commons.rng.simple.RandomSource;
  *
  * <pre>
  * data    [0, 1, 2, 1, 2, 5, 2, 3, 3, 6, 7, 7, 7, 7]
- *
  *
  * k=4   : [0, 1, 2, 1], [2], [5, 2, 3, 3, 6, 7, 7, 7, 7]
  * k=4,8 : [0, 1, 2, 1], [2], [3, 3, 2], [5], [6, 7, 7, 7, 7]
@@ -123,11 +121,14 @@ import org.apache.commons.rng.simple.RandomSource;
  * @since 1.2
  */
 final class Partition {
-    // This class contains implementations for use in benchmarking.
 
-    /** Default pivoting strategy. Note: Using the dynamic strategy avoids excess recursion
-     * on the Bentley and McIlroy test data vs the MEDIAN_OF_3 strategy. */
+    // This class contains implementations for use in benchmarking.
+    /**
+     * Default pivoting strategy. Note: Using the dynamic strategy avoids excess recursion
+     * on the Bentley and McIlroy test data vs the MEDIAN_OF_3 strategy.
+     */
     static final PivotingStrategy PIVOTING_STRATEGY = PivotingStrategy.DYNAMIC;
+
     /**
      * Default pivoting strategy. Choosing from 5 points is unbiased on random data and
      * has a lower standard deviation around the thirds than choosing 2 points
@@ -141,7 +142,9 @@ final class Partition {
      * not too small, appears to be most performant.
      */
     static final DualPivotingStrategy DUAL_PIVOTING_STRATEGY = DualPivotingStrategy.SORT_5B;
-    /** Minimum selection size for quickselect/quicksort.
+
+    /**
+     * Minimum selection size for quickselect/quicksort.
      * Below this switch to sortselect/insertion sort rather than selection.
      * Dual-pivot quicksort used 27 in Yaroslavskiy's original paper.
      * Changes to this value are only noticeable when the input array is small.
@@ -159,96 +162,182 @@ final class Partition {
      * and increasing with higher n in the same range.
      * Dual-pivot sorting requires a value of ~120. If keys are saturated between k1 and kn
      * an increase to this threshold will gain full sort performance.</li>
-     * </ul> */
+     * </ul>
+     */
     static final int MIN_QUICKSELECT_SIZE = 0;
-    /** Minimum size for heapselect.
+
+    /**
+     * Minimum size for heapselect.
      * Below this switch to insertion sort rather than selection. This is used to avoid
-     * heap select on tiny data. */
+     * heap select on tiny data.
+     */
     static final int MIN_HEAPSELECT_SIZE = 5;
-    /** Minimum size for sortselect.
+
+    /**
+     * Minimum size for sortselect.
      * Below this switch to insertion sort rather than selection. This is used to avoid
-     * sort select on tiny data. */
+     * sort select on tiny data.
+     */
     static final int MIN_SORTSELECT_SIZE = 4;
-    /** Default selection constant for edgeselect. Any k closer than this to the left/right
-     * bound will be selected using the configured edge selection function. */
+
+    /**
+     * Default selection constant for edgeselect. Any k closer than this to the left/right
+     * bound will be selected using the configured edge selection function.
+     */
     static final int EDGESELECT_CONSTANT = 20;
-    /** Default sort selection constant for linearselect. Note that linear select variants
+
+    /**
+     * Default sort selection constant for linearselect. Note that linear select variants
      * recursively call quickselect so very small lengths are included with an initial
      * medium length. Using lengths of 1023-5 and 2043-53 indicate optimum performance around
      * 80 for median-of-medians when placing the sample on the left. Adaptive linear methods
      * are faster and so this value is reduced. Quickselect adaptive has a value around 20-30.
      * Note: When using {@link ExpandStrategy#T2} the input length must create a sample of at
      * least length 2 as each end of the sample is used as a sentinel. With a sample length of
-     * 1/12 of the data this requires edge select of at least 12. */
+     * 1/12 of the data this requires edge select of at least 12.
+     */
     static final int LINEAR_SORTSELECT_SIZE = 24;
-    /** Default sub-sampling size to identify a single pivot. Sub-sampling is performed if the
+
+    /**
+     * Default sub-sampling size to identify a single pivot. Sub-sampling is performed if the
      * length is above this value thus using MAX_VALUE sets it off by default.
-     * The SELECT algorithm of Floyd-Rivest uses 600. */
+     * The SELECT algorithm of Floyd-Rivest uses 600.
+     */
     static final int SUBSAMPLING_SIZE = Integer.MAX_VALUE;
-    /** Default key strategy. */
+
+    /**
+     * Default key strategy.
+     */
     static final KeyStrategy KEY_STRATEGY = KeyStrategy.INDEX_SET;
-    /** Default 1 or 2 key strategy. */
+
+    /**
+     * Default 1 or 2 key strategy.
+     */
     static final PairedKeyStrategy PAIRED_KEY_STRATEGY = PairedKeyStrategy.SEARCHABLE_INTERVAL;
-    /** Default recursion multiple. */
+
+    /**
+     * Default recursion multiple.
+     */
     static final int RECURSION_MULTIPLE = 2;
-    /** Default recursion constant. */
+
+    /**
+     * Default recursion constant.
+     */
     static final int RECURSION_CONSTANT = 0;
-    /** Default compression. */
+
+    /**
+     * Default compression.
+     */
     static final int COMPRESSION_LEVEL = 1;
-    /** Default control flags. */
+
+    /**
+     * Default control flags.
+     */
     static final int CONTROL_FLAGS = 0;
-    /** Default option flags. */
+
+    /**
+     * Default option flags.
+     */
     static final int OPTION_FLAGS = 0;
-    /** Default single-pivot partition strategy. */
+
+    /**
+     * Default single-pivot partition strategy.
+     */
     static final SPStrategy SP_STRATEGY = SPStrategy.KBM;
-    /** Default expand partition strategy. A ternary method is faster on equal elements and no
-     * slower on unique elements. */
+
+    /**
+     * Default expand partition strategy. A ternary method is faster on equal elements and no
+     * slower on unique elements.
+     */
     static final ExpandStrategy EXPAND_STRATEGY = ExpandStrategy.T2;
-    /** Default single-pivot linear select strategy. */
+
+    /**
+     * Default single-pivot linear select strategy.
+     */
     static final LinearStrategy LINEAR_STRATEGY = LinearStrategy.RSA;
-    /** Default edge select strategy. */
+
+    /**
+     * Default edge select strategy.
+     */
     static final EdgeSelectStrategy EDGE_STRATEGY = EdgeSelectStrategy.ESS;
-    /** Default single-pivot stopper strategy. */
+
+    /**
+     * Default single-pivot stopper strategy.
+     */
     static final StopperStrategy STOPPER_STRATEGY = StopperStrategy.SQA;
-    /** Default quickselect adaptive mode. */
+
+    /**
+     * Default quickselect adaptive mode.
+     */
     static final AdaptMode ADAPT_MODE = AdaptMode.ADAPT3;
 
-    /** Sampling mode using Floyd-Rivest sampling. */
+    /**
+     * Sampling mode using Floyd-Rivest sampling.
+     */
     static final int MODE_FR_SAMPLING = -1;
-    /** Sampling mode. */
+
+    /**
+     * Sampling mode.
+     */
     static final int MODE_SAMPLING = 0;
-    /** No sampling but use adaption of the target k. */
+
+    /**
+     * No sampling but use adaption of the target k.
+     */
     static final int MODE_ADAPTION = 1;
-    /** No sampling and no adaption of target k (strict margins). */
+
+    /**
+     * No sampling and no adaption of target k (strict margins).
+     */
     static final int MODE_STRICT = 2;
 
     // Floyd-Rivest flags
-
-    /** Control flag for random sampling. */
+    /**
+     * Control flag for random sampling.
+     */
     static final int FLAG_RANDOM_SAMPLING = 0x2;
-    /** Control flag for vector swap of the sample. */
+
+    /**
+     * Control flag for vector swap of the sample.
+     */
     static final int FLAG_MOVE_SAMPLE = 0x4;
-    /** Control flag for random subset sampling. This creates the sample at the end
-     * of the data and requires moving regions to reposition around the target k. */
+
+    /**
+     * Control flag for random subset sampling. This creates the sample at the end
+     * of the data and requires moving regions to reposition around the target k.
+     */
     static final int FLAG_SUBSET_SAMPLING = 0x8;
 
     // RNG flags
-
-    /** Control flag for biased nextInt(n) RNG. */
+    /**
+     * Control flag for biased nextInt(n) RNG.
+     */
     static final int FLAG_BIASED_RANDOM = 0x1000;
-    /** Control flag for SplittableRandom RNG. */
+
+    /**
+     * Control flag for SplittableRandom RNG.
+     */
     static final int FLAG_SPLITTABLE_RANDOM = 0x2000;
-    /** Control flag for MSWS RNG. */
+
+    /**
+     * Control flag for MSWS RNG.
+     */
     static final int FLAG_MSWS = 0x4000;
 
     // Quickselect adaptive flags. Must not clash with the Floyd-Rivest/RNG flags
     // that are supported for sample mode.
-
-    /** Control flag for quickselect adaptive to propagate the no sampling mode recursively. */
+    /**
+     * Control flag for quickselect adaptive to propagate the no sampling mode recursively.
+     */
     static final int FLAG_QA_PROPAGATE = 0x1;
-    /** Control flag for quickselect adaptive variant of Floyd-Rivest random sampling. */
+
+    /**
+     * Control flag for quickselect adaptive variant of Floyd-Rivest random sampling.
+     */
     static final int FLAG_QA_RANDOM_SAMPLING = 0x4;
-    /** Control flag for quickselect adaptive to use a different far left/right step
+
+    /**
+     * Control flag for quickselect adaptive to use a different far left/right step
      * using min of 4; then median of 3 into the 2nd 12th-tile. The default (original) uses
      * lower median of 4; then min of 3 into 4th 12th-tile). The default has a larger
      * upper margin of 3/8 vs 1/3 for the new method. The new method is better
@@ -256,9 +345,12 @@ final class Partition {
      * far left/right step using the new k mapping. When sampling is off it is marginally
      * faster, may be due to improved layout of the sample closer to the strict 1/12 lower margin.
      * There is no compelling evidence to indicate is it better so the default uses
-     * the original far step method. */
+     * the original far step method.
+     */
     static final int FLAG_QA_FAR_STEP = 0x8;
-    /** Control flag for quickselect adaptive to map k using the same k mapping for all
+
+    /**
+     * Control flag for quickselect adaptive to map k using the same k mapping for all
      * repeated steps. This enables the original algorithm behaviour.
      *
      * <p>Note that the original mapping can create a lower margin that
@@ -270,75 +362,122 @@ final class Partition {
      * adaptive k and using the median of the 12th-tile shows a measurable speed-up
      * as the smaller margin always contains k. This result has been extended to change
      * the mapping for the far step to ensure the smaller
-     * margin always contains at least k elements. This is faster and so enabled by default. */
+     * margin always contains at least k elements. This is faster and so enabled by default.
+     */
     static final int FLAG_QA_FAR_STEP_ADAPT_ORIGINAL = 0x10;
-    /** Use a 12th-tile for the sampling mode in the middle repeated step method.
+
+    /**
+     * Use a 12th-tile for the sampling mode in the middle repeated step method.
      * The default uses a 9th-tile which is a larger sample than the 12th-tile used in
-     * the step left/far left methods. */
+     * the step left/far left methods.
+     */
     static final int FLAG_QA_MIDDLE_12 = 0x20;
-    /** Position the sample for quickselect adaptive to place the mapped k' at the target index k.
+
+    /**
+     * Position the sample for quickselect adaptive to place the mapped k' at the target index k.
      * This is not possible for the far step methods as it can generated a bounds error as
-     * k approaches the edge. */
+     * k approaches the edge.
+     */
     static final int FLAG_QA_SAMPLE_K = 0x40;
 
-    /** Threshold to use sub-sampling of the range to identify the single pivot.
+    /**
+     * Threshold to use sub-sampling of the range to identify the single pivot.
      * Sub-sampling uses the Floyd-Rivest algorithm to partition a sample of the data to
      * identify a pivot so that the target element is in the smaller set after partitioning.
      * The original FR paper used 600 otherwise reverted to the target index as the pivot.
      * This implementation uses a sample to identify a median pivot which increases robustness
      * at small size on a variety of data and allows raising the original FR threshold.
-     * At 600, FR has no speed-up; at double this the speed-up can be measured. */
+     * At 600, FR has no speed-up; at double this the speed-up can be measured.
+     */
     static final int SELECT_SUB_SAMPLING_SIZE = 1200;
 
-    /** Message for an unsupported introselect configuration. */
+    /**
+     * Message for an unsupported introselect configuration.
+     */
     private static final String UNSUPPORTED_INTROSELECT = "Unsupported introselect: ";
 
-    /** Transformer factory for double data with the behaviour of a JDK sort.
-     * Moves NaN to the end of the data and handles signed zeros. Works on the data in-place. */
-    private static final Supplier<DoubleDataTransformer> SORT_TRANSFORMER =
-        DoubleDataTransformers.createFactory(NaNPolicy.INCLUDE, false);
+    /**
+     * Transformer factory for double data with the behaviour of a JDK sort.
+     * Moves NaN to the end of the data and handles signed zeros. Works on the data in-place.
+     */
+    private static final Supplier<DoubleDataTransformer> SORT_TRANSFORMER = DoubleDataTransformers.createFactory(NaNPolicy.INCLUDE, false);
 
-    /** Minimum length between 2 pivots {@code p2 - p1} that requires a full sort. */
+    /**
+     * Minimum length between 2 pivots {@code p2 - p1} that requires a full sort.
+     */
     private static final int SORT_BETWEEN_SIZE = 2;
-    /** log2(e). Used for conversions: log2(x) = ln(x) * log2(e) */
+
+    /**
+     * log2(e). Used for conversions: log2(x) = ln(x) * log2(e)
+     */
     private static final double LOG2_E = 1.4426950408889634;
 
-    /** Threshold to use repeated step left: 7 / 16. */
+    /**
+     * Threshold to use repeated step left: 7 / 16.
+     */
     private static final double STEP_LEFT = 0.4375;
-    /** Threshold to use repeated step right: 9 / 16. */
+
+    /**
+     * Threshold to use repeated step right: 9 / 16.
+     */
     private static final double STEP_RIGHT = 0.5625;
-    /** Threshold to use repeated step far-left: 1 / 12. */
+
+    /**
+     * Threshold to use repeated step far-left: 1 / 12.
+     */
     private static final double STEP_FAR_LEFT = 0.08333333333333333;
-    /** Threshold to use repeated step far-right: 11 / 12. */
+
+    /**
+     * Threshold to use repeated step far-right: 11 / 12.
+     */
     private static final double STEP_FAR_RIGHT = 0.9166666666666666;
 
-    /** Default quickselect adaptive mode. Start with FR sampling. */
+    /**
+     * Default quickselect adaptive mode. Start with FR sampling.
+     */
     private static int qaMode = MODE_FR_SAMPLING;
-    /** Default quickselect adaptive mode increment. */
+
+    /**
+     * Default quickselect adaptive mode increment.
+     */
     private static int qaIncrement = 1;
 
     // Use final for settings/objects used within partitioning functions
-
-    /** A {@link PivotingStrategy} used for pivoting. */
+    /**
+     * A {@link PivotingStrategy} used for pivoting.
+     */
     private final PivotingStrategy pivotingStrategy;
-    /** A {@link DualPivotingStrategy} used for pivoting. */
+
+    /**
+     * A {@link DualPivotingStrategy} used for pivoting.
+     */
     private final DualPivotingStrategy dualPivotingStrategy;
 
-    /** Minimum size for quickselect when partitioning multiple keys.
+    /**
+     * Minimum size for quickselect when partitioning multiple keys.
      * Below this threshold partitioning using quickselect is stopped and a sort selection
      * is performed.
      *
      * <p>This threshold is also used in the sort methods to switch to insertion sort;
      * and in legacy partition methods which do not use edge selection. These may perform
-     * key analysis using this value to determine saturation. */
+     * key analysis using this value to determine saturation.
+     */
     private final int minQuickSelectSize;
-    /** Constant for edgeselect. */
+
+    /**
+     * Constant for edgeselect.
+     */
     private final int edgeSelectConstant;
-    /** Size for sortselect in the linearselect function. Optimal value for this is higher
+
+    /**
+     * Size for sortselect in the linearselect function. Optimal value for this is higher
      * than for regular quickselect as the median-of-medians pivot strategy is expensive.
-     * For convenience (limit overrides for the constructor) this is not final. */
+     * For convenience (limit overrides for the constructor) this is not final.
+     */
     private int linearSortSelectSize = LINEAR_SORTSELECT_SIZE;
-    /** Threshold to use sub-sampling of the range to identify the single pivot.
+
+    /**
+     * Threshold to use sub-sampling of the range to identify the single pivot.
      * Sub-sampling uses the Floyd-Rivest algorithm to partition a sample of the data. This
      * identifies a pivot so that the target element is in the smaller set after partitioning.
      * The algorithm applies to searching for a single k.
@@ -390,126 +529,217 @@ final class Partition {
      * Floyd and Rivest (1975)
      * Algorithm 489: The Algorithm SELECT—for Finding the ith Smallest of n elements.
      * Comm. ACM. 18 (3): 173.
-     * </pre> */
+     * </pre>
+     */
     private final int subSamplingSize;
 
     // Use non-final members for settings used to configure partitioning functions
-
-    /** Setting to indicate strategy for processing of multiple keys. */
+    /**
+     * Setting to indicate strategy for processing of multiple keys.
+     */
     private KeyStrategy keyStrategy = KEY_STRATEGY;
-    /** Setting to indicate strategy for processing of 1 or 2 keys. */
+
+    /**
+     * Setting to indicate strategy for processing of 1 or 2 keys.
+     */
     private PairedKeyStrategy pairedKeyStrategy = PAIRED_KEY_STRATEGY;
 
-    /** Multiplication factor {@code m} applied to the length based recursion factor {@code x}.
+    /**
+     * Multiplication factor {@code m} applied to the length based recursion factor {@code x}.
      * The recursion is set using {@code m * x + c}.
      * <p>Also used for the multiple of the original length to check the sum of the partition length
      * for poor quickselect partitions.
      * <p>Also used for the number of iterations before checking the partition length has been
-     * reduced by a given factor of 2 (in iselect). */
+     * reduced by a given factor of 2 (in iselect).
+     */
     private double recursionMultiple = RECURSION_MULTIPLE;
-    /** Constant {@code c} added to the length based recursion factor {@code x}.
+
+    /**
+     * Constant {@code c} added to the length based recursion factor {@code x}.
      * The recursion is set using {@code m * x + c}.
      * <p>Also used to specify the factor of two to reduce the partition length after a set
-     * number of iterations (in iselect). */
+     * number of iterations (in iselect).
+     */
     private int recursionConstant = RECURSION_CONSTANT;
-    /** Compression level for a {@link CompressedIndexSet} (in [1, 31]). */
-    private int compression = COMPRESSION_LEVEL;
-    /** Control flags level for Floyd-Rivest sub-sampling. */
-    private int controlFlags = CONTROL_FLAGS;
-    /** Consumer for the recursion level reached during partitioning. Used to analyse
-     * the distribution of the recursion for different input data. */
-    private IntConsumer recursionConsumer = i -> { /* no-op */ };
 
-    /** The single-pivot partition function. */
+    /**
+     * Compression level for a {@link CompressedIndexSet} (in [1, 31]).
+     */
+    private int compression = COMPRESSION_LEVEL;
+
+    /**
+     * Control flags level for Floyd-Rivest sub-sampling.
+     */
+    private int controlFlags = CONTROL_FLAGS;
+
+    /**
+     * Consumer for the recursion level reached during partitioning. Used to analyse
+     * the distribution of the recursion for different input data.
+     */
+    private IntConsumer recursionConsumer = i -> {
+        /* no-op */
+    };
+
+    /**
+     * The single-pivot partition function.
+     */
     private SPEPartition spFunction;
-    /** The expand partition function. */
+
+    /**
+     * The expand partition function.
+     */
     private ExpandPartition expandFunction;
-    /** The single-pivot linear partition function. */
+
+    /**
+     * The single-pivot linear partition function.
+     */
     private SPEPartition linearSpFunction;
-    /** Selection function used when {@code k} is close to the edge of the range. */
+
+    /**
+     * Selection function used when {@code k} is close to the edge of the range.
+     */
     private SelectFunction edgeSelection;
-    /** Selection function used when quickselect progress is poor. */
+
+    /**
+     * Selection function used when quickselect progress is poor.
+     */
     private SelectFunction stopperSelection;
-    /** Quickselect adaptive mode. */
+
+    /**
+     * Quickselect adaptive mode.
+     */
     private AdaptMode adaptMode = ADAPT_MODE;
 
-    /** Quickselect adaptive mapping function applied when sampling-mode is on. */
+    /**
+     * Quickselect adaptive mapping function applied when sampling-mode is on.
+     */
     private MapDistance samplingAdapt;
-    /** Quickselect adaptive mapping function applied when sampling-mode is on for
-     * distances close to the edge (i.e. the far-step functions). */
+
+    /**
+     * Quickselect adaptive mapping function applied when sampling-mode is on for
+     * distances close to the edge (i.e. the far-step functions).
+     */
     private MapDistance samplingEdgeAdapt;
-    /** Quickselect adaptive mapping function applied when sampling-mode is off. */
+
+    /**
+     * Quickselect adaptive mapping function applied when sampling-mode is off.
+     */
     private MapDistance noSamplingAdapt;
-    /** Quickselect adaptive mapping function applied when sampling-mode is off for
-     * distances close to the edge (i.e. the far-step functions). */
+
+    /**
+     * Quickselect adaptive mapping function applied when sampling-mode is off for
+     * distances close to the edge (i.e. the far-step functions).
+     */
     private MapDistance noSamplingEdgeAdapt;
 
     /**
      * Define the strategy for processing multiple keys.
      */
     enum KeyStrategy {
-        /** Sort unique keys, collate ranges and process in ascending order. */
+
+        /**
+         * Sort unique keys, collate ranges and process in ascending order.
+         */
         SEQUENTIAL,
-        /** Process in input order using an {@link IndexSet} to cover the entire range.
-         * Introselect implementations will use a {@link SearchableInterval}. */
+        /**
+         * Process in input order using an {@link IndexSet} to cover the entire range.
+         * Introselect implementations will use a {@link SearchableInterval}.
+         */
         INDEX_SET,
-        /** Process in input order using a {@link CompressedIndexSet} to cover the entire range.
-         * Introselect implementations will use a {@link SearchableInterval}. */
+        /**
+         * Process in input order using a {@link CompressedIndexSet} to cover the entire range.
+         * Introselect implementations will use a {@link SearchableInterval}.
+         */
         COMPRESSED_INDEX_SET,
-        /** Process in input order using a {@link PivotCache} to cover the minimum range. */
+        /**
+         * Process in input order using a {@link PivotCache} to cover the minimum range.
+         */
         PIVOT_CACHE,
-        /** Sort unique keys and process using recursion with division of the keys
-         * for each sub-partition. */
+        /**
+         * Sort unique keys and process using recursion with division of the keys
+         * for each sub-partition.
+         */
         ORDERED_KEYS,
-        /** Sort unique keys and process using recursion with a {@link ScanningKeyInterval}. */
+        /**
+         * Sort unique keys and process using recursion with a {@link ScanningKeyInterval}.
+         */
         SCANNING_KEY_SEARCHABLE_INTERVAL,
-        /** Sort unique keys and process using recursion with a {@link BinarySearchKeyInterval}. */
+        /**
+         * Sort unique keys and process using recursion with a {@link BinarySearchKeyInterval}.
+         */
         SEARCH_KEY_SEARCHABLE_INTERVAL,
-        /** Sort unique keys and process using recursion with a {@link KeyIndexIterator}. */
+        /**
+         * Sort unique keys and process using recursion with a {@link KeyIndexIterator}.
+         */
         INDEX_ITERATOR,
-        /** Process in input order using an {@link IndexIterator} of a {@link CompressedIndexSet}. */
+        /**
+         * Process in input order using an {@link IndexIterator} of a {@link CompressedIndexSet}.
+         */
         COMPRESSED_INDEX_ITERATOR,
-        /** Process using recursion with an {@link IndexSet}-based {@link UpdatingInterval}. */
+        /**
+         * Process using recursion with an {@link IndexSet}-based {@link UpdatingInterval}.
+         */
         INDEX_SET_UPDATING_INTERVAL,
-        /** Sort unique keys and process using recursion with an {@link UpdatingInterval}. */
+        /**
+         * Sort unique keys and process using recursion with an {@link UpdatingInterval}.
+         */
         KEY_UPDATING_INTERVAL,
-        /** Process using recursion with an {@link IndexSet}-based {@link SplittingInterval}. */
+        /**
+         * Process using recursion with an {@link IndexSet}-based {@link SplittingInterval}.
+         */
         INDEX_SET_SPLITTING_INTERVAL,
-        /** Sort unique keys and process using recursion with a {@link SplittingInterval}. */
-        KEY_SPLITTING_INTERVAL;
+        /**
+         * Sort unique keys and process using recursion with a {@link SplittingInterval}.
+         */
+        KEY_SPLITTING_INTERVAL
     }
 
     /**
      * Define the strategy for processing 1 key or 2 keys: (k, k+1).
      */
     enum PairedKeyStrategy {
-        /** Use a dedicated single key method that returns information about (k+1).
-         * Use recursion depth to trigger the stopper select. */
+
+        /**
+         * Use a dedicated single key method that returns information about (k+1).
+         * Use recursion depth to trigger the stopper select.
+         */
         PAIRED_KEYS,
-        /** Use a dedicated single key method that returns information about (k+1).
+        /**
+         * Use a dedicated single key method that returns information about (k+1).
          * Recursion is monitored by checking the partition is reduced by 2<sup>-x</sup> after
          * {@code c} iterations where {@code x} is the
          * {@link #setRecursionConstant(int) recursion constant} and {@code c} is the
-         * {@link #setRecursionMultiple(double) recursion multiple} */
+         * {@link #setRecursionMultiple(double) recursion multiple}
+         */
         PAIRED_KEYS_2,
-        /** Use a dedicated single key method that returns information about (k+1).
-         * Use a multiple of the sum of the length of all partitions to trigger the stopper select. */
+        /**
+         * Use a dedicated single key method that returns information about (k+1).
+         * Use a multiple of the sum of the length of all partitions to trigger the stopper select.
+         */
         PAIRED_KEYS_LEN,
-        /** Use a method that accepts two separate keys. The keys do not define a range
-         * and are independent. */
+        /**
+         * Use a method that accepts two separate keys. The keys do not define a range
+         * and are independent.
+         */
         TWO_KEYS,
-        /** Use a method that accepts two keys to define a range.
+        /**
+         * Use a method that accepts two keys to define a range.
          * Recursion is monitored by checking the partition is reduced by 2<sup>-x</sup> after
          * {@code c} iterations where {@code x} is the
          * {@link #setRecursionConstant(int) recursion constant} and {@code c} is the
-         * {@link #setRecursionMultiple(double) recursion multiple} */
+         * {@link #setRecursionMultiple(double) recursion multiple}
+         */
         KEY_RANGE,
-        /** Use an {@link SearchableInterval} covering the keys. This will reuse a multi-key
-         * strategy with keys that are a very small range. */
+        /**
+         * Use an {@link SearchableInterval} covering the keys. This will reuse a multi-key
+         * strategy with keys that are a very small range.
+         */
         SEARCHABLE_INTERVAL,
-        /** Use an {@link UpdatingInterval} covering the keys. This will reuse a multi-key
-         * strategy with keys that are a very small range. */
-        UPDATING_INTERVAL;
+        /**
+         * Use an {@link UpdatingInterval} covering the keys. This will reuse a multi-key
+         * strategy with keys that are a very small range.
+         */
+        UPDATING_INTERVAL
     }
 
     /**
@@ -552,6 +782,7 @@ final class Partition {
      * @see SPEPartition
      */
     enum SPStrategy {
+
         /**
          * Single-pivot partitioning. Uses a method adapted from Floyd and Rivest (1975)
          * which uses sentinels to avoid bounds checks on the i and j pointers.
@@ -598,7 +829,7 @@ final class Partition {
          * uses fast-forward to reduce swaps. The {@code ==} region is filled during
          * traversal.
          */
-        DNF3;
+        DNF3
     }
 
     /**
@@ -616,23 +847,34 @@ final class Partition {
      * @see ExpandPartition
      */
     enum ExpandStrategy {
-        /** Use the current {@link SPStrategy} partition method. This will not expand
+
+        /**
+         * Use the current {@link SPStrategy} partition method. This will not expand
          * the partition but will Partition the Entire Range (PER). This can be used
-         * to test if the implementations of expand are efficient. */
+         * to test if the implementations of expand are efficient.
+         */
         PER,
-        /** Ternary partition method 1. Sweeps outwards and uses sentinels at the ends
+        /**
+         * Ternary partition method 1. Sweeps outwards and uses sentinels at the ends
          * to avoid pointer range checks. Equal values are moved directly into the
-         * central pivot range. */
+         * central pivot range.
+         */
         T1,
-        /** Ternary partition method 2. Similar to {@link #T1} with different method
-         * to set the sentinels. */
+        /**
+         * Ternary partition method 2. Similar to {@link #T1} with different method
+         * to set the sentinels.
+         */
         T2,
-        /** Binary partition method 1. Sweeps outwards and uses sentinels at the ends
-         * to avoid pointer range checks. */
+        /**
+         * Binary partition method 1. Sweeps outwards and uses sentinels at the ends
+         * to avoid pointer range checks.
+         */
         B1,
-        /** Binary partition method 2. Similar to {@link #B1} with different method
-         * to set the sentinels. */
-        B2,
+        /**
+         * Binary partition method 2. Similar to {@link #B1} with different method
+         * to set the sentinels.
+         */
+        B2
     }
 
     /**
@@ -652,38 +894,51 @@ final class Partition {
      * @see ExpandPartition
      */
     enum LinearStrategy {
-        /** Uses the Blum, Floyd, Pratt, Rivest, and Tarjan (BFPRT) median-of-medians algorithm
+
+        /**
+         * Uses the Blum, Floyd, Pratt, Rivest, and Tarjan (BFPRT) median-of-medians algorithm
          * with medians of 5. This is the baseline version that creates the median sample
          * at the left end and repartitions the entire range using the pivot.
-         * Fixed borders of 3/10. */
+         * Fixed borders of 3/10.
+         */
         BFPRT,
-        /** Uses the Chen and Dumitrescu repeated step median-of-medians-of-medians algorithm
+        /**
+         * Uses the Chen and Dumitrescu repeated step median-of-medians-of-medians algorithm
          * with medians of 3. This is the baseline version that creates the median sample
          * at the left end and repartitions the entire range using the pivot.
-         * Fixed borders of 2/9. */
+         * Fixed borders of 2/9.
+         */
         RS,
-        /** Uses the Blum, Floyd, Pratt, Rivest, and Tarjan (BFPRT) median-of-medians algorithm
+        /**
+         * Uses the Blum, Floyd, Pratt, Rivest, and Tarjan (BFPRT) median-of-medians algorithm
          * with medians of 5. This is the improved version that creates the median sample
          * in the centre and expands the partition around the pivot sample.
-         * Fixed borders of 3/10. */
+         * Fixed borders of 3/10.
+         */
         BFPRT_IM,
-        /** Uses the Chen and Dumitrescu repeated step median-of-medians-of-medians algorithm
+        /**
+         * Uses the Chen and Dumitrescu repeated step median-of-medians-of-medians algorithm
          * with medians of 3. This is the improved version that creates the median sample
          * in the centre and expands the partition around the pivot sample.
-         * Fixed borders of 2/9. */
+         * Fixed borders of 2/9.
+         */
         RS_IM,
-        /** Uses the Blum, Floyd, Pratt, Rivest, and Tarjan (BFPRT) median-of-medians algorithm
+        /**
+         * Uses the Blum, Floyd, Pratt, Rivest, and Tarjan (BFPRT) median-of-medians algorithm
          * with medians of 5. This is the improved version that creates the median sample
          * in the centre and expands the partition around the pivot sample; the adaption
          * is to use k to define the pivot in the sample instead of using the median.
-         * This will not have fixed borders. */
+         * This will not have fixed borders.
+         */
         BFPRTA,
-        /** Uses the Chen and Dumitrescu repeated step median-of-medians-of-medians algorithm
+        /**
+         * Uses the Chen and Dumitrescu repeated step median-of-medians-of-medians algorithm
          * with medians of 3. This is the adaptive version that creates the median sample
          * in the centre and expands the partition around the pivot sample; the adaption
          * is to use k to define the pivot in the sample instead of using the median.
-         * This will not have fixed borders. */
-        RSA;
+         * This will not have fixed borders.
+         */
+        RSA
     }
 
     /**
@@ -692,21 +947,30 @@ final class Partition {
      * in benchmarking using the name; this uses the E (Edge) prefix.
      */
     enum EdgeSelectStrategy {
-        /** Use heapselect version 1. Selects {@code k} and an additional
+
+        /**
+         * Use heapselect version 1. Selects {@code k} and an additional
          * {@code c} elements closer to the edge than {@code k} using a heap
-         * structure. */
+         * structure.
+         */
         ESH,
-        /** Use heapselect version 2. Differs from {@link #ESH} in the
+        /**
+         * Use heapselect version 2. Differs from {@link #ESH} in the
          * final unwinding of the heap to sort the range {@code [ka, kb]};
-         * the heap construction is identical. */
+         * the heap construction is identical.
+         */
         ESH2,
-        /** Use sortselect version 1. Uses an insertion sort to maintain {@code k}
-         * and all elements closer to the edge as sorted. */
+        /**
+         * Use sortselect version 1. Uses an insertion sort to maintain {@code k}
+         * and all elements closer to the edge as sorted.
+         */
         ESS,
-        /** Use sortselect version 2. Differs from {@link #ESS} by a using pointer
+        /**
+         * Use sortselect version 2. Differs from {@link #ESS} by a using pointer
          * into the sorted range to improve insertion speed. In practice the more
-         * complex code is not more performant. */
-        ESS2;
+         * complex code is not more performant.
+         */
+        ESS2
     }
 
     /**
@@ -717,22 +981,31 @@ final class Partition {
      * in benchmarking using the name; this uses the S (Stopper) prefix.
      */
     enum StopperStrategy {
-        /** Use heapselect version 1. Selects {@code k} and an additional
+
+        /**
+         * Use heapselect version 1. Selects {@code k} and an additional
          * {@code c} elements closer to the edge than {@code k}. Heapselect
          * provides increasingly slower performance with distance from the edge.
-         * It has better worst-case performance than quickselect. */
+         * It has better worst-case performance than quickselect.
+         */
         SSH,
-        /** Use heapselect version 2. Differs from {@link #SSH} in the
+        /**
+         * Use heapselect version 2. Differs from {@link #SSH} in the
          * final unwinding of the heap to sort the range {@code [ka, kb]};
-         * the heap construction is identical. */
+         * the heap construction is identical.
+         */
         SSH2,
-        /** Use a linear selection algorithm with Order(n) worst-case performance.
+        /**
+         * Use a linear selection algorithm with Order(n) worst-case performance.
          * This is a median-of-medians using medians of size 5. This is the base
          * implementation using a median sample into the first 20% of the data
-         * and not the improved version (with sample in the centre). */
+         * and not the improved version (with sample in the centre).
+         */
         SLS,
-        /** Use the quickselect adaptive algorithm with Order(n) worst-case performance. */
-        SQA;
+        /**
+         * Use the quickselect adaptive algorithm with Order(n) worst-case performance.
+         */
+        SQA
     }
 
     /**
@@ -764,8 +1037,7 @@ final class Partition {
          * @param leftInner Flag to indicate {@code left - 1} is a pivot.
          * @param rightInner Flag to indicate {@code right + 1} is a pivot.
          */
-        void partition(double[] a, int left, int right, int ka, int kb,
-            boolean leftInner, boolean rightInner);
+        void partition(double[] a, int left, int right, int ka, int kb, boolean leftInner, boolean rightInner);
 
         /**
          * Partition (partially sort) the array in the range {@code [left, right]} around
@@ -788,8 +1060,7 @@ final class Partition {
          * @param rightInner Flag to indicate {@code right + 1} is a pivot.
          * @param pivots Used to store sorted regions.
          */
-        void partitionSequential(double[] a, int left, int right, int ka, int kb,
-            boolean leftInner, boolean rightInner, PivotStore pivots);
+        void partitionSequential(double[] a, int left, int right, int ka, int kb, boolean leftInner, boolean rightInner, PivotStore pivots);
 
         /**
          * Partition (partially sort) the array in the range {@code [left, right]} around
@@ -811,8 +1082,7 @@ final class Partition {
          * @param rightInner Flag to indicate {@code right + 1} is a pivot.
          * @param pivots Used to store sorted regions.
          */
-        void partition(double[] a, int left, int right, int ka, int kb,
-            boolean leftInner, boolean rightInner, PivotStore pivots);
+        void partition(double[] a, int left, int right, int ka, int kb, boolean leftInner, boolean rightInner, PivotStore pivots);
 
         /**
          * Sort the array in the range {@code [left, right]}.
@@ -831,6 +1101,7 @@ final class Partition {
      */
     @FunctionalInterface
     private interface SPEPartitionFunction extends PartitionFunction {
+
         /**
          * Partition an array slice around a single pivot. Partitioning exchanges array
          * elements such that all elements smaller than pivot are before it and all
@@ -854,135 +1125,29 @@ final class Partition {
          * @param rightInner Flag to indicate {@code right + 1} is a pivot.
          * @return Lower bound (inclusive) of the pivot range [k0].
          */
-        int partition(double[] a, int left, int right, int[] upper,
-            boolean leftInner, boolean rightInner);
+        int partition(double[] a, int left, int right, int[] upper, boolean leftInner, boolean rightInner);
 
         // Add support to have a pivot cache. Assume it is to store pivots after kb.
         // Switch to not using it when right < kb, or doing a full sort between
         // left and right (pivots are irrelevant).
-
         @Override
-        default void partition(double[] a, int left, int right, int ka, int kb,
-            boolean leftInner, boolean rightInner) {
-            // Skip when [left, right] does not overlap [ka, kb]
-            if (right - left < 1) {
-                return;
-            }
-            // Assume: left <= right && ka <= kb
-            // Ranges may overlap either way:
-            // left ---------------------- right
-            //        ka --- kb
-            //
-            // Requires full sort:
-            // ka ------------------------- kb
-            //        left ---- right
-            //
-            // This will naturally perform a full sort when ka < left and kb > right
-
-            // Edge case for a single point
-            if (ka == right) {
-                selectMax(a, left, ka);
-            } else if (kb == left) {
-                selectMin(a, kb, right);
-            } else {
-                final int[] upper = {0};
-                final int k0 = partition(a, left, right, upper, leftInner, rightInner);
-                final int k1 = upper[0];
-                // Sorted in [k0, k1]
-                // Unsorted in [left, k0) and (k1, right]
-                if (ka < k0) {
-                    partition(a, left, k0 - 1, ka, kb, leftInner, true);
-                }
-                if (kb > k1) {
-                    partition(a, k1 + 1, right, ka, kb, true, rightInner);
-                }
-            }
+        default void partition(double[] a, int left, int right, int ka, int kb, boolean leftInner, boolean rightInner) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
-        default void partitionSequential(double[] a, int left, int right, int ka, int kb,
-            boolean leftInner, boolean rightInner, PivotStore pivots) {
-            // This method is a copy of the above method except:
-            // - It records all sorted ranges to the cache
-            // - It switches to the above method when the cache is not required
-            if (right - left < 1) {
-                return;
-            }
-            if (ka == right) {
-                selectMax(a, left, ka);
-                pivots.add(ka);
-            } else if (kb == left) {
-                selectMin(a, kb, right);
-                pivots.add(kb);
-            } else {
-                final int[] upper = {0};
-                final int k0 = partition(a, left, right, upper, leftInner, rightInner);
-                final int k1 = upper[0];
-                // Sorted in [k0, k1]
-                // Unsorted in [left, k0) and (k1, right]
-                pivots.add(k0, k1);
-
-                if (ka < k0) {
-                    if (k0 - 1 < kb) {
-                        // Left branch entirely below kb - no cache required
-                        partition(a, left, k0 - 1, ka, kb, leftInner, true);
-                    } else {
-                        partitionSequential(a, left, k0 - 1, ka, kb, leftInner, true, pivots);
-                    }
-                }
-                if (kb > k1) {
-                    partitionSequential(a, k1 + 1, right, ka, kb, true, rightInner, pivots);
-                }
-            }
+        default void partitionSequential(double[] a, int left, int right, int ka, int kb, boolean leftInner, boolean rightInner, PivotStore pivots) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
-        default void partition(double[] a, int left, int right, int ka, int kb,
-            boolean leftInner, boolean rightInner, PivotStore pivots) {
-            // This method is a copy of the above method except:
-            // - It records all sorted ranges to the cache
-            // - It switches to the above method when the cache is not required
-            if (right - left < 1) {
-                return;
-            }
-            if (ka == right) {
-                selectMax(a, left, ka);
-                pivots.add(ka);
-            } else if (kb == left) {
-                selectMin(a, kb, right);
-                pivots.add(kb);
-            } else {
-                final int[] upper = {0};
-                final int k0 = partition(a, left, right, upper, leftInner, rightInner);
-                final int k1 = upper[0];
-                // Sorted in [k0, k1]
-                // Unsorted in [left, k0) and (k1, right]
-                pivots.add(k0, k1);
-
-                if (ka < k0) {
-                    partition(a, left, k0 - 1, ka, kb, leftInner, true, pivots);
-                }
-                if (kb > k1) {
-                    partition(a, k1 + 1, right, ka, kb, true, rightInner, pivots);
-                }
-            }
+        default void partition(double[] a, int left, int right, int ka, int kb, boolean leftInner, boolean rightInner, PivotStore pivots) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         default void sort(double[] a, int left, int right, boolean leftInner, boolean rightInner) {
-            // Skip when [left, right] is sorted
-            // Note: This has no insertion sort for small lengths (so is less performant).
-            // It can be used to test the partition algorithm across the entire data.
-            if (right - left < 1) {
-                return;
-            }
-            final int[] upper = {0};
-            final int k0 = partition(a, left, right, upper, leftInner, rightInner);
-            final int k1 = upper[0];
-            // Sorted in [k0, k1]
-            // Unsorted in [left, k0) and (k1, right]
-            sort(a, left, k0 - 1, leftInner, true);
-            sort(a, k1 + 1, right, true, rightInner);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -991,6 +1156,7 @@ final class Partition {
      */
     @FunctionalInterface
     interface SPEPartition {
+
         /**
          * Partition an array slice around a single pivot. Partitioning exchanges array
          * elements such that all elements smaller than pivot are before it and all
@@ -1021,6 +1187,7 @@ final class Partition {
      */
     @FunctionalInterface
     interface DPPartition {
+
         /**
          * Partition an array slice around two pivots. Partitioning exchanges array
          * elements such that all elements smaller than pivot are before it and all
@@ -1065,6 +1232,7 @@ final class Partition {
      */
     @FunctionalInterface
     interface SelectFunction {
+
         /**
          * Partition the elements between {@code ka} and {@code kb}.
          * It is assumed {@code left <= ka <= kb <= right}.
@@ -1083,6 +1251,7 @@ final class Partition {
      */
     @FunctionalInterface
     interface ExpandPartition {
+
         /**
          * Expand a partition around a single pivot. Partitioning exchanges array
          * elements such that all elements smaller than pivot are before it and all
@@ -1114,8 +1283,7 @@ final class Partition {
          * @param upper Upper bound (inclusive) of the pivot range [k1].
          * @return Lower bound (inclusive) of the pivot range [k0].
          */
-        int partition(double[] a, int left, int right, int start, int end,
-            int pivot0, int pivot1, int[] upper);
+        int partition(double[] a, int left, int right, int start, int end, int pivot0, int pivot1, int[] upper);
     }
 
     /**
@@ -1125,32 +1293,40 @@ final class Partition {
      * |A| is the size of the data to partition; f' is the size of the sample.
      */
     enum MapDistance {
-        /** Use the median of the new range. */
+
+        /**
+         * Use the median of the new range.
+         */
         MEDIAN {
+
             @Override
             int mapDistance(int d, int l, int r, int n) {
-                return n >>> 1;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
-        /** Map the distance using a fraction of the original range: {@code d / (r - l)}. */
+        }
+        ,
+        /**
+         * Map the distance using a fraction of the original range: {@code d / (r - l)}.
+         */
         ADAPT {
+
             @Override
             int mapDistance(int d, int l, int r, int n) {
-                // If distance==r-l this returns n-1
-                return (int) (d * (n - 1.0) / (r - l));
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
-        /** Use the midpoint between the adaption computed by the {@link #MEDIAN} and {@link #ADAPT} methods. */
+        }
+        ,
+        /**
+         * Use the midpoint between the adaption computed by the {@link #MEDIAN} and {@link #ADAPT} methods.
+         */
         HALF_ADAPT {
+
             @Override
             int mapDistance(int d, int l, int r, int n) {
-                // Half-adaption: compute the full adaption
-                final int x = ADAPT.mapDistance(d, l, r, n);
-                // Compute the median between the x and the middle
-                final int m = n >>> 1;
-                return (m + x) >>> 1;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
+        }
+        ,
         /**
          * Map the distance assuming the distance to the edge is small. This method is
          * used when the sample has a lower margin (minimum number of elements) in the
@@ -1162,11 +1338,13 @@ final class Partition {
          * will generate a bounds error if called with {@code d > 2(r - l)}.
          */
         EDGE_ADAPT {
+
             @Override
             int mapDistance(int d, int l, int r, int n) {
-                return d >>> 1;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        };
+        }
+        ;
 
         /**
          * Map the distance from the edge of {@code [l, r]} to a new distance in {@code [0, n)}.
@@ -1226,119 +1404,160 @@ final class Partition {
      * this is supported for completeness and can be used to demonstrate its inefficiency.
      */
     enum AdaptMode {
-        /** No sampling and no adaption (fixed margins) for worst-case linear runtime performance.
-         * This is a terminal state. */
+
+        /**
+         * No sampling and no adaption (fixed margins) for worst-case linear runtime performance.
+         * This is a terminal state.
+         */
         FIXED {
+
             @Override
             boolean isSampleMode() {
-                return false;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             boolean isAdapt() {
-                return false;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             AdaptMode update(int size, int l, int r) {
-                // No further states
-                return this;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
-        /** Sampling and adaption. Failure to achieve the expected partition size
-         * will revert to no sampling but retain adaption. */
+        }
+        ,
+        /**
+         * Sampling and adaption. Failure to achieve the expected partition size
+         * will revert to no sampling but retain adaption.
+         */
         ADAPT1 {
+
             @Override
             boolean isSampleMode() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             boolean isAdapt() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             AdaptMode update(int size, int l, int r) {
-                return r - l <= size ? this : ADAPT1B;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
-        /** No sampling and use adaption. This is a terminal state. */
+        }
+        ,
+        /**
+         * No sampling and use adaption. This is a terminal state.
+         */
         ADAPT1B {
+
             @Override
             boolean isSampleMode() {
-                return false;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             boolean isAdapt() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             AdaptMode update(int size, int l, int r) {
-                // No further states
-                return this;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
-        /** Sampling and adaption. Failure to achieve the expected partition size
-         * will revert to no sampling and no adaption. */
+        }
+        ,
+        /**
+         * Sampling and adaption. Failure to achieve the expected partition size
+         * will revert to no sampling and no adaption.
+         */
         ADAPT2 {
+
             @Override
             boolean isSampleMode() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             boolean isAdapt() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             AdaptMode update(int size, int l, int r) {
-                return r - l <= size ? this : FIXED;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
-        /** Sampling and adaption. Failure to achieve the expected partition size
-         * will revert to no sampling but retain adaption. */
+        }
+        ,
+        /**
+         * Sampling and adaption. Failure to achieve the expected partition size
+         * will revert to no sampling but retain adaption.
+         */
         ADAPT3 {
+
             @Override
             boolean isSampleMode() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             boolean isAdapt() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             AdaptMode update(int size, int l, int r) {
-                return r - l <= size ? this : ADAPT3B;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
-        /** No sampling and use adaption. Failure to achieve the expected partition size
-         * will disable adaption (revert to fixed margins). */
+        }
+        ,
+        /**
+         * No sampling and use adaption. Failure to achieve the expected partition size
+         * will disable adaption (revert to fixed margins).
+         */
         ADAPT3B {
+
             @Override
             boolean isSampleMode() {
-                return false;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             boolean isAdapt() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             AdaptMode update(int size, int l, int r) {
-                return r - l <= size ? this : FIXED;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        },
-        /** Sampling and no adaption. Failure to achieve the expected partition size
-         * will disabled sampling (revert to fixed margins). */
+        }
+        ,
+        /**
+         * Sampling and no adaption. Failure to achieve the expected partition size
+         * will disabled sampling (revert to fixed margins).
+         */
         ADAPT4 {
+
             @Override
             boolean isSampleMode() {
-                return true;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             boolean isAdapt() {
-                return false;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
+
             @Override
             AdaptMode update(int size, int l, int r) {
-                return r - l <= size ? this : FIXED;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
-        };
+        }
+        ;
 
         /**
          * Checks if sample-mode is enabled.
@@ -1372,8 +1591,7 @@ final class Partition {
      * Constructor with defaults.
      */
     Partition() {
-        this(PIVOTING_STRATEGY, DUAL_PIVOTING_STRATEGY, MIN_QUICKSELECT_SIZE,
-            EDGESELECT_CONSTANT, SUBSAMPLING_SIZE);
+        this(PIVOTING_STRATEGY, DUAL_PIVOTING_STRATEGY, MIN_QUICKSELECT_SIZE, EDGESELECT_CONSTANT, SUBSAMPLING_SIZE);
     }
 
     /**
@@ -1385,8 +1603,7 @@ final class Partition {
      * @param minQuickSelectSize Minimum size for quickselect.
      */
     Partition(PivotingStrategy pivotingStrategy, int minQuickSelectSize) {
-        this(pivotingStrategy, DUAL_PIVOTING_STRATEGY, minQuickSelectSize,
-            EDGESELECT_CONSTANT, SUBSAMPLING_SIZE);
+        this(pivotingStrategy, DUAL_PIVOTING_STRATEGY, minQuickSelectSize, EDGESELECT_CONSTANT, SUBSAMPLING_SIZE);
     }
 
     /**
@@ -1398,8 +1615,7 @@ final class Partition {
      * @param minQuickSelectSize Minimum size for quickselect.
      */
     Partition(DualPivotingStrategy dualPivotingStrategy, int minQuickSelectSize) {
-        this(PIVOTING_STRATEGY, dualPivotingStrategy, minQuickSelectSize,
-            EDGESELECT_CONSTANT, SUBSAMPLING_SIZE);
+        this(PIVOTING_STRATEGY, dualPivotingStrategy, minQuickSelectSize, EDGESELECT_CONSTANT, SUBSAMPLING_SIZE);
     }
 
     /**
@@ -1412,10 +1628,8 @@ final class Partition {
      * @param edgeSelectConstant Length constant used for edge select distance from end threshold.
      * @param subSamplingSize Size threshold to use sub-sampling for single-pivot selection.
      */
-    Partition(PivotingStrategy pivotingStrategy,
-        int minQuickSelectSize, int edgeSelectConstant, int subSamplingSize) {
-        this(pivotingStrategy, DUAL_PIVOTING_STRATEGY, minQuickSelectSize, edgeSelectConstant,
-            subSamplingSize);
+    Partition(PivotingStrategy pivotingStrategy, int minQuickSelectSize, int edgeSelectConstant, int subSamplingSize) {
+        this(pivotingStrategy, DUAL_PIVOTING_STRATEGY, minQuickSelectSize, edgeSelectConstant, subSamplingSize);
     }
 
     /**
@@ -1427,10 +1641,8 @@ final class Partition {
      * @param minQuickSelectSize Minimum size for quickselect.
      * @param edgeSelectConstant Length constant used for edge select distance from end threshold.
      */
-    Partition(DualPivotingStrategy dualPivotingStrategy,
-        int minQuickSelectSize, int edgeSelectConstant) {
-        this(PIVOTING_STRATEGY, dualPivotingStrategy, minQuickSelectSize,
-            edgeSelectConstant, SUBSAMPLING_SIZE);
+    Partition(DualPivotingStrategy dualPivotingStrategy, int minQuickSelectSize, int edgeSelectConstant) {
+        this(PIVOTING_STRATEGY, dualPivotingStrategy, minQuickSelectSize, edgeSelectConstant, SUBSAMPLING_SIZE);
     }
 
     /**
@@ -1442,8 +1654,7 @@ final class Partition {
      * @param edgeSelectConstant Length constant used for distance from end threshold.
      * @param subSamplingSize Size threshold to use sub-sampling for single-pivot selection.
      */
-    Partition(PivotingStrategy pivotingStrategy, DualPivotingStrategy dualPivotingStrategy,
-        int minQuickSelectSize, int edgeSelectConstant, int subSamplingSize) {
+    Partition(PivotingStrategy pivotingStrategy, DualPivotingStrategy dualPivotingStrategy, int minQuickSelectSize, int edgeSelectConstant, int subSamplingSize) {
         this.pivotingStrategy = pivotingStrategy;
         this.dualPivotingStrategy = dualPivotingStrategy;
         this.minQuickSelectSize = minQuickSelectSize;
@@ -1466,32 +1677,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setSPStrategy(SPStrategy v) {
-        switch (v) {
-        case BM:
-            spFunction = Partition::partitionBM;
-            break;
-        case DNF1:
-            spFunction = Partition::partitionDNF1;
-            break;
-        case DNF2:
-            spFunction = Partition::partitionDNF2;
-            break;
-        case DNF3:
-            spFunction = Partition::partitionDNF3;
-            break;
-        case KBM:
-            spFunction = Partition::partitionKBM;
-            break;
-        case SBM:
-            spFunction = Partition::partitionSBM;
-            break;
-        case SP:
-            spFunction = Partition::partitionSP;
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown single-pivot strategy: " + v);
-        }
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1501,28 +1687,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setExpandStrategy(ExpandStrategy v) {
-        switch (v) {
-        case PER:
-            // Partition the entire range using the single-pivot partition strategy
-            expandFunction = (a, left, right, start, end, pivot0, pivot1, upper) ->
-                spFunction.partition(a, left, right, (pivot0 + pivot1) >>> 1, upper);
-            break;
-        case T1:
-            expandFunction = Partition::expandPartitionT1;
-            break;
-        case B1:
-            expandFunction = Partition::expandPartitionB1;
-            break;
-        case T2:
-            expandFunction = Partition::expandPartitionT2;
-            break;
-        case B2:
-            expandFunction = Partition::expandPartitionB2;
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown expand strategy: " + v);
-        }
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1537,35 +1702,7 @@ final class Partition {
      * @see #setExpandStrategy(ExpandStrategy)
      */
     Partition setLinearStrategy(LinearStrategy v) {
-        switch (v) {
-        case BFPRT:
-            linearSpFunction = this::linearBFPRTBaseline;
-            break;
-        case RS:
-            linearSpFunction = this::linearRepeatedStepBaseline;
-            break;
-        case BFPRT_IM:
-            noSamplingAdapt = MapDistance.MEDIAN;
-            linearSpFunction = this::linearBFPRTImproved;
-            break;
-        case BFPRTA:
-            // Here we re-use the same method as the only difference is adaption of k
-            noSamplingAdapt = MapDistance.ADAPT;
-            linearSpFunction = this::linearBFPRTImproved;
-            break;
-        case RS_IM:
-            noSamplingAdapt = MapDistance.MEDIAN;
-            linearSpFunction = this::linearRepeatedStepImproved;
-            break;
-        case RSA:
-            // Here we re-use the same method as the only difference is adaption of k
-            noSamplingAdapt = MapDistance.ADAPT;
-            linearSpFunction = this::linearRepeatedStepImproved;
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown linear strategy: " + v);
-        }
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1575,23 +1712,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setEdgeSelectStrategy(EdgeSelectStrategy v) {
-        switch (v) {
-        case ESH:
-            edgeSelection = Partition::heapSelectRange;
-            break;
-        case ESH2:
-            edgeSelection = Partition::heapSelectRange2;
-            break;
-        case ESS:
-            edgeSelection = Partition::sortSelectRange;
-            break;
-        case ESS2:
-            edgeSelection = Partition::sortSelectRange2;
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown edge select: " + v);
-        }
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1601,31 +1722,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setStopperStrategy(StopperStrategy v) {
-        switch (v) {
-        case SSH:
-            stopperSelection = Partition::heapSelectRange;
-            break;
-        case SSH2:
-            stopperSelection = Partition::heapSelectRange2;
-            break;
-        case SLS:
-            // Linear select does not match the interface as it:
-            // - requires the single-pivot partition function
-            // - uses a bounds array to allow minimising the partition region size after pivot selection
-            stopperSelection = (a, l, r, ka, kb) -> linearSelect(getSPFunction(),
-                a, l, r, ka, kb, new int[2]);
-            break;
-        case SQA:
-            // Linear select does not match the interface as it:
-            // - uses a bounds array to allow minimising the partition region size after pivot selection
-            // - uses control flags to set sampling mode on/off
-            stopperSelection = (a, l, r, ka, kb) -> quickSelectAdaptive(a, l, r, ka, kb, new int[1],
-                adaptMode);
-            break;
-        default:
-            throw new IllegalArgumentException("Unknown stopper: " + v);
-        }
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1635,8 +1732,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setKeyStrategy(KeyStrategy v) {
-        this.keyStrategy = v;
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1646,8 +1742,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setPairedKeyStrategy(PairedKeyStrategy v) {
-        this.pairedKeyStrategy = v;
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1657,8 +1752,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setRecursionMultiple(double v) {
-        this.recursionMultiple = v;
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1668,8 +1762,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setRecursionConstant(int v) {
-        this.recursionConstant = v;
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1679,11 +1772,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setCompression(int v) {
-        if (v < 1 || v > Integer.SIZE - 1) {
-            throw new IllegalArgumentException("Bad compression: " + v);
-        }
-        this.compression = v;
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1693,38 +1782,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setControlFlags(int v) {
-        this.controlFlags = v;
-        // Quickselect adaptive requires functions to map k to the sample.
-        // These functions must be set based on the margins in the repeated step method.
-        // These will differ due to the implementation and whether the first step is
-        // skipped (sampling mode on).
-        if ((v & FLAG_QA_FAR_STEP_ADAPT_ORIGINAL) != 0) {
-            // Use the same mapping for all repeated step functions.
-            // This is the original behaviour from Alexandrescu (2016).
-            samplingAdapt = samplingEdgeAdapt = noSamplingAdapt = noSamplingEdgeAdapt = MapDistance.ADAPT;
-        } else {
-            // Default behaviour. This optimises the adaption for the algorithm.
-            samplingAdapt = MapDistance.ADAPT;
-            if ((v & FLAG_QA_FAR_STEP) != 0) {
-                // Switches the far-step to minimum-of-4, median-of-3.
-                // When sampling mode is on all samples are from median-of-3 and we
-                // use the same adaption.
-                samplingEdgeAdapt = MapDistance.ADAPT;
-            } else {
-                // Original far-step of lower-median-of-4, minimum-of-3
-                // When sampling mode is on the sample is a minimum-of-3. This halves the
-                // lower margin from median-of-3. Change the adaption to avoid
-                // a tiny lower margin (and possibility of k falling in a very large partition).
-                // Note: The only way we can ensure that k is inside the lower margin is by using
-                // (r-l) as the sample k. Compromise by using the midpoint for a 50% chance that
-                // k is inside the lower margin.
-                samplingEdgeAdapt = MapDistance.MEDIAN;
-            }
-            noSamplingAdapt = MapDistance.ADAPT;
-            // Force edge margin to contain the target index
-            noSamplingEdgeAdapt = MapDistance.EDGE_ADAPT;
-        }
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1737,11 +1795,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setLinearSortSelectSize(int v) {
-        if (v < 1) {
-            throw new IllegalArgumentException("Bad linear sortselect size: " + v);
-        }
-        this.linearSortSelectSize = v;
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1751,8 +1805,7 @@ final class Partition {
      * @return {@code this} for chaining
      */
     Partition setAdaptMode(AdaptMode v) {
-        this.adaptMode = v;
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1763,7 +1816,7 @@ final class Partition {
      * @param v Value.
      */
     void setRecursionConsumer(IntConsumer v) {
-        this.recursionConsumer = Objects.requireNonNull(v);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1772,7 +1825,7 @@ final class Partition {
      * @return the single-pivot partition function
      */
     SPEPartition getSPFunction() {
-        return spFunction;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1783,8 +1836,7 @@ final class Partition {
      * @param increment Flag increment
      */
     static void configureQaAdaptive(int mode, int increment) {
-        qaMode = mode;
-        qaIncrement = increment;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1799,11 +1851,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      */
     static void selectMin(double[] data, int left, int right) {
-        selectMinIgnoreZeros(data, left, right);
-        // Edge-case: if min was 0.0, check for a -0.0 above and swap.
-        if (data[left] == 0) {
-            minZero(data, left, right);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1818,11 +1866,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      */
     static void selectMax(double[] data, int left, int right) {
-        selectMaxIgnoreZeros(data, left, right);
-        // Edge-case: if max was -0.0, check for a 0.0 below and swap.
-        if (data[right] == 0) {
-            maxZero(data, left, right);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1840,7 +1884,7 @@ final class Partition {
         if (Double.doubleToRawLongBits(data[left]) >= 0) {
             // Check for a -0.0 above and swap.
             // We only require 1 swap as this is not a full sort of zeros.
-            for (int k = left; ++k <= right;) {
+            for (int k = left; ++k <= right; ) {
                 if (data[k] == 0 && Double.doubleToRawLongBits(data[k]) < 0) {
                     data[k] = 0.0;
                     data[left] = -0.0;
@@ -1865,7 +1909,7 @@ final class Partition {
         if (Double.doubleToRawLongBits(data[right]) < 0) {
             // Check for a 0.0 below and swap.
             // We only require 1 swap as this is not a full sort of zeros.
-            for (int k = right; --k >= left;) {
+            for (int k = right; --k >= left; ) {
                 if (data[k] == 0 && Double.doubleToRawLongBits(data[k]) >= 0) {
                     data[k] = -0.0;
                     data[right] = 0.0;
@@ -1885,16 +1929,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      */
     static void selectMinIgnoreZeros(double[] data, int left, int right) {
-        // Mitigate worst case performance on descending data by backward sweep
-        double min = data[left];
-        for (int i = right + 1; --i > left;) {
-            final double v = data[i];
-            if (v < min) {
-                data[i] = min;
-                min = v;
-            }
-        }
-        data[left] = min;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1907,25 +1942,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      */
     static void selectMin2IgnoreZeros(double[] data, int left, int right) {
-        double min1 = data[left + 1];
-        if (min1 < data[left]) {
-            min1 = data[left];
-            data[left] = data[left + 1];
-        }
-        // Mitigate worst case performance on descending data by backward sweep
-        for (int i = right + 1, end = left + 1; --i > end;) {
-            final double v = data[i];
-            if (v < min1) {
-                data[i] = min1;
-                if (v < data[left]) {
-                    min1 = data[left];
-                    data[left] = v;
-                } else {
-                    min1 = v;
-                }
-            }
-        }
-        data[left + 1] = min1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1938,16 +1955,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      */
     static void selectMaxIgnoreZeros(double[] data, int left, int right) {
-        // Mitigate worst case performance on descending data by backward sweep
-        double max = data[right];
-        for (int i = left - 1; ++i < right;) {
-            final double v = data[i];
-            if (v > max) {
-                data[i] = max;
-                max = v;
-            }
-        }
-        data[right] = max;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1960,25 +1968,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      */
     static void selectMax2IgnoreZeros(double[] data, int left, int right) {
-        double max1 = data[right - 1];
-        if (max1 > data[right]) {
-            max1 = data[right];
-            data[right] = data[right - 1];
-        }
-        // Mitigate worst case performance on descending data by backward sweep
-        for (int i = left - 1, end = right - 1; ++i < end;) {
-            final double v = data[i];
-            if (v > max1) {
-                data[i] = max1;
-                if (v > data[right]) {
-                    max1 = data[right];
-                    data[right] = v;
-                } else {
-                    max1 = v;
-                }
-            }
-        }
-        data[right - 1] = max1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1989,8 +1979,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      */
     static void heapSort(double[] a, int left, int right) {
-        // We could make a choice here between select left or right
-        heapSelectLeft(a, left, right, right, right - left);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2011,36 +2000,7 @@ final class Partition {
      * @see #heapSelectRange(double[], int, int, int, int)
      */
     static void heapSelectPair(double[] a, int left, int right, int ka, int kb) {
-        // Avoid the overhead of heap select on tiny data (supports right <= left).
-        if (right - left < MIN_HEAPSELECT_SIZE) {
-            Sorting.sort(a, left, right);
-            return;
-        }
-        // Call the appropriate heap partition function based on
-        // building a heap up to 50% of the length
-        // |l|-----|ka|--------|kb|------|r|
-        //  ---d1----
-        //                      -----d3----
-        //  ---------d2----------
-        //          ----------d4-----------
-        final int d1 = ka - left;
-        final int d2 = kb - left;
-        final int d3 = right - kb;
-        final int d4 = right - ka;
-        if (d1 + d3 < Math.min(d2, d4)) {
-            // Partition both ends.
-            // Note: Not possible if ka == kb.
-            // s1 + s3 == r - l and >= than the smallest
-            // distance to one of the ends
-            heapSelectLeft(a, left, right, ka, 0);
-            // Repeat for the other side above ka
-            heapSelectRight(a, ka + 1, right, kb, 0);
-        } else if (d2 < d4) {
-            heapSelectLeft(a, left, right, kb, kb - ka);
-        } else {
-            // s4
-            heapSelectRight(a, left, right, ka, kb - ka);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2055,25 +2015,7 @@ final class Partition {
      * @see #heapSelectPair(double[], int, int, int, int)
      */
     static void heapSelectRange(double[] a, int left, int right, int ka, int kb) {
-        // Combine the test for right <= left with
-        // avoiding the overhead of heap select on tiny data.
-        if (right - left < MIN_HEAPSELECT_SIZE) {
-            Sorting.sort(a, left, right);
-            return;
-        }
-        // Call the appropriate heap partition function based on
-        // building a heap up to 50% of the length
-        // |l|-----|ka|--------|kb|------|r|
-        // |---------d1-----------|
-        //         |----------d2-----------|
-        // Note: Optimisation for small heap size (n=1,2) is negligible.
-        // The main overhead is the test for insertion against the current top of the heap
-        // which grows increasingly unlikely as the range is scanned.
-        if (kb - left < right - ka) {
-            heapSelectLeft(a, left, right, kb, kb - ka);
-        } else {
-            heapSelectRight(a, left, right, ka, kb - ka);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2095,49 +2037,7 @@ final class Partition {
      * @param count Size of range to sort below k.
      */
     static void heapSelectLeft(double[] a, int left, int right, int k, int count) {
-        // Create a max heap in-place in [left, k], rooted at a[left] = max
-        // |l|-max-heap-|k|--------------|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = k - left
-        int end = k + 1;
-        for (int p = left + ((k - left - 1) >> 1); p >= left; p--) {
-            maxHeapSiftDown(a, a[p], p, left, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double max = a[left];
-        for (int i = right + 1; --i > k;) {
-            final double v = a[i];
-            if (v < max) {
-                a[i] = max;
-                maxHeapSiftDown(a, v, left, left, end);
-                max = a[left];
-            }
-        }
-
-        // To partition elements k (and below) move the top of the heap to the position
-        // immediately after the end of the reduced size heap; the previous end
-        // of the heap [k] is placed at the top
-        // |l|-max-heap-|k|--------------|
-        //  |  <-swap->  |
-        // The heap can be restored by sifting down the new top.
-
-        // Always require the top 1
-        a[left] = a[k];
-        a[k] = max;
-
-        if (count > 0) {
-            --end;
-            // Sifting limited to heap size of 2 (i.e. don't sift heap n==1)
-            for (int c = Math.min(count, end - left - 1); --c >= 0;) {
-                maxHeapSiftDown(a, a[left], left, left, end--);
-                // Move top of heap to the sorted end
-                max = a[left];
-                a[left] = a[end];
-                a[end] = max;
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2195,49 +2095,7 @@ final class Partition {
      * @param count Size of range to sort below k.
      */
     static void heapSelectRight(double[] a, int left, int right, int k, int count) {
-        // Create a min heap in-place in [k, right], rooted at a[right] = min
-        // |--------------|k|-min-heap-|r|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = right - k
-        int end = k - 1;
-        for (int p = right - ((right - k - 1) >> 1); p <= right; p++) {
-            minHeapSiftDown(a, a[p], p, right, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double min = a[right];
-        for (int i = left - 1; ++i < k;) {
-            final double v = a[i];
-            if (v > min) {
-                a[i] = min;
-                minHeapSiftDown(a, v, right, right, end);
-                min = a[right];
-            }
-        }
-
-        // To partition elements k (and above) move the top of the heap to the position
-        // immediately before the end of the reduced size heap; the previous end
-        // of the heap [k] is placed at the top.
-        // |--------------|k|-min-heap-|r|
-        //                 |  <-swap->  |
-        // The heap can be restored by sifting down the new top.
-
-        // Always require the top 1
-        a[right] = a[k];
-        a[k] = min;
-
-        if (count > 0) {
-            ++end;
-            // Sifting limited to heap size of 2 (i.e. don't sift heap n==1)
-            for (int c = Math.min(count, right - end - 1); --c >= 0;) {
-                minHeapSiftDown(a, a[right], right, right, end++);
-                // Move top of heap to the sorted end
-                min = a[right];
-                a[right] = a[end];
-                a[end] = min;
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2291,18 +2149,7 @@ final class Partition {
      * @see #heapSelectPair(double[], int, int, int, int)
      */
     static void heapSelectRange2(double[] a, int left, int right, int ka, int kb) {
-        // Combine the test for right <= left with
-        // avoiding the overhead of heap select on tiny data.
-        if (right - left < MIN_HEAPSELECT_SIZE) {
-            Sorting.sort(a, left, right);
-            return;
-        }
-        // Use the smallest heap
-        if (kb - left < right - ka) {
-            heapSelectLeft2(a, left, right, ka, kb);
-        } else {
-            heapSelectRight2(a, left, right, ka, kb);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2322,36 +2169,7 @@ final class Partition {
      * @param kb Upper index to select.
      */
     static void heapSelectLeft2(double[] a, int left, int right, int ka, int kb) {
-        // Create a max heap in-place in [left, k], rooted at a[left] = max
-        // |l|-max-heap-|k|--------------|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = k - left
-        int end = kb + 1;
-        for (int p = left + ((kb - left - 1) >> 1); p >= left; p--) {
-            maxHeapSiftDown(a, a[p], p, left, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double max = a[left];
-        for (int i = right + 1; --i > kb;) {
-            final double v = a[i];
-            if (v < max) {
-                a[i] = max;
-                maxHeapSiftDown(a, v, left, left, end);
-                max = a[left];
-            }
-        }
-        // Partition [ka, kb]
-        // |l|-max-heap-|k|--------------|
-        //  |  <-swap->  |   then sift down reduced size heap
-        // Avoid sifting heap of size 1
-        final int last = Math.max(left, ka - 1);
-        while (--end > last) {
-            maxHeapSiftDown(a, a[end], left, left, end);
-            a[end] = max;
-            max = a[left];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2371,36 +2189,7 @@ final class Partition {
      * @param kb Upper index to select.
      */
     static void heapSelectRight2(double[] a, int left, int right, int ka, int kb) {
-        // Create a min heap in-place in [k, right], rooted at a[right] = min
-        // |--------------|k|-min-heap-|r|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = right - k
-        int end = ka - 1;
-        for (int p = right - ((right - ka - 1) >> 1); p <= right; p++) {
-            minHeapSiftDown(a, a[p], p, right, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double min = a[right];
-        for (int i = left - 1; ++i < ka;) {
-            final double v = a[i];
-            if (v > min) {
-                a[i] = min;
-                minHeapSiftDown(a, v, right, right, end);
-                min = a[right];
-            }
-        }
-        // Partition [ka, kb]
-        // |--------------|k|-min-heap-|r|
-        //                 |  <-swap->  |   then sift down reduced size heap
-        // Avoid sifting heap of size 1
-        final int last = Math.min(right, kb + 1);
-        while (++end < last) {
-            minHeapSiftDown(a, a[end], right, right, end);
-            a[end] = min;
-            min = a[right];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2414,18 +2203,7 @@ final class Partition {
      * @param kb Upper index to select.
      */
     static void sortSelectRange(double[] a, int left, int right, int ka, int kb) {
-        // Combine the test for right <= left with
-        // avoiding the overhead of sort select on tiny data.
-        if (right - left <= MIN_SORTSELECT_SIZE) {
-            Sorting.sort(a, left, right);
-            return;
-        }
-        // Sort the smallest side
-        if (kb - left < right - ka) {
-            sortSelectLeft(a, left, right, kb);
-        } else {
-            sortSelectRight(a, left, right, ka);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2445,33 +2223,7 @@ final class Partition {
      * @param k Index to select.
      */
     static void sortSelectLeft(double[] a, int left, int right, int k) {
-        // Sort
-        for (int i = left; ++i <= k;) {
-            final double v = a[i];
-            // Move preceding higher elements above (if required)
-            if (v < a[i - 1]) {
-                int j = i;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double m = a[k];
-        for (int i = right + 1; --i > k;) {
-            final double v = a[i];
-            if (v < m) {
-                a[i] = m;
-                int j = k;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2491,33 +2243,7 @@ final class Partition {
      * @param k Index to select.
      */
     static void sortSelectRight(double[] a, int left, int right, int k) {
-        // Sort
-        for (int i = right; --i >= k;) {
-            final double v = a[i];
-            // Move succeeding lower elements below (if required)
-            if (v > a[i + 1]) {
-                int j = i;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double m = a[k];
-        for (int i = left - 1; ++i < k;) {
-            final double v = a[i];
-            if (v > m) {
-                a[i] = m;
-                int j = k;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2535,18 +2261,7 @@ final class Partition {
      * @param kb Upper index to select.
      */
     static void sortSelectRange2(double[] a, int left, int right, int ka, int kb) {
-        // Combine the test for right <= left with
-        // avoiding the overhead of sort select on tiny data.
-        if (right - left <= MIN_SORTSELECT_SIZE) {
-            Sorting.sort(a, left, right);
-            return;
-        }
-        // Sort the smallest side
-        if (kb - left < right - ka) {
-            sortSelectLeft2(a, left, right, kb);
-        } else {
-            sortSelectRight2(a, left, right, ka);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2569,49 +2284,7 @@ final class Partition {
      * @param k Index to select.
      */
     static void sortSelectLeft2(double[] a, int left, int right, int k) {
-        // Sort
-        for (int i = left; ++i <= k;) {
-            final double v = a[i];
-            // Move preceding higher elements above (if required)
-            if (v < a[i - 1]) {
-                int j = i;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double m = a[k];
-        // Pointer to a position in the sorted array
-        final int p = (left + k) >>> 1;
-        for (int i = right + 1; --i > k;) {
-            final double v = a[i];
-            if (v < m) {
-                a[i] = m;
-                int j = k;
-                if (v < a[p]) {
-                    // Skip ahead
-                    //System.arraycopy(a, p, a, p + 1, k - p);
-                    while (j > p) {
-                        // left index is evaluated before right decrement
-                        a[j] = a[--j];
-                    }
-                    // j == p
-                    while (--j >= left && v < a[j]) {
-                        a[j + 1] = a[j];
-                    }
-                } else {
-                    // No bounds check on left: a[p] <= v < a[k]
-                    while (v < a[--j]) {
-                        a[j + 1] = a[j];
-                    }
-                }
-                a[j + 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2634,49 +2307,7 @@ final class Partition {
      * @param k Index to select.
      */
     static void sortSelectRight2(double[] a, int left, int right, int k) {
-        // Sort
-        for (int i = right; --i >= k;) {
-            final double v = a[i];
-            // Move succeeding lower elements below (if required)
-            if (v > a[i + 1]) {
-                int j = i;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double m = a[k];
-        // Pointer to a position in the sorted array
-        final int p = (right + k) >>> 1;
-        for (int i = left - 1; ++i < k;) {
-            final double v = a[i];
-            if (v > m) {
-                a[i] = m;
-                int j = k;
-                if (v > a[p]) {
-                    // Skip ahead
-                    //System.arraycopy(a, p, a, p - 1, p - k);
-                    while (j < p) {
-                        // left index is evaluated before right increment
-                        a[j] = a[++j];
-                    }
-                    // j == p
-                    while (++j <= right && v > a[j]) {
-                        a[j - 1] = a[j];
-                    }
-                } else {
-                    // No bounds check on right: a[k] < v <= a[p]
-                    while (v > a[++j]) {
-                        a[j - 1] = a[j];
-                    }
-                }
-                a[j - 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2773,13 +2404,11 @@ final class Partition {
             } else if (keyStrategy == KeyStrategy.PIVOT_CACHE) {
                 // Non-sequential processing using a pivot cache to optimise storage
                 final PivotCache pivots = createPivotCacheForIndices(k, n);
-
                 // Handle single-point or tiny range
                 if ((pivots.right() - pivots.left()) <= (minQuickSelectSize >>> 1)) {
                     part.partition(data, 0, right, pivots.left(), pivots.right(), false, false);
                     return;
                 }
-
                 // Bracket the range so the rest is internal.
                 // Note: Partition function handles min/max searching if ka/kb are
                 // at the end of the range.
@@ -2879,35 +2508,7 @@ final class Partition {
      */
     // package-private for testing
     ScanningPivotCache keyAnalysis(int size, int[] k, int n, int minSeparation) {
-        // Tiny data, signal to sort it
-        if (size < minQuickSelectSize) {
-            k[0] = Integer.MIN_VALUE;
-            return null;
-        }
-        // Sort the keys
-        final IndexSet indices = Sorting.sortUnique(Math.max(6, minQuickSelectSize), k, n);
-        // Find the max index
-        int right = k[n - 1];
-        if (right < 0) {
-            right = ~right;
-        }
-        // Join up close keys using the min separation distance.
-        final int left = compressRange(k, n, minSeparation);
-        if (left < 0) {
-            // Nothing to partition after the first target.
-            // Recommend full sort if the range is effectively complete.
-            // A range requires n > 1 and positive indices.
-            if (n != 1 && k[0] >= 0 && size - (k[1] - k[0]) < minQuickSelectSize) {
-                k[0] = Integer.MIN_VALUE;
-            }
-            return null;
-        }
-        // Return an optimal PivotCache to process keys in sorted order
-        if (indices != null) {
-            // Reuse storage from sorting large number of indices
-            return indices.asScanningPivotCache(left, right);
-        }
-        return IndexSet.createScanningPivotCache(left, right);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2933,7 +2534,7 @@ final class Partition {
         int j = 0;
         int p2 = k[0];
         int secondTarget = -1;
-        for (int i = 0; ++i < n;) {
+        for (int i = 0; ++i < n; ) {
             if (k[i] < 0) {
                 // Start of duplicate indices
                 break;
@@ -2991,8 +2592,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      * @param pivots Cache of pivots (created by key analysis).
      */
-    private static void partitionSequential(PartitionFunction part, double[] data, int[] k, int n,
-        int right, ScanningPivotCache pivots) {
+    private static void partitionSequential(PartitionFunction part, double[] data, int[] k, int n, int right, ScanningPivotCache pivots) {
         // Sequential processing of [s, s] single points / [s, e] pairs (regions).
         // Single-points are identified as negative indices.
         // The partition algorithm must run so each [s, e] is sorted:
@@ -3007,16 +2607,13 @@ final class Partition {
         } else {
             e = k[i++];
         }
-
         // Key analysis has configured the pivot cache correctly for the first region.
         // If there is no cache, there is only 1 region.
         if (pivots == null) {
             part.partition(data, 0, right, s, e, false, false);
             return;
         }
-
         part.partitionSequential(data, 0, right, s, e, false, false, pivots);
-
         // Process remaining regions
         while (i < n) {
             s = k[i++];
@@ -3038,7 +2635,6 @@ final class Partition {
             // Right (exclusive) may not have been searched yet so we check right bounds.
             final int l = pivots.previousPivot(s);
             final int r = pivots.nextPivotOrElse(e, right + 1);
-
             // Create regions:
             // Partition: l------s--p1
             // Sort:                p1-----p2
@@ -3066,7 +2662,6 @@ final class Partition {
                     }
                 }
             }
-
             // Pivots are only required for the next downstream region
             int sn = right + 1;
             if (i < n) {
@@ -3078,11 +2673,9 @@ final class Partition {
             // Current implementations will signal if this is outside the support.
             // Occurs on the last region the cache was created to support (i.e. sn > right).
             final boolean unsupportedCacheRange = !pivots.moveLeft(sn);
-
             // Note: The partition function uses inclusive left and right bounds
             // so use +/- 1 from pivot values. If r is not a pivot it is right + 1
             // which is a valid exclusive upper bound.
-
             if (p1 > s) {
                 // At least 1 internal pivot:
                 // l <= s < p1 and p2 < e <= r
@@ -3113,9 +2706,7 @@ final class Partition {
      * @param data Values.
      */
     void sortSBM(double[] data) {
-        // Handle NaN
-        final int right = sortNaN(data);
-        sort((SPEPartitionFunction) this::partitionSBMWithZeros, data, right);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3142,8 +2733,7 @@ final class Partition {
      * @param data Values.
      */
     void sortISP(double[] data) {
-        // NaN processing is done in the introsort method
-        introsort(getSPFunction(), data);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3186,7 +2776,7 @@ final class Partition {
         // can remain within this function call.
         final int l = left;
         int r = right;
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         while (true) {
             // Full sort of small data
             if (r - l < minQuickSelectSize) {
@@ -3198,13 +2788,9 @@ final class Partition {
                 heapSort(a, l, r);
                 return;
             }
-
             // Pick a pivot and partition
-            final int p0 = part.partition(a, l, r,
-                pivotingStrategy.pivotIndex(a, l, r, l),
-                upper);
+            final int p0 = part.partition(a, l, r, pivotingStrategy.pivotIndex(a, l, r, l), upper);
             final int p1 = upper[0];
-
             // Recurse right side
             introsort(part, a, p1 + 1, r, --maxDepth);
             // Continue on the left side
@@ -3221,8 +2807,7 @@ final class Partition {
      * @param data Values.
      */
     void sortIDP(double[] data) {
-        // NaN processing is done in the introsort method
-        introsort((DPPartition) Partition::partitionDP, data);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3265,7 +2850,7 @@ final class Partition {
         // can remain within this function call.
         final int l = left;
         int r = right;
-        final int[] upper = {0, 0, 0};
+        final int[] upper = { 0, 0, 0 };
         while (true) {
             // Full sort of small data
             if (r - l < minQuickSelectSize) {
@@ -3277,14 +2862,12 @@ final class Partition {
                 heapSort(a, l, r);
                 return;
             }
-
             // Pick 2 pivots and partition
             int p0 = dualPivotingStrategy.pivotIndex(a, l, r, upper);
             p0 = part.partition(a, l, r, p0, upper[0], upper);
             final int p1 = upper[0];
             final int p2 = upper[1];
             final int p3 = upper[2];
-
             // Recurse middle and right sides
             --maxDepth;
             introsort(part, a, p3 + 1, r, maxDepth);
@@ -3326,7 +2909,7 @@ final class Partition {
         if (end > 1) {
             // Filter indices invalidated by NaN check
             if (end < a.length) {
-                for (int i = n; --i >= 0;) {
+                for (int i = n; --i >= 0; ) {
                     final int v = k[i];
                     if (v >= end) {
                         // swap(k, i, --n)
@@ -3439,15 +3022,12 @@ final class Partition {
             }
             return;
         }
-
         // Note: Sorting to unique keys is an overhead. This can be eliminated
         // by requesting the caller passes sorted keys.
-
         // Note: Attempts to perform key analysis here to detect a full sort
         // add an overhead for sparse keys and do not increase performance
         // for saturated keys unless data is structured with ascending/descending
         // runs so that it is fast with JDK's merge sort algorithm in Arrays.sort.
-
         if (keyStrategy == KeyStrategy.ORDERED_KEYS) {
             final int unique = Sorting.sortIndices(k, n);
             introselect(part, a, 0, right, k, 0, unique - 1, maxDepth);
@@ -3515,11 +3095,10 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      * @return the index {@code p}
      */
-    private int introselect(SPEPartition part, double[] a, int left, int right,
-        int k, int maxDepth) {
+    private int introselect(SPEPartition part, double[] a, int left, int right, int k, int maxDepth) {
         int l = left;
         int r = right;
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         while (true) {
             // It is possible to use edgeselect when k is close to the end
             // |l|-----|k|---------|k|--------|r|
@@ -3532,7 +3111,6 @@ final class Partition {
                 // Last known unsorted value >= k
                 return r;
             }
-
             if (maxDepth == 0) {
                 // Too much recursion
                 // Note: For testing the Floyd-Rivest algorithm we trigger the recursion
@@ -3542,7 +3120,6 @@ final class Partition {
                 // Last known unsorted value >= k
                 return r;
             }
-
             // Pick a pivot and partition
             int pivot;
             // length - 1
@@ -3563,7 +3140,7 @@ final class Partition {
                     final IntUnaryOperator rng = createRNG(n, k);
                     // Shuffle [ll, k) from [l, k)
                     if (ll > l) {
-                        for (int i = k; i > ll;) {
+                        for (int i = k; i > ll; ) {
                             // l + rand [0, i - l + 1) : i is currently i+1
                             final int j = l + rng.applyAsInt(i - l);
                             final double t = a[--i];
@@ -3573,7 +3150,7 @@ final class Partition {
                     }
                     // Shuffle (k, rr] from (k, r]
                     if (rr < r) {
-                        for (int i = k; i < rr;) {
+                        for (int i = k; i < rr; ) {
                             // r - rand [0, r - i + 1) : i is currently i-1
                             final int j = r - rng.applyAsInt(r - i);
                             final double t = a[++i];
@@ -3588,10 +3165,8 @@ final class Partition {
                 // default pivot strategy
                 pivot = pivotingStrategy.pivotIndex(a, l, r, k);
             }
-
             final int p0 = part.partition(a, l, r, pivot, upper);
             final int p1 = upper[0];
-
             maxDepth--;
             if (k < p0) {
                 // The element is in the left partition
@@ -3653,7 +3228,7 @@ final class Partition {
     private int introselect2(SPEPartition part, double[] a, int left, int right, int k) {
         int l = left;
         int r = right;
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         int counter = (int) recursionMultiple;
         int threshold = (right - left) >>> recursionConstant;
         int depth = singlePivotMaxDepth(right - left);
@@ -3669,7 +3244,6 @@ final class Partition {
                 // Last known unsorted value >= k
                 return r;
             }
-
             // length - 1
             int n = r - l;
             depth--;
@@ -3679,7 +3253,6 @@ final class Partition {
                     // Here riselect (Valois (2000)) would use random points to choose the pivot
                     // to inject entropy and restart. This continues until the sum of the partition
                     // lengths is too high (twice the original length). Here we just switch.
-
                     // Note: For testing we trigger the recursion consumer
                     recursionConsumer.accept(depth);
                     stopperSelection.partition(a, l, r, k, k);
@@ -3693,7 +3266,6 @@ final class Partition {
                 }
                 threshold >>>= 1;
             }
-
             // Pick a pivot and partition
             int pivot;
             if (n > subSamplingSize) {
@@ -3712,7 +3284,7 @@ final class Partition {
                     final IntUnaryOperator rng = createRNG(n, k);
                     // Shuffle [ll, k) from [l, k)
                     if (ll > l) {
-                        for (int i = k; i > ll;) {
+                        for (int i = k; i > ll; ) {
                             // l + rand [0, i - l + 1) : i is currently i+1
                             final int j = l + rng.applyAsInt(i - l);
                             final double t = a[--i];
@@ -3722,7 +3294,7 @@ final class Partition {
                     }
                     // Shuffle (k, rr] from (k, r]
                     if (rr < r) {
-                        for (int i = k; i < rr;) {
+                        for (int i = k; i < rr; ) {
                             // r - rand [0, r - i + 1) : i is currently i-1
                             final int j = r - rng.applyAsInt(r - i);
                             final double t = a[++i];
@@ -3738,10 +3310,8 @@ final class Partition {
                 // default pivot strategy
                 pivot = pivotingStrategy.pivotIndex(a, l, r, k);
             }
-
             final int p0 = part.partition(a, l, r, pivot, upper);
             final int p1 = upper[0];
-
             if (k < p0) {
                 // The element is in the left partition
                 r = p0 - 1;
@@ -3788,7 +3358,7 @@ final class Partition {
     private int introselect(SPEPartition part, double[] a, int left, int right, int k) {
         int l = left;
         int r = right;
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         // Set the limit on the sum of the length. Since the length is subtracted at the start
         // of the loop use (1 + recursionMultiple).
         long limit = (long) ((1 + recursionMultiple) * (right - left));
@@ -3805,12 +3375,10 @@ final class Partition {
                 // Last known unsorted value >= k
                 return r;
             }
-
             // length - 1
             int n = r - l;
             limit -= n;
             depth--;
-
             if (limit < 0) {
                 // Excess total partition length
                 // Note: For testing we trigger the recursion consumer
@@ -3819,7 +3387,6 @@ final class Partition {
                 // Last known unsorted value >= k
                 return r;
             }
-
             // Pick a pivot and partition
             int pivot;
             if (n > subSamplingSize) {
@@ -3838,7 +3405,7 @@ final class Partition {
                     final IntUnaryOperator rng = createRNG(n, k);
                     // Shuffle [ll, k) from [l, k)
                     if (ll > l) {
-                        for (int i = k; i > ll;) {
+                        for (int i = k; i > ll; ) {
                             // l + rand [0, i - l + 1) : i is currently i+1
                             final int j = l + rng.applyAsInt(i - l);
                             final double t = a[--i];
@@ -3848,7 +3415,7 @@ final class Partition {
                     }
                     // Shuffle (k, rr] from (k, r]
                     if (rr < r) {
-                        for (int i = k; i < rr;) {
+                        for (int i = k; i < rr; ) {
                             // r - rand [0, r - i + 1) : i is currently i-1
                             final int j = r - rng.applyAsInt(r - i);
                             final double t = a[++i];
@@ -3864,10 +3431,8 @@ final class Partition {
                 // default pivot strategy
                 pivot = pivotingStrategy.pivotIndex(a, l, r, k);
             }
-
             final int p0 = part.partition(a, l, r, pivot, upper);
             final int p1 = upper[0];
-
             if (k < p0) {
                 // The element is in the left partition
                 r = p0 - 1;
@@ -3908,25 +3473,22 @@ final class Partition {
      * @param kb Index.
      * @param maxDepth Maximum depth for recursion.
      */
-    private void introselect(SPEPartition part, double[] a, int left, int right,
-        int ka, int kb, int maxDepth) {
+    private void introselect(SPEPartition part, double[] a, int left, int right, int ka, int kb, int maxDepth) {
         // Only one side requires recursion. The other side
         // can remain within this function call.
         int l = left;
         int r = right;
         int ka1 = ka;
         int kb1 = kb;
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         while (true) {
             // length - 1
             final int n = r - l;
-
             if (n < minQuickSelectSize) {
                 // Sort selection on small data
                 sortSelectRange(a, l, r, ka1, kb1);
                 return;
             }
-
             // It is possible to use heapselect when ka1 and kb1 are close to the ends
             // |l|-----|ka1|--------|kb1|------|r|
             //  ---d1----
@@ -3937,20 +3499,15 @@ final class Partition {
             final int d2 = kb1 - l;
             final int d3 = r - kb1;
             final int d4 = r - ka1;
-            if (maxDepth == 0 ||
-                Math.min(d1 + d3, Math.min(d2, d4)) < edgeSelectConstant) {
+            if (maxDepth == 0 || Math.min(d1 + d3, Math.min(d2, d4)) < edgeSelectConstant) {
                 // Too much recursion, or ka1 and kb1 are both close to the ends
                 // Note: Does not use the edgeSelection function as the indices are not a range
                 heapSelectPair(a, l, r, ka1, kb1);
                 return;
             }
-
             // Pick a pivot and partition
-            final int p0 = part.partition(a, l, r,
-                pivotingStrategy.pivotIndex(a, l, r, ka),
-                upper);
+            final int p0 = part.partition(a, l, r, pivotingStrategy.pivotIndex(a, l, r, ka), upper);
             final int p1 = upper[0];
-
             // Recursion to max depth
             // Note: Here we possibly branch left and right with multiple keys.
             // It is possible that the partition has split the pair
@@ -4023,7 +3580,7 @@ final class Partition {
     private void introselect2(SPEPartition part, double[] a, int left, int right, int ka, int kb) {
         int l = left;
         int r = right;
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         int counter = (int) recursionMultiple;
         int threshold = (right - left) >>> recursionConstant;
         while (true) {
@@ -4033,7 +3590,6 @@ final class Partition {
                 edgeSelection.partition(a, l, r, ka, kb);
                 return;
             }
-
             // length - 1
             int n = r - l;
             if (--counter < 0) {
@@ -4042,7 +3598,6 @@ final class Partition {
                     // Here riselect (Valois (2000)) would use random points to choose the pivot
                     // to inject entropy and restart. This continues until the sum of the partition
                     // lengths is too high (twice the original length). Here we just switch.
-
                     // Note: For testing we trigger the recursion consumer with the remaining length
                     recursionConsumer.accept(r - l);
                     stopperSelection.partition(a, l, r, ka, kb);
@@ -4055,7 +3610,6 @@ final class Partition {
                 }
                 threshold >>>= 1;
             }
-
             // Pick a pivot and partition
             int pivot;
             if (n > subSamplingSize) {
@@ -4074,7 +3628,7 @@ final class Partition {
                     final IntUnaryOperator rng = createRNG(n, ka);
                     // Shuffle [ll, k) from [l, k)
                     if (ll > l) {
-                        for (int i = ka; i > ll;) {
+                        for (int i = ka; i > ll; ) {
                             // l + rand [0, i - l + 1) : i is currently i+1
                             final int j = l + rng.applyAsInt(i - l);
                             final double t = a[--i];
@@ -4084,7 +3638,7 @@ final class Partition {
                     }
                     // Shuffle (k, rr] from (k, r]
                     if (rr < r) {
-                        for (int i = ka; i < rr;) {
+                        for (int i = ka; i < rr; ) {
                             // r - rand [0, r - i + 1) : i is currently i-1
                             final int j = r - rng.applyAsInt(r - i);
                             final double t = a[++i];
@@ -4100,10 +3654,8 @@ final class Partition {
                 // default pivot strategy
                 pivot = pivotingStrategy.pivotIndex(a, l, r, ka);
             }
-
             final int p0 = part.partition(a, l, r, pivot, upper);
             final int p1 = upper[0];
-
             // Note: Here we expect [ka, kb] to be small and splitting is unlikely.
             //                   p0 p1
             // |l|--|ka|kkkk|kb|--|P|-------------------|r|
@@ -4161,15 +3713,14 @@ final class Partition {
      * @param ib Index of last key.
      * @param maxDepth Maximum depth for recursion.
      */
-    private void introselect(SPEPartition part, double[] a, int left, int right,
-        int[] k, int ia, int ib, int maxDepth) {
+    private void introselect(SPEPartition part, double[] a, int left, int right, int[] k, int ia, int ib, int maxDepth) {
         // Only one side requires recursion. The other side
         // can remain within this function call.
         int l = left;
         int r = right;
         int ia1 = ia;
         int ib1 = ib;
-        final int[] upper = {0};
+        final int[] upper = { 0 };
         while (true) {
             // Switch to paired key implementation if possible.
             // Note: adjacent indices can refer to well separated keys.
@@ -4180,18 +3731,15 @@ final class Partition {
                 introselect(part, a, l, r, k[ia1], k[ib1], maxDepth);
                 return;
             }
-
             // length - 1
             final int n = r - l;
             int ka = k[ia1];
             final int kb = k[ib1];
-
             if (n < minQuickSelectSize) {
                 // Sort selection on small data
                 sortSelectRange(a, l, r, ka, kb);
                 return;
             }
-
             // It is possible to use heapselect when ka and kb are close to the same end
             // |l|-----|ka|--------|kb|------|r|
             //  ---------s2----------
@@ -4200,19 +3748,14 @@ final class Partition {
                 edgeSelection.partition(a, l, r, ka, kb);
                 return;
             }
-
             if (maxDepth == 0) {
                 // Too much recursion
                 heapSelectRange(a, l, r, ka, kb);
                 return;
             }
-
             // Pick a pivot and partition
-            final int p0 = part.partition(a, l, r,
-                pivotingStrategy.pivotIndex(a, l, r, ka),
-                upper);
+            final int p0 = part.partition(a, l, r, pivotingStrategy.pivotIndex(a, l, r, ka), upper);
             final int p1 = upper[0];
-
             // Recursion to max depth
             // Note: Here we possibly branch left and right with multiple keys.
             // It is possible that the partition has split the keys
@@ -4282,124 +3825,8 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      */
     // package-private for benchmarking
-    void introselect(SPEPartition part, double[] a, int left, int right,
-        SearchableInterval k, int ka, int kb, int maxDepth) {
-        // Only one side requires recursion. The other side
-        // can remain within this function call.
-        int l = left;
-        int r = right;
-        int ka1 = ka;
-        int kb1 = kb;
-        final int[] upper = {0};
-        while (true) {
-            // length - 1
-            int n = r - l;
-
-            if (n < minQuickSelectSize) {
-                // Sort selection on small data
-                sortSelectRange(a, l, r, ka1, kb1);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // It is possible to use heapselect when kaa and kb1 are close to the same end
-            // |l|-----|ka1|--------|kb1|------|r|
-            //  ---------s2----------
-            //          ----------s4-----------
-            if (Math.min(kb1 - l, r - ka1) < edgeSelectConstant) {
-                edgeSelection.partition(a, l, r, ka1, kb1);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            if (maxDepth == 0) {
-                // Too much recursion
-                heapSelectRange(a, l, r, ka1, kb1);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // Pick a pivot and partition
-            int pivot;
-            if (n > subSamplingSize) {
-                // Floyd-Rivest: use SELECT recursively on a sample of size S to get an estimate
-                // for the (k-l+1)-th smallest element into a[k], biased slightly so that the
-                // (k-l+1)-th element is expected to lie in the smaller set after partitioning.
-                // Note: This targets ka1 and ignores kb1 for pivot selection.
-                ++n;
-                final int ith = ka1 - l + 1;
-                final double z = Math.log(n);
-                final double s = 0.5 * Math.exp(0.6666666666666666 * z);
-                final double sd = 0.5 * Math.sqrt(z * s * (n - s) / n) * Integer.signum(ith - (n >> 1));
-                final int ll = Math.max(l, (int) (ka1 - ith * s / n + sd));
-                final int rr = Math.min(r, (int) (ka1 + (n - ith) * s / n + sd));
-                // Optional random sampling
-                if ((controlFlags & FLAG_RANDOM_SAMPLING) != 0) {
-                    final IntUnaryOperator rng = createRNG(n, ka1);
-                    // Shuffle [ll, k) from [l, k)
-                    if (ll > l) {
-                        for (int i = ka1; i > ll;) {
-                            // l + rand [0, i - l + 1) : i is currently i+1
-                            final int j = l + rng.applyAsInt(i - l);
-                            final double t = a[--i];
-                            a[i] = a[j];
-                            a[j] = t;
-                        }
-                    }
-                    // Shuffle (k, rr] from (k, r]
-                    if (rr < r) {
-                        for (int i = ka1; i < rr;) {
-                            // r - rand [0, r - i + 1) : i is currently i-1
-                            final int j = r - rng.applyAsInt(r - i);
-                            final double t = a[++i];
-                            a[i] = a[j];
-                            a[j] = t;
-                        }
-                    }
-                }
-                introselect(part, a, ll, rr, k, ka1, ka1, lnNtoMaxDepthSinglePivot(z));
-                pivot = ka1;
-            } else {
-                // default pivot strategy
-                pivot = pivotingStrategy.pivotIndex(a, l, r, ka1);
-            }
-
-            final int p0 = part.partition(a, l, r, pivot, upper);
-            final int p1 = upper[0];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set on either side.
-            //                    p0 p1
-            // |l|--|ka1|--k----k--|P|------k--|kb1|------|r|
-            //                 kb1  |      ka1
-            // Search previous/next is bounded at ka1/kb1
-            maxDepth--;
-            // Recurse left side if required
-            if (ka1 < p0) {
-                if (kb1 <= p1) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    if (r < kb1) {
-                        kb1 = k.previousIndex(r);
-                    }
-                    continue;
-                }
-                introselect(part, a, l, p0 - 1, k, ka1, k.split(p0, p1, upper), maxDepth);
-                ka1 = upper[0];
-            }
-            if (kb1 <= p1) {
-                // No right side
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-            // Continue on the right side
-            l = p1 + 1;
-            if (ka1 < l) {
-                ka1 = k.nextIndex(l);
-            }
-        }
+    void introselect(SPEPartition part, double[] a, int left, int right, SearchableInterval k, int ka, int kb, int maxDepth) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -4428,79 +3855,8 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      */
     // package-private for benchmarking
-    void introselect(SPEPartition part, double[] a, int left, int right,
-        UpdatingInterval k, int maxDepth) {
-        // Only one side requires recursion. The other side
-        // can remain within this function call.
-        int l = left;
-        int r = right;
-        int ka = k.left();
-        int kb = k.right();
-        final int[] upper = {0};
-        while (true) {
-            // length - 1
-            final int n = r - l;
-
-            if (n < minQuickSelectSize) {
-                // Sort selection on small data
-                sortSelectRange(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // It is possible to use heapselect when ka and kb are close to the same end
-            // |l|-----|ka|--------|kb|------|r|
-            //  ---------s2----------
-            //          ----------s4-----------
-            if (Math.min(kb - l, r - ka) < edgeSelectConstant) {
-                edgeSelection.partition(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            if (maxDepth == 0) {
-                // Too much recursion
-                heapSelectRange(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // Pick a pivot and partition
-            final int p0 = part.partition(a, l, r,
-                pivotingStrategy.pivotIndex(a, l, r, ka),
-                upper);
-            final int p1 = upper[0];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set on either side.
-            //                   p0 p1
-            // |l|--|ka|--k----k--|P|------k--|kb|------|r|
-            //                 kb  |       ka
-            maxDepth--;
-            // Recurse left side if required
-            if (ka < p0) {
-                if (kb <= p1) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                introselect(part, a, l, p0 - 1, k.splitLeft(p0, p1), maxDepth);
-                ka = k.left();
-            } else if (kb <= p1) {
-                // No right side
-                recursionConsumer.accept(maxDepth);
-                return;
-            } else if (ka <= p1) {
-                ka = k.updateLeft(p1 + 1);
-            }
-            // Continue on the right side
-            l = p1 + 1;
-        }
+    void introselect(SPEPartition part, double[] a, int left, int right, UpdatingInterval k, int maxDepth) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -4528,80 +3884,8 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      */
     // package-private for benchmarking
-    void introselect(SPEPartition part, double[] a, int left, int right,
-        SplittingInterval keys, int maxDepth) {
-        // Only one side requires recursion. The other side
-        // can remain within this function call.
-        int l = left;
-        int r = right;
-        SplittingInterval k = keys;
-        int ka = k.left();
-        int kb = k.right();
-        final int[] upper = {0};
-        while (true) {
-            // length - 1
-            final int n = r - l;
-
-            if (n < minQuickSelectSize) {
-                // Sort selection on small data
-                sortSelectRange(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // It is possible to use heapselect when ka and kb are close to the same end
-            // |l|-----|ka|--------|kb|------|r|
-            //  ---------s2----------
-            //          ----------s4-----------
-            if (Math.min(kb - l, r - ka) < edgeSelectConstant) {
-                edgeSelection.partition(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            if (maxDepth == 0) {
-                // Too much recursion
-                heapSelectRange(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // Pick a pivot and partition
-            final int p0 = part.partition(a, l, r,
-                pivotingStrategy.pivotIndex(a, l, r, ka),
-                upper);
-            final int p1 = upper[0];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set on either side.
-            //                   p0 p1
-            // |l|--|ka|--k----k--|P|------k--|kb|------|r|
-            //                 kb  |       ka
-            maxDepth--;
-            final SplittingInterval lk = k.split(p0, p1);
-            // Recurse left side if required
-            if (lk != null) {
-                // Avoid recursive method calls
-                if (k.empty()) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    kb = lk.right();
-                    k = lk;
-                    continue;
-                }
-                introselect(part, a, l, p0 - 1, lk, maxDepth);
-            }
-            if (k.empty()) {
-                // No right side
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-            // Continue on the right side
-            l = p1 + 1;
-            ka = k.left();
-        }
+    void introselect(SPEPartition part, double[] a, int left, int right, SplittingInterval keys, int maxDepth) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -4637,118 +3921,8 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      */
     // package-private for benchmarking
-    void introselect(SPEPartition part, double[] a, int left, int right,
-        IndexIterator k, int ka, int kb, int maxDepth) {
-        // Left side requires recursion; right side remains within this function
-        // When this function returns all indices in [left, right] must be processed.
-        int l = left;
-        int lo = ka;
-        int hi = kb;
-        final int[] upper = {0};
-        while (true) {
-            if (maxDepth == 0) {
-                // Too much recursion.
-                // Advance the iterator to the end of the current range.
-                // Note: heapSelectRange handles hi > right.
-                // Single API method: advanceBeyond(right): return hi <= right
-                while (hi < right && k.next()) {
-                    hi = k.right();
-                }
-                heapSelectRange(a, l, right, lo, hi);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // length - 1
-            final int n = right - l;
-
-            // If interval is close to one end then edgeselect.
-            // Only elect left if there are no further indices in the range.
-            // |l|-----|lo|--------|hi|------|right|
-            //  ---------d1----------
-            //          --------------d2-----------
-            if (Math.min(hi - l, right - lo) < edgeSelectConstant) {
-                if (hi - l > right - lo) {
-                    // Right end. Do not check above hi, just select to the end
-                    edgeSelection.partition(a, l, right, lo, right);
-                    recursionConsumer.accept(maxDepth);
-                    return;
-                } else if (k.nextAfter(right)) {
-                    // Left end
-                    // Only if no further indices in the range.
-                    // If false this branch will continue to be triggered until
-                    // a partition is made to separate the next indices.
-                    edgeSelection.partition(a, l, right, lo, hi);
-                    recursionConsumer.accept(maxDepth);
-                    // Advance iterator
-                    l = hi + 1;
-                    if (!k.positionAfter(hi) || Math.max(k.left(), l) > right) {
-                        // No more keys, or keys beyond the current bounds
-                        return;
-                    }
-                    lo = Math.max(k.left(), l);
-                    hi = Math.min(right, k.right());
-                    // Continue right (allows a second heap select for the right side)
-                    continue;
-                }
-            }
-
-            // If interval is close to both ends then full sort
-            // |l|-----|lo|--------|hi|------|right|
-            //  ---d1----
-            //                       ----d2--------
-            // (lo - l) + (right - hi) == (right - l) - (hi - lo)
-            if (n - (hi - lo) < minQuickSelectSize) {
-                // Handle small data. This is done as the JDK sort will
-                // use insertion sort for small data. For double data it
-                // will also pre-process the data for NaN and signed
-                // zeros which is an overhead to avoid.
-                if (n < minQuickSelectSize) {
-                    // Must not use sortSelectRange in [lo, hi] as the iterator
-                    // has not been advanced to check after hi
-                    sortSelectRight(a, l, right, lo);
-                } else {
-                    // Note: This disregards the current level of recursion
-                    // but can exploit the JDK's more advanced sort algorithm.
-                    Arrays.sort(a, l, right + 1);
-                }
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // Here: l <= lo <= hi <= right
-            // Pick a pivot and partition
-            final int p0 = part.partition(a, l, right,
-                pivotingStrategy.pivotIndex(a, l, right, ka),
-                upper);
-            final int p1 = upper[0];
-
-            maxDepth--;
-            // Recursion left
-            if (lo < p0) {
-                introselect(part, a, l, p0 - 1, k, lo, Math.min(hi, p0 - 1), maxDepth);
-                // Advance iterator
-                // Single API method: fastForwardAndLeftWithin(p1, right)
-                if (!k.positionAfter(p1) || k.left() > right) {
-                    // No more keys, or keys beyond the current bounds
-                    return;
-                }
-                lo = k.left();
-                hi = Math.min(right, k.right());
-            }
-            if (hi <= p1) {
-                // Advance iterator
-                if (!k.positionAfter(p1) || k.left() > right) {
-                    // No more keys, or keys beyond the current bounds
-                    return;
-                }
-                lo = k.left();
-                hi = Math.min(right, k.right());
-            }
-            // Continue right
-            l = p1 + 1;
-            lo = Math.max(lo, l);
-        }
+    void introselect(SPEPartition part, double[] a, int left, int right, IndexIterator k, int ka, int kb, int maxDepth) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -4774,28 +3948,7 @@ final class Partition {
      * @param count Count of indices (assumed to be strictly positive).
      */
     void introselect(DPPartition part, double[] a, int[] k, int count) {
-        // Handle NaN / signed zeros
-        final DoubleDataTransformer t = SORT_TRANSFORMER.get();
-        // Assume this is in-place
-        t.preProcess(a);
-        final int end = t.length();
-        int n = count;
-        if (end > 1) {
-            // Filter indices invalidated by NaN check
-            if (end < a.length) {
-                for (int i = n; --i >= 0;) {
-                    final int v = k[i];
-                    if (v >= end) {
-                        // swap(k, i, --n)
-                        k[i] = k[--n];
-                        k[n] = v;
-                    }
-                }
-            }
-            introselect(part, a, end - 1, k, n);
-        }
-        // Restore signed zeros
-        t.postProcess(a, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -4874,7 +4027,6 @@ final class Partition {
             }
             return;
         }
-
         // Detect possible saturated range.
         // minimum keys = 10
         // min separation = 2^3  (could use log2(minQuickSelectSize) here)
@@ -4883,10 +4035,8 @@ final class Partition {
         //    Arrays.sort(a, 0, right + 1);
         //    return;
         //}
-
         // Note: Sorting to unique keys is an overhead. This can be eliminated
         // by requesting the caller passes sorted keys (or quantiles in order).
-
         if (keyStrategy == KeyStrategy.ORDERED_KEYS) {
             // DP does not offer ORDERED_KEYS implementation but we include the branch
             // for completeness.
@@ -4955,11 +4105,10 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      * @return the index {@code p}
      */
-    private int introselect(DPPartition part, double[] a, int left, int right,
-        int k, int maxDepth) {
+    private int introselect(DPPartition part, double[] a, int left, int right, int k, int maxDepth) {
         int l = left;
         int r = right;
-        final int[] upper = {0, 0, 0};
+        final int[] upper = { 0, 0, 0 };
         while (true) {
             // It is possible to use edgeselect when k is close to the end
             // |l|-----|k|---------|k|--------|r|
@@ -4972,21 +4121,18 @@ final class Partition {
                 // Last known unsorted value >= k
                 return r;
             }
-
             if (maxDepth == 0) {
                 // Too much recursion
                 stopperSelection.partition(a, l, r, k, k);
                 // Last known unsorted value >= k
                 return r;
             }
-
             // Pick 2 pivots and partition
             int p0 = dualPivotingStrategy.pivotIndex(a, l, r, upper);
             p0 = part.partition(a, l, r, p0, upper[0], upper);
             final int p1 = upper[0];
             final int p2 = upper[1];
             final int p3 = upper[2];
-
             maxDepth--;
             if (k < p0) {
                 // The element is in the left partition
@@ -5040,25 +4186,22 @@ final class Partition {
      * @param kb Index.
      * @param maxDepth Maximum depth for recursion.
      */
-    private void introselect(DPPartition part, double[] a, int left, int right,
-        int ka, int kb, int maxDepth) {
+    private void introselect(DPPartition part, double[] a, int left, int right, int ka, int kb, int maxDepth) {
         // Only one side requires recursion. The other side
         // can remain within this function call.
         int l = left;
         int r = right;
         int ka1 = ka;
         int kb1 = kb;
-        final int[] upper = {0, 0, 0};
+        final int[] upper = { 0, 0, 0 };
         while (true) {
             // length - 1
             final int n = r - l;
-
             if (n < minQuickSelectSize) {
                 // Sort selection on small data
                 sortSelectRange(a, l, r, ka1, kb1);
                 return;
             }
-
             // It is possible to use heapselect when ka1 and kb1 are close to the ends
             // |l|-----|ka1|--------|kb1|------|r|
             //  ---s1----
@@ -5069,21 +4212,18 @@ final class Partition {
             final int s2 = kb1 - l;
             final int s3 = r - kb1;
             final int s4 = r - ka1;
-            if (maxDepth == 0 ||
-                Math.min(s1 + s3, Math.min(s2, s4)) < edgeSelectConstant) {
+            if (maxDepth == 0 || Math.min(s1 + s3, Math.min(s2, s4)) < edgeSelectConstant) {
                 // Too much recursion, or ka1 and kb1 are both close to the ends
                 // Note: Does not use the edgeSelection function as the indices are not a range
                 heapSelectPair(a, l, r, ka1, kb1);
                 return;
             }
-
             // Pick 2 pivots and partition
             int p0 = dualPivotingStrategy.pivotIndex(a, l, r, upper);
             p0 = part.partition(a, l, r, p0, upper[0], upper);
             final int p1 = upper[0];
             final int p2 = upper[1];
             final int p3 = upper[2];
-
             // Recursion to max depth
             // Note: Here we possibly branch left and right with multiple keys.
             // It is possible that the partition has split the pair
@@ -5161,114 +4301,8 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      */
     // package-private for benchmarking
-    void introselect(DPPartition part, double[] a, int left, int right,
-        SearchableInterval k, int ka, int kb, int maxDepth) {
-        // If partitioning splits the interval then recursion is used for left and/or
-        // right sides and the middle remains within this function. If partitioning does
-        // not split the interval then it remains within this function.
-        int l = left;
-        int r = right;
-        int ka1 = ka;
-        int kb1 = kb;
-        final int[] upper = {0, 0, 0};
-        while (true) {
-            // length - 1
-            final int n = r - l;
-
-            if (n < minQuickSelectSize) {
-                // Sort selection on small data
-                sortSelectRange(a, l, r, ka1, kb1);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // It is possible to use heapselect when ka1 and kb1 are close to the same end
-            // |l|-----|ka1|--------|kb1|------|r|
-            //  ---------s2-----------
-            //          ----------s4-----------
-            if (Math.min(kb1 - l, r - ka1) < edgeSelectConstant) {
-                edgeSelection.partition(a, l, r, ka1, kb1);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            if (maxDepth == 0) {
-                // Too much recursion
-                heapSelectRange(a, l, r, ka1, kb1);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // Pick 2 pivots and partition
-            int p0 = dualPivotingStrategy.pivotIndex(a, l, r, upper);
-            p0 = part.partition(a, l, r, p0, upper[0], upper);
-            final int p1 = upper[0];
-            final int p2 = upper[1];
-            final int p3 = upper[2];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left, middle and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set in each region.
-            //                    p0 p1                p2 p3
-            // |l|--|ka1|--k----k--|P|------k--|kb1|----|P|----|r|
-            //                 kb1  |      ka1
-            // Search previous/next is bounded at ka1/kb1
-            maxDepth--;
-            // Recurse left side if required
-            if (ka1 < p0) {
-                if (kb1 <= p1) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    if (r < kb1) {
-                        kb1 = k.previousIndex(r);
-                    }
-                    continue;
-                }
-                introselect(part, a, l, p0 - 1, k, ka1, k.split(p0, p1, upper), maxDepth);
-                ka1 = upper[0];
-            }
-            // Recurse right side if required
-            if (kb1 > p3) {
-                if (ka1 >= p2) {
-                    // Entirely on right-side
-                    l = p3 + 1;
-                    if (ka1 < l) {
-                        ka1 = k.nextIndex(l);
-                    }
-                    continue;
-                }
-                final int lo = k.split(p2, p3, upper);
-                introselect(part, a, p3 + 1, r, k, upper[0], kb1, maxDepth);
-                kb1 = lo;
-            }
-            // Check the interval overlaps the middle; and the middle exists.
-            //                    p0 p1                p2 p3
-            // |l|-----------------|P|------------------|P|----|r|
-            // Eliminate:     ----kb1                    ka1----
-            if (kb1 <= p1 || p2 <= ka1 || p2 - p1 <= 2) {
-                // No middle
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-            l = p1 + 1;
-            r = p2 - 1;
-            // Interval [ka1, kb1] overlaps the middle but there may be nothing in the interval.
-            // |l|-----------------|P|------------------|P|----|r|
-            // Eliminate:          ka1                  kb1
-            // Detect this if ka1 is advanced too far.
-            if (ka1 < l) {
-                ka1 = k.nextIndex(l);
-                if (ka1 > r) {
-                    // No middle
-                    recursionConsumer.accept(maxDepth);
-                    return;
-                }
-            }
-            if (r < kb1) {
-                kb1 = k.previousIndex(r);
-            }
-        }
+    void introselect(DPPartition part, double[] a, int left, int right, SearchableInterval k, int ka, int kb, int maxDepth) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -5296,101 +4330,8 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      */
     // package-private for benchmarking
-    void introselect(DPPartition part, double[] a, int left, int right,
-        UpdatingInterval k, int maxDepth) {
-        // If partitioning splits the interval then recursion is used for left and/or
-        // right sides and the middle remains within this function. If partitioning does
-        // not split the interval then it remains within this function.
-        int l = left;
-        int r = right;
-        int ka = k.left();
-        int kb = k.right();
-        final int[] upper = {0, 0, 0};
-        while (true) {
-            // length - 1
-            final int n = r - l;
-
-            if (n < minQuickSelectSize) {
-                // Sort selection on small data
-                sortSelectRange(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // It is possible to use heapselect when ka and kb are close to the same end
-            // |l|-----|ka|--------|kb|------|r|
-            //  ---------s2-----------
-            //          ----------s4-----------
-            if (Math.min(kb - l, r - ka) < edgeSelectConstant) {
-                edgeSelection.partition(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            if (maxDepth == 0) {
-                // Too much recursion
-                heapSelectRange(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // Pick 2 pivots and partition
-            int p0 = dualPivotingStrategy.pivotIndex(a, l, r, upper);
-            p0 = part.partition(a, l, r, p0, upper[0], upper);
-            final int p1 = upper[0];
-            final int p2 = upper[1];
-            final int p3 = upper[2];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left, middle and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set in each region.
-            //                   p0 p1               p2 p3
-            // |l|--|ka|--k----k--|P|------k--|kb|----|P|----|r|
-            //                 kb  |      ka
-            // Search previous/next is bounded at ka/kb
-            maxDepth--;
-            // Recurse left side if required
-            if (ka < p0) {
-                if (kb <= p1) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                introselect(part, a, l, p0 - 1, k.splitLeft(p0, p1), maxDepth);
-                ka = k.left();
-            } else if (kb <= p1) {
-                // No middle/right side
-                return;
-            } else if (ka <= p1) {
-                // Advance lower bound
-                ka = k.updateLeft(p1 + 1);
-            }
-            // Recurse middle if required
-            if (ka < p2) {
-                l = p1 + 1;
-                if (kb <= p3) {
-                    // Entirely in middle
-                    r = p2 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                introselect(part, a, l, p2 - 1, k.splitLeft(p2, p3), maxDepth);
-                ka = k.left();
-            } else if (kb <= p3) {
-                // No right side
-                return;
-            } else if (ka <= p3) {
-                ka = k.updateLeft(p3 + 1);
-            }
-            // Continue right
-            l = p3 + 1;
-        }
+    void introselect(DPPartition part, double[] a, int left, int right, UpdatingInterval k, int maxDepth) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -5418,102 +4359,8 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      */
     // package-private for benchmarking
-    void introselect(DPPartition part, double[] a, int left, int right,
-        SplittingInterval k, int maxDepth) {
-        // If partitioning splits the interval then recursion is used for left and/or
-        // right sides and the middle remains within this function. If partitioning does
-        // not split the interval then it remains within this function.
-        int l = left;
-        int r = right;
-        int ka = k.left();
-        int kb = k.right();
-        final int[] upper = {0, 0, 0};
-        while (true) {
-            // length - 1
-            final int n = r - l;
-
-            if (n < minQuickSelectSize) {
-                // Sort selection on small data
-                sortSelectRange(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // It is possible to use heapselect when ka and kb are close to the same end
-            // |l|-----|ka|--------|kb|------|r|
-            //  ---------s2-----------
-            //          ----------s4-----------
-            if (Math.min(kb - l, r - ka) < edgeSelectConstant) {
-                edgeSelection.partition(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            if (maxDepth == 0) {
-                // Too much recursion
-                heapSelectRange(a, l, r, ka, kb);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // Pick 2 pivots and partition
-            int p0 = dualPivotingStrategy.pivotIndex(a, l, r, upper);
-            p0 = part.partition(a, l, r, p0, upper[0], upper);
-            final int p1 = upper[0];
-            final int p2 = upper[1];
-            final int p3 = upper[2];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left, middle and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set in each region.
-            //                   p0 p1               p2 p3
-            // |l|--|ka|--k----k--|P|------k--|kb|----|P|----|r|
-            //                 kb  |      ka
-            // Search previous/next is bounded at ka/kb
-            maxDepth--;
-            SplittingInterval lk = k.split(p0, p1);
-            // Recurse left side if required
-            if (lk != null) {
-                // Avoid recursive method calls
-                if (k.empty()) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    kb = lk.right();
-                    k = lk;
-                    continue;
-                }
-                introselect(part, a, l, p0 - 1, lk, maxDepth);
-            }
-            if (k.empty()) {
-                // No middle/right side
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-            lk = k.split(p2, p3);
-            // Recurse middle side if required
-            if (lk != null) {
-                // Avoid recursive method calls
-                if (k.empty()) {
-                    // Entirely in middle side
-                    l = p1 + 1;
-                    r = p2 - 1;
-                    ka = lk.left();
-                    kb = lk.right();
-                    k = lk;
-                    continue;
-                }
-                introselect(part, a, p1 + 1, p2 - 1, lk, maxDepth);
-            }
-            if (k.empty()) {
-                // No right side
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-            // Continue right
-            l = p3 + 1;
-            ka = k.left();
-        }
+    void introselect(DPPartition part, double[] a, int left, int right, SplittingInterval k, int maxDepth) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -5525,7 +4372,6 @@ final class Partition {
      * <pre>{@code
      * data[i < k] <= data[k] <= data[k < i]
      * }</pre>
-     *
      *
      * <p>This function accepts an {@link IndexIterator} of indices {@code k}; for
      * convenience the lower and upper indices of the current interval are passed as the
@@ -5550,144 +4396,8 @@ final class Partition {
      * @param maxDepth Maximum depth for recursion.
      */
     // package-private for benchmarking
-    void introselect(DPPartition part, double[] a, int left, int right,
-        IndexIterator k, int ka, int kb, int maxDepth) {
-        // If partitioning splits the interval then recursion is used for left and/or
-        // right sides and the middle remains within this function. If partitioning does
-        // not split the interval then it remains within this function.
-        int l = left;
-        final int r = right;
-        int lo = ka;
-        int hi = kb;
-        final int[] upper = {0, 0, 0};
-        while (true) {
-            if (maxDepth == 0) {
-                // Too much recursion.
-                // Advance the iterator to the end of the current range.
-                // Note: heapSelectRange handles hi > right.
-                // Single API method: advanceBeyond(right): return hi <= right
-                while (hi < right && k.next()) {
-                    hi = k.right();
-                }
-                heapSelectRange(a, l, right, lo, hi);
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // length - 1
-            final int n = right - l;
-
-            // If interval is close to one end then heapselect.
-            // Only heapselect left if there are no further indices in the range.
-            // |l|-----|lo|--------|hi|------|right|
-            //  ---------d1----------
-            //          --------------d2-----------
-            if (Math.min(hi - l, right - lo) < edgeSelectConstant) {
-                if (hi - l > right - lo) {
-                    // Right end. Do not check above hi, just select to the end
-                    edgeSelection.partition(a, l, right, lo, right);
-                    recursionConsumer.accept(maxDepth);
-                    return;
-                } else if (k.nextAfter(right)) {
-                    // Left end
-                    // Only if no further indices in the range.
-                    // If false this branch will continue to be triggered until
-                    // a partition is made to separate the next indices.
-                    edgeSelection.partition(a, l, right, lo, hi);
-                    recursionConsumer.accept(maxDepth);
-                    // Advance iterator
-                    l = hi + 1;
-                    if (!k.positionAfter(hi) || Math.max(k.left(), l) > right) {
-                        // No more keys, or keys beyond the current bounds
-                        return;
-                    }
-                    lo = Math.max(k.left(), l);
-                    hi = Math.min(right, k.right());
-                    // Continue right (allows a second heap select for the right side)
-                    continue;
-                }
-            }
-
-            // If interval is close to both ends then sort
-            // |l|-----|lo|--------|hi|------|right|
-            //  ---d1----
-            //                       ----d2--------
-            // (lo - l) + (right - hi) == (right - l) - (hi - lo)
-            if (n - (hi - lo) < minQuickSelectSize) {
-                // Handle small data. This is done as the JDK sort will
-                // use insertion sort for small data. For double data it
-                // will also pre-process the data for NaN and signed
-                // zeros which is an overhead to avoid.
-                if (n < minQuickSelectSize) {
-                    // Must not use sortSelectRange in [lo, hi] as the iterator
-                    // has not been advanced to check after hi
-                    sortSelectRight(a, l, right, lo);
-                } else {
-                    // Note: This disregards the current level of recursion
-                    // but can exploit the JDK's more advanced sort algorithm.
-                    Arrays.sort(a, l, right + 1);
-                }
-                recursionConsumer.accept(maxDepth);
-                return;
-            }
-
-            // Here: l <= lo <= hi <= right
-            // Pick 2 pivots and partition
-            int p0 = dualPivotingStrategy.pivotIndex(a, l, r, upper);
-            p0 = part.partition(a, l, r, p0, upper[0], upper);
-            final int p1 = upper[0];
-            final int p2 = upper[1];
-            final int p3 = upper[2];
-
-            maxDepth--;
-            // Recursion left
-            if (lo < p0) {
-                introselect(part, a, l, p0 - 1, k, lo, Math.min(hi, p0 - 1), maxDepth);
-                // Advance iterator
-                if (!k.positionAfter(p1) || k.left() > right) {
-                    // No more keys, or keys beyond the current bounds
-                    return;
-                }
-                lo = k.left();
-                hi = Math.min(right, k.right());
-            }
-            if (hi <= p1) {
-                // Advance iterator
-                if (!k.positionAfter(p1) || k.left() > right) {
-                    // No more keys, or keys beyond the current bounds
-                    return;
-                }
-                lo = k.left();
-                hi = Math.min(right, k.right());
-            }
-
-            // Recursion middle
-            l = p1 + 1;
-            lo = Math.max(lo, l);
-            if (lo < p2) {
-                introselect(part, a, l, p2 - 1, k, lo, Math.min(hi, p2 - 1), maxDepth);
-                // Advance iterator
-                if (!k.positionAfter(p3) || k.left() > right) {
-                    // No more keys, or keys beyond the current bounds
-                    return;
-                }
-                lo = k.left();
-                hi = Math.min(right, k.right());
-            }
-            if (hi <= p3) {
-                // Advance iterator
-                if (!k.positionAfter(p3) || k.left() > right) {
-                    // No more keys, or keys beyond the current bounds
-                    return;
-                }
-                lo = k.left();
-                hi = Math.min(right, k.right());
-            }
-
-            // Continue right
-            l = p3 + 1;
-            lo = Math.max(lo, l);
-        }
+    void introselect(DPPartition part, double[] a, int left, int right, IndexIterator k, int ka, int kb, int maxDepth) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -5706,9 +4416,7 @@ final class Partition {
      * @param n Count of indices.
      */
     void partitionSBM(double[] data, int[] k, int n) {
-        // Handle NaN (this does assume n > 0)
-        final int right = sortNaN(data);
-        partition((SPEPartitionFunction) this::partitionSBMWithZeros, data, right, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -5732,7 +4440,7 @@ final class Partition {
      * @param n Count of indices.
      */
     void partitionISP(double[] data, int[] k, int n) {
-        introselect(getSPFunction(), data, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -5756,7 +4464,7 @@ final class Partition {
      * @param n Count of indices.
      */
     void partitionIDP(double[] data, int[] k, int n) {
-        introselect((DPPartition) Partition::partitionDP, data, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -5783,31 +4491,7 @@ final class Partition {
      * @param count Count of indices.
      */
     void partitionFR(double[] a, int[] k, int count) {
-        // Handle NaN / signed zeros
-        final DoubleDataTransformer t = SORT_TRANSFORMER.get();
-        // Assume this is in-place
-        t.preProcess(a);
-        final int end = t.length();
-        int n = count;
-        if (end > 1) {
-            // Filter indices invalidated by NaN check
-            if (end < a.length) {
-                for (int i = n; --i >= 0;) {
-                    final int v = k[i];
-                    if (v >= end) {
-                        // swap(k, i, --n)
-                        k[i] = k[--n];
-                        k[n] = v;
-                    }
-                }
-            }
-            // Only handles a single k
-            if (n != 0) {
-                selectFR(a, 0, end - 1, k[0], controlFlags);
-            }
-        }
-        // Restore signed zeros
-        t.postProcess(a, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -5836,7 +4520,6 @@ final class Partition {
             // The following edgeselect modifications are additions to the
             // FR algorithm. These have been added for testing and only affect the finishing
             // selection of small lengths.
-
             // It is possible to use edgeselect when k is close to the end
             // |l|-----|ka|--------|kb|------|r|
             //  ---------s2----------
@@ -5845,7 +4528,6 @@ final class Partition {
                 edgeSelection.partition(a, l, r, k, k);
                 return;
             }
-
             // use SELECT recursively on a sample of size S to get an estimate for the
             // (k-l+1)-th smallest element into a[k], biased slightly so that the (k-l+1)-th
             // element is expected to lie in the smaller set after partitioning.
@@ -5869,7 +4551,7 @@ final class Partition {
                     // This method is not as fast as sampling into [ll, rr] (see below).
                     final IntUnaryOperator rng = createRNG(n, k);
                     final int rs = l + rr - ll;
-                    for (int i = l - 1; i < rs;) {
+                    for (int i = l - 1; i < rs; ) {
                         // r - rand [0, r - i + 1) : i is currently i-1
                         final int j = r - rng.applyAsInt(r - i);
                         final double t = a[++i];
@@ -5901,7 +4583,7 @@ final class Partition {
                         final IntUnaryOperator rng = createRNG(n, k);
                         // Shuffle [ll, k) from [l, k)
                         if (ll > l) {
-                            for (int i = k; i > ll;) {
+                            for (int i = k; i > ll; ) {
                                 // l + rand [0, i - l + 1) : i is currently i+1
                                 final int j = l + rng.applyAsInt(i - l);
                                 final double t = a[--i];
@@ -5911,7 +4593,7 @@ final class Partition {
                         }
                         // Shuffle (k, rr] from (k, r]
                         if (rr < r) {
-                            for (int i = k; i < rr;) {
+                            for (int i = k; i < rr; ) {
                                 // r - rand [0, r - i + 1) : i is currently i-1
                                 final int j = r - rng.applyAsInt(r - i);
                                 final double t = a[++i];
@@ -5940,11 +4622,9 @@ final class Partition {
                 // Optional: use pivot strategy
                 pivot = pivotingStrategy.pivotIndex(a, l, r, k);
             }
-
             // This uses the original binary partition of FR.
             // FR sub-sampling can be used in some introselect methods; this
             // allows the original FR to be compared with introselect.
-
             // Partition a[p : q] about t.
             // Sub-script range checking has been eliminated by appropriate placement of t
             // at the p or q end.
@@ -6018,32 +4698,7 @@ final class Partition {
      * @param count Count of indices.
      */
     void partitionKFR(double[] a, int[] k, int count) {
-        // Handle NaN / signed zeros
-        final DoubleDataTransformer t = SORT_TRANSFORMER.get();
-        // Assume this is in-place
-        t.preProcess(a);
-        final int end = t.length();
-        int n = count;
-        if (end > 1) {
-            // Filter indices invalidated by NaN check
-            if (end < a.length) {
-                for (int i = n; --i >= 0;) {
-                    final int v = k[i];
-                    if (v >= end) {
-                        // swap(k, i, --n)
-                        k[i] = k[--n];
-                        k[n] = v;
-                    }
-                }
-            }
-            // Only handles a single k
-            if (n != 0) {
-                final int[] bounds = new int[5];
-                selectKFR(a, 0, end - 1, k[0], bounds, null);
-            }
-        }
-        // Restore signed zeros
-        t.postProcess(a, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -6069,15 +4724,13 @@ final class Partition {
      * @param bounds Inclusive bounds {@code [k-, k+]} containing {@code k}.
      * @param rng Random generator for samples in {@code [0, n)}.
      */
-    private void selectKFR(double[] x, int left, int right, int k, int[] bounds,
-        IntUnaryOperator rng) {
+    private void selectKFR(double[] x, int left, int right, int k, int[] bounds, IntUnaryOperator rng) {
         int l = left;
         int r = right;
         while (true) {
             // The following edgeselect modifications are additions to the
             // KFR algorithm. These have been added for testing and only affect the finishing
             // selection of small lengths.
-
             // It is possible to use edgeselect when k is close to the end
             // |l|-----|ka|--------|kb|------|r|
             //  ---------s2----------
@@ -6087,13 +4740,11 @@ final class Partition {
                 bounds[0] = bounds[1] = k;
                 return;
             }
-
             // length - 1
             int n = r - l;
             if (n < 600) {
                 // Switch to quickselect
-                final int p0 = partitionKBM(x, l, r,
-                    pivotingStrategy.pivotIndex(x, l, r, k), bounds);
+                final int p0 = partitionKBM(x, l, r, pivotingStrategy.pivotIndex(x, l, r, k), bounds);
                 final int p1 = bounds[0];
                 if (k < p0) {
                     // The element is in the left partition
@@ -6109,7 +4760,6 @@ final class Partition {
                 }
                 continue;
             }
-
             // Floyd-Rivest sub-sampling
             ++n;
             // Step 1: Choose sample size s <= n-1 and gap g > 0
@@ -6126,14 +4776,13 @@ final class Partition {
             if (rng == null) {
                 rng = createRNG(n, k);
             }
-            for (int i = l - 1; i < rs;) {
+            for (int i = l - 1; i < rs; ) {
                 // r - rand [0, r - i + 1) : i is currently i-1
                 final int j = r - rng.applyAsInt(r - i);
                 final double t = x[++i];
                 x[i] = x[j];
                 x[j] = t;
             }
-
             // Step 3: pivot selection
             final double isn = (k - l + 1) * s / n;
             final int ku = (int) Math.max(Math.floor(l - 1 + isn - g), l);
@@ -6154,7 +4803,6 @@ final class Partition {
                 kvm = bounds[0];
                 kvp = bounds[1];
             }
-
             // Step 4: Partitioning
             final double u = x[kup];
             final double v = x[kvm];
@@ -6168,15 +4816,12 @@ final class Partition {
             vectorSwap(x, kvm, kvp, rr);
             // |l      |ll   pp|                   |kv-          |qq   rr|      r|     (6.5)
             // | x < u | x = u |     u < x < v     |      ???    | x = v | x > v |
-
             int a;
             int b;
             int c;
             int d;
-
             // Note: The quintary partitioning is as specified in Kiwiel.
             // Moving each branch to methods had no effect on performance.
-
             if (u == v) {
                 // Can be optimised by omitting step A1 (moving of sentinels). Here the
                 // size of ??? is large and initialisation is insignificant.
@@ -6205,7 +4850,7 @@ final class Partition {
                 int q = qq;
                 int i = p;
                 int j = q;
-                for (;;) {
+                for (; ; ) {
                     while (x[++i] < v) {
                         if (x[i] < u) {
                             continue;
@@ -6277,7 +4922,7 @@ final class Partition {
                 int i = p;
                 int j = q;
                 vectorSwap(x, pp + 1, kvm - 1, qq - 1);
-                for (;;) {
+                for (; ; ) {
                     while (x[++i] <= u) {
                         if (x[i] == u) {
                             final double xi = x[i];
@@ -6331,7 +4976,6 @@ final class Partition {
                 vectorSwapL(x, ll, p, j, u);
                 vectorSwapR(x, c + 1, qq - 1, rr, v);
             }
-
             // Step 5/6/7: Stopping test, reduction and recursion
             // |l              |a      |b             c|      d|            r|
             // |   x < u       | x = u |    u < x < v  | x = v |       x > v |
@@ -6371,7 +5015,7 @@ final class Partition {
      * @param c Index.
      */
     private static void vectorSwap(double[] x, int a, int b, int c) {
-        for (int i = a - 1, j = c + 1, m = Math.min(b + 1 - a, c - b); --m >= 0;) {
+        for (int i = a - 1, j = c + 1, m = Math.min(b + 1 - a, c - b); --m >= 0; ) {
             final double v = x[++i];
             x[i] = x[--j];
             x[j] = v;
@@ -6392,7 +5036,7 @@ final class Partition {
      * @param v Constant value in [a, b]
      */
     private static void vectorSwapL(double[] x, int a, int b, int c, double v) {
-        for (int i = a - 1, j = c + 1, m = Math.min(b + 1 - a, c - b); --m >= 0;) {
+        for (int i = a - 1, j = c + 1, m = Math.min(b + 1 - a, c - b); --m >= 0; ) {
             x[++i] = x[--j];
             x[j] = v;
         }
@@ -6412,7 +5056,7 @@ final class Partition {
      * @param v Constant value in (b, c]
      */
     private static void vectorSwapR(double[] x, int a, int b, int c, double v) {
-        for (int i = a - 1, j = c + 1, m = Math.min(b + 1 - a, c - b); --m >= 0;) {
+        for (int i = a - 1, j = c + 1, m = Math.min(b + 1 - a, c - b); --m >= 0; ) {
             x[--j] = x[++i];
             x[i] = v;
         }
@@ -6444,7 +5088,7 @@ final class Partition {
      * @param n Count of indices.
      */
     void partitionLSP(double[] data, int[] k, int n) {
-        linearSelect(getSPFunction(), data, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -6480,7 +5124,7 @@ final class Partition {
         if (end > 1) {
             // Filter indices invalidated by NaN check
             if (end < a.length) {
-                for (int i = n; --i >= 0;) {
+                for (int i = n; --i >= 0; ) {
                     final int v = k[i];
                     if (v >= end) {
                         // swap(k, i, --n)
@@ -6529,8 +5173,7 @@ final class Partition {
      * @param bounds Bounds of the range containing {@code [ka, kb]} (inclusive).
      * @see <a href="https://en.wikipedia.org/wiki/Median_of_medians">Median of medians (Wikipedia)</a>
      */
-    private void linearSelect(SPEPartition part, double[] a, int left, int right, int ka, int kb,
-            int[] bounds) {
+    private void linearSelect(SPEPartition part, double[] a, int left, int right, int ka, int kb, int[] bounds) {
         int l = left;
         int r = right;
         while (true) {
@@ -6582,7 +5225,6 @@ final class Partition {
                 p0 = part.partition(a, l, r, p0, bounds);
             }
             final int p1 = bounds[0];
-
             // Note: Here we expect [ka, kb] to be small and splitting is unlikely.
             //                   p0 p1
             // |l|--|ka|kkkk|kb|--|P|-------------------|r|
@@ -6635,7 +5277,7 @@ final class Partition {
         // Process blocks of 5.
         // Moves the median of each block to the left of the array.
         int rr = l - 1;
-        for (int e = l + 5;; e += 5) {
+        for (int e = l + 5; ; e += 5) {
             if (e > r) {
                 // Final block of size 1-5
                 Sorting.sort(a, e - 5, r);
@@ -6645,7 +5287,6 @@ final class Partition {
                 a[rr] = v;
                 break;
             }
-
             // Various methods for time-critical step.
             // Each must be compiled and run on the same benchmark data.
             // Decision tree is fastest.
@@ -6660,12 +5301,10 @@ final class Partition {
             //Sorting.sort(a, e - 5, e - 1); // insertion sort
             //Sorting.sort5(a, e - 5, e - 4, e - 3, e - 2, e - 1);
             Sorting.median5d(a, e - 5, e - 4, e - 3, e - 2, e - 1);
-
             final double v = a[m];
             a[m] = a[++rr];
             a[rr] = v;
         }
-
         int m = (l + rr + 1) >>> 1;
         // mutual recursion
         linearSelect(part, a, l, rr, m, m, bounds);
@@ -6699,7 +5338,7 @@ final class Partition {
      * @see #setLinearStrategy(LinearStrategy)
      */
     void partitionLinear(double[] data, int[] k, int n) {
-        quickSelect(linearSpFunction, data, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -6738,7 +5377,7 @@ final class Partition {
         if (end > 1) {
             // Filter indices invalidated by NaN check
             if (end < a.length) {
-                for (int i = n; --i >= 0;) {
+                for (int i = n; --i >= 0; ) {
                     final int v = k[i];
                     if (v >= end) {
                         // swap(k, i, --n)
@@ -6788,8 +5427,7 @@ final class Partition {
      * @param bounds Bounds of the range containing {@code [ka, kb]} (inclusive).
      * @see #setLinearStrategy(LinearStrategy)
      */
-    private void quickSelect(SPEPartition part, double[] a, int left, int right, int ka, int kb,
-            int[] bounds) {
+    private void quickSelect(SPEPartition part, double[] a, int left, int right, int ka, int kb, int[] bounds) {
         int l = left;
         int r = right;
         while (true) {
@@ -6813,7 +5451,6 @@ final class Partition {
             // Only target ka; kb is assumed to be close
             final int p0 = part.partition(a, l, r, ka, bounds);
             final int p1 = bounds[0];
-
             // Note: Here we expect [ka, kb] to be small and splitting is unlikely.
             //                   p0 p1
             // |l|--|ka|kkkk|kb|--|P|-------------------|r|
@@ -6866,7 +5503,7 @@ final class Partition {
      * @param n Count of indices.
      */
     void partitionQA(double[] data, int[] k, int n) {
-        quickSelectAdaptive(data, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -6899,7 +5536,7 @@ final class Partition {
         if (end > 1) {
             // Filter indices invalidated by NaN check
             if (end < a.length) {
-                for (int i = n; --i >= 0;) {
+                for (int i = n; --i >= 0; ) {
                     final int v = k[i];
                     if (v >= end) {
                         // swap(k, i, --n)
@@ -6950,8 +5587,7 @@ final class Partition {
      * @param mode Adaption mode.
      * @return Lower bound of the range containing {@code [ka, kb]} (inclusive).
      */
-    private int quickSelectAdaptive(double[] a, int left, int right, int ka, int kb,
-            int[] bounds, AdaptMode mode) {
+    private int quickSelectAdaptive(double[] a, int left, int right, int ka, int kb, int[] bounds, AdaptMode mode) {
         int l = left;
         int r = right;
         AdaptMode m = mode;
@@ -6966,7 +5602,6 @@ final class Partition {
                 bounds[0] = kb;
                 return ka;
             }
-
             // Only target ka; kb is assumed to be close
             int p0;
             int n = r - l;
@@ -7036,7 +5671,6 @@ final class Partition {
                 // 2/9 : 2/9 (use 1/4 - 1/32 ~ 0.219)
                 n -= (n >> 2) - (n >> 5);
             }
-
             // Note: Here we expect [ka, kb] to be small and splitting is unlikely.
             //                   p0 p1
             // |l|--|ka|kkkk|kb|--|P|-------------------|r|
@@ -7102,7 +5736,7 @@ final class Partition {
      * @param n Count of indices.
      */
     static void partitionQA2(double[] data, int[] k, int n) {
-        quickSelectAdaptive2(data, k, n, qaMode);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -7127,32 +5761,7 @@ final class Partition {
      * @param flags Adaption flags.
      */
     static void quickSelectAdaptive2(double[] a, int[] k, int count, int flags) {
-        // Handle NaN / signed zeros
-        final DoubleDataTransformer t = SORT_TRANSFORMER.get();
-        // Assume this is in-place
-        t.preProcess(a);
-        final int end = t.length();
-        int n = count;
-        if (end > 1) {
-            // Filter indices invalidated by NaN check
-            if (end < a.length) {
-                for (int i = n; --i >= 0;) {
-                    final int v = k[i];
-                    if (v >= end) {
-                        // swap(k, i, --n)
-                        k[i] = k[--n];
-                        k[n] = v;
-                    }
-                }
-            }
-            if (n != 0) {
-                final int ka = Math.min(k[0], k[n - 1]);
-                final int kb = Math.max(k[0], k[n - 1]);
-                quickSelectAdaptive2(a, 0, end - 1, ka, kb, new int[1], flags);
-            }
-        }
-        // Restore signed zeros
-        t.postProcess(a, k, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -7187,8 +5796,7 @@ final class Partition {
      * @param flags Adaption flags.
      * @return Lower bound of the range containing {@code [ka, kb]} (inclusive).
      */
-    private static int quickSelectAdaptive2(double[] a, int left, int right, int ka, int kb,
-            int[] bounds, int flags) {
+    private static int quickSelectAdaptive2(double[] a, int left, int right, int ka, int kb, int[] bounds, int flags) {
         int l = left;
         int r = right;
         int m = flags;
@@ -7200,7 +5808,6 @@ final class Partition {
                 bounds[0] = kb;
                 return ka;
             }
-
             // Only target ka; kb is assumed to be close
             int p0;
             final int n = r - l;
@@ -7238,7 +5845,6 @@ final class Partition {
                 margin -= n >> 5;
                 p0 = repeatedStep(a, l, r, ka, bounds, m);
             }
-
             // Note: Here we expect [ka, kb] to be small and splitting is unlikely.
             //                   p0 p1
             // |l|--|ka|kkkk|kb|--|P|-------------------|r|
@@ -7291,8 +5897,7 @@ final class Partition {
      * @param rightInner Flag to indicate {@code right + 1} is a pivot.
      * @return Lower bound (inclusive) of the pivot range.
      */
-    private int partitionSBMWithZeros(double[] data, int left, int right, int[] upper,
-        boolean leftInner, boolean rightInner) {
+    private int partitionSBMWithZeros(double[] data, int left, int right, int[] upper, boolean leftInner, boolean rightInner) {
         // Single-pivot Bentley-McIlroy quicksort handling equal keys (Sedgewick's algorithm).
         //
         // Partition data using pivot P into less-than, greater-than or equal.
@@ -7317,7 +5922,6 @@ final class Partition {
         //   The end is then assumed to be the equal value. This would not work with
         //   object references. Equivalent swap calls are commented.
         // - Added a fast-forward over initial range containing the pivot.
-
         // Switch to insertion sort for small range
         if (right - left <= minQuickSelectSize) {
             Sorting.sort(data, left, right, leftInner);
@@ -7325,26 +5929,21 @@ final class Partition {
             upper[0] = right;
             return left;
         }
-
         final int l = left;
         final int r = right;
-
         int p = l;
         int q = r;
-
         // Use the pivot index to set the upper sentinel value.
         // Pass -1 as the target k (should trigger an IOOBE if strategy uses it).
         final int pivot = pivotingStrategy.pivotIndex(data, left, right, -1);
         final double v = data[pivot];
         data[pivot] = data[r];
         data[r] = v;
-
         // Special case: count signed zeros
         int c = 0;
         if (v == 0) {
             c = countMixedSignedZeros(data, left, right);
         }
-
         // Fast-forward over equal regions to reduce swaps
         while (data[p] == v) {
             if (++p == q) {
@@ -7360,11 +5959,9 @@ final class Partition {
         while (data[q - 1] == v) {
             q--;
         }
-
         int i = p - 1;
         int j = q;
-
-        for (;;) {
+        for (; ; ) {
             do {
                 ++i;
             } while (data[i] < v);
@@ -7405,23 +6002,19 @@ final class Partition {
             }
         }
         // i is at the end (exclusive) of the less-than region
-
         // Place pivot value in centre
         //swap(data, r, i)
         data[r] = data[i];
         data[i] = v;
-
         // Move equal regions to the centre.
         // Set the pivot range [j, i) and move this outward for equal values.
         j = i++;
-
         // less-equal:
         //   for (int k = l; k < p; k++):
         //     swap(data, k, --j)
         // greater-equal:
         //   for (int k = r; k-- > q; i++) {
         //     swap(data, k, i)
-
         // Move the minimum of less-equal or less-than
         int move = Math.min(p - l, j - p);
         final int lower = j - (p - l);
@@ -7436,7 +6029,6 @@ final class Partition {
             data[--k] = data[i];
             data[i] = v;
         }
-
         // Special case: fixed signed zeros
         if (c != 0) {
             p = lower;
@@ -7447,7 +6039,6 @@ final class Partition {
                 data[p++] = 0.0;
             }
         }
-
         // Equal in [lower, upper]
         return lower;
     }
@@ -7560,15 +6151,12 @@ final class Partition {
         //
         // Then the equal values are copied from the ends to the centre:
         // | less        |        equal      |    greater |
-
         int i = l;
         int j = r;
         int p = l;
         int q = r;
-
         final double v = data[pivot];
-
-        for (;;) {
+        for (; ; ) {
             while (i <= j && data[i] <= v) {
                 if (data[i] == v) {
                     //swap(data, i, p++)
@@ -7595,7 +6183,6 @@ final class Partition {
             data[j] = data[i];
             data[i] = tmp;
         }
-
         // Move equal regions to the centre.
         int s = Math.min(p - l, i - p);
         for (int k = l; s > 0; k++, s--) {
@@ -7609,12 +6196,10 @@ final class Partition {
             data[r - s] = data[k];
             data[k] = v;
         }
-
         // Set output range
         i = i - p + l;
         j = j - q + r;
         upper[0] = j;
-
         return i;
     }
 
@@ -7633,133 +6218,7 @@ final class Partition {
      * @return Lower bound (inclusive) of the pivot range.
      */
     static int partitionSBM(double[] data, int l, int r, int pivot, int[] upper) {
-        // Single-pivot Bentley-McIlroy quicksort handling equal keys (Sedgewick's algorithm).
-        //
-        // Partition data using pivot P into less-than, greater-than or equal.
-        // P is placed at the end to act as a sentinel.
-        // k traverses the unknown region ??? and values moved if equal (l) or greater (g):
-        //
-        // left    p       i            j         q    right
-        // |  ==P  |  <P   |     ???    |   >P    | ==P  |P|
-        //
-        // At the end P and additional equal values are swapped back to the centre.
-        //
-        // |         <P        | ==P |            >P        |
-        //
-        // Adapted from Sedgewick "Quicksort is optimal"
-        // https://sedgewick.io/wp-content/themes/sedgewick/talks/2002QuicksortIsOptimal.pdf
-        //
-        // Note: The difference between this and the original BM partition is the use of
-        // < or > rather than <= and >=. This allows the pivot to act as a sentinel and removes
-        // the requirement for checks on i; and j can be checked against an unlikely condition.
-        // This method will swap runs of equal values.
-        //
-        // The algorithm has been changed so that:
-        // - A pivot point must be provided.
-        // - An edge case where the search meets in the middle is handled.
-        // - Added a fast-forward over any initial range containing the pivot.
-        // - Changed the final move to perform the minimum moves.
-
-        // Use the pivot index to set the upper sentinel value
-        final double v = data[pivot];
-        data[pivot] = data[r];
-        data[r] = v;
-
-        int p = l;
-        int q = r;
-
-        // Fast-forward over equal regions to reduce swaps
-        while (data[p] == v) {
-            if (++p == q) {
-                // Edge-case: constant value
-                upper[0] = r;
-                return l;
-            }
-        }
-        // Cannot overrun as the prior scan using p stopped before the end
-        while (data[q - 1] == v) {
-            q--;
-        }
-
-        int i = p - 1;
-        int j = q;
-
-        for (;;) {
-            do {
-                ++i;
-            } while (data[i] < v);
-            while (v < data[--j]) {
-                // Cannot use j == i in the event that i == q (already passed j)
-                if (j == l) {
-                    break;
-                }
-            }
-            if (i >= j) {
-                // Edge-case if search met on an internal pivot value
-                // (not at the greater equal region, i.e. i < q).
-                // Move this to the lower-equal region.
-                if (i == j && v == data[i]) {
-                    //swap(data, i++, p++)
-                    data[i] = data[p];
-                    data[p] = v;
-                    i++;
-                    p++;
-                }
-                break;
-            }
-            //swap(data, i, j)
-            final double vi = data[j];
-            final double vj = data[i];
-            data[i] = vi;
-            data[j] = vj;
-            // Move the equal values to the ends
-            if (vi == v) {
-                //swap(data, i, p++)
-                data[i] = data[p];
-                data[p] = v;
-                p++;
-            }
-            if (vj == v) {
-                //swap(data, j, --q)
-                data[j] = data[--q];
-                data[q] = v;
-            }
-        }
-        // i is at the end (exclusive) of the less-than region
-
-        // Place pivot value in centre
-        //swap(data, r, i)
-        data[r] = data[i];
-        data[i] = v;
-
-        // Move equal regions to the centre.
-        // Set the pivot range [j, i) and move this outward for equal values.
-        j = i++;
-
-        // less-equal:
-        //   for k = l; k < p; k++
-        //     swap(data, k, --j)
-        // greater-equal:
-        //   for k = r; k-- > q; i++
-        //     swap(data, k, i)
-
-        // Move the minimum of less-equal or less-than
-        int move = Math.min(p - l, j - p);
-        final int lower = j - (p - l);
-        for (int k = l; --move >= 0; k++) {
-            data[k] = data[--j];
-            data[j] = v;
-        }
-        // Move the minimum of greater-equal or greater-than
-        move = Math.min(r - q, q - i);
-        upper[0] = i + (r - q) - 1;
-        for (int k = r; --move >= 0; i++) {
-            data[--k] = data[i];
-            data[i] = v;
-        }
-
-        // Equal in [lower, upper]
-        return lower;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -7777,132 +6236,7 @@ final class Partition {
      * @return Lower bound (inclusive) of the pivot range.
      */
     static int partitionKBM(double[] x, int l, int r, int pivot, int[] upper) {
-        // Single-pivot Bentley-McIlroy quicksort handling equal keys.
-        //
-        // Partition data using pivot v into less-than, greater-than or equal.
-        // The basic idea is to work with the 5 inner parts of the array [ll, rr]
-        // by positioning sentinels at l and r:
-        //
-        // |l |ll   p|          |i          j|         |q   rr| r|           (6.1)
-        // |<v|  ==v |     <v   |     ???    |   >v    | ==v  |>v|
-        //
-        // until the middle part is empty or just contains an element equal to the pivot:
-        //
-        // |ll   p|              j|   |i          |q   rr|                   (6.2)
-        // |  ==v |     <v        |==v|     >v    | ==v  |
-        //
-        // i.e. j = i-1 or i-2, then swap the ends into the middle:
-        //
-        // |ll              |a         d|              rr|                   (6.3)
-        // |        <v      |     ==v   |      >v        |
-        //
-        // Adapted from Kiwiel (2005) "On Floyd and Rivest's SELECT algorithm"
-        // Theoretical Computer Science 347, 214-238.
-        // This is the safeguarded ternary partition Scheme E with modification to
-        // prevent vacuous swaps of equal keys (section 5.6) in Kiwiel (2003)
-        // Partitioning schemes for quicksort and quickselect,
-        // Technical report, Systems Research Institute, Warsaw.
-        // http://arxiv.org/abs/cs.DS/0312054
-        //
-        // Note: The difference between this and Sedgewick's BM is the use of sentinels
-        // at either end to remove index checks at both ends and changing the behaviour
-        // when i and j meet on a pivot value.
-        //
-        // The listing in Kiwiel (2005) has been updated:
-        // - p and q mark the *inclusive* end of ==v regions.
-        // - Added a fast-forward over initial range containing the pivot.
-        // - Vector swap is optimised given one side of the exchange is v.
-
-        final double v = x[pivot];
-        x[pivot] = x[l];
-        x[l] = v;
-
-        int ll = l;
-        int rr = r;
-
-        // Ensure x[l] <= v <= x[r]
-        if (v < x[r]) {
-            --rr;
-        } else if (v > x[r]) {
-            x[l] = x[r];
-            x[r] = v;
-            ++ll;
-        }
-
-        // Position p and q for pre-in/decrement to write into edge pivot regions
-        // Fast-forward over equal regions to reduce swaps
-        int p = l;
-        while (x[p + 1] == v) {
-            if (++p == rr) {
-                // Edge-case: constant value in [ll, rr]
-                // Return the full range [l, r] as a single edge element
-                // will also be partitioned.
-                upper[0] = r;
-                return l;
-            }
-        }
-        // Cannot overrun as the prior scan using p stopped before the end
-        int q = r;
-        while (x[q - 1] == v) {
-            --q;
-        }
-
-        // [ll, p] and [q, rr] are pivot
-        // Position for pre-in/decrement
-        int i = p;
-        int j = q;
-
-        for (;;) {
-            do {
-                ++i;
-            } while (x[i] < v);
-            do {
-                --j;
-            } while (x[j] > v);
-            // Here x[j] <= v <= x[i]
-            if (i >= j) {
-                if (i == j) {
-                    // x[i]=x[j]=v; update to leave the pivot in between (j, i)
-                    ++i;
-                    --j;
-                }
-                break;
-            }
-            //swap(x, i, j)
-            final double vi = x[j];
-            final double vj = x[i];
-            x[i] = vi;
-            x[j] = vj;
-            // Move the equal values to the ends
-            if (vi == v) {
-                x[i] = x[++p];
-                x[p] = v;
-            }
-            if (vj == v) {
-                x[j] = x[--q];
-                x[q] = v;
-            }
-        }
-
-        // Set [a, d] (p and q are offset by 1 from Kiwiel)
-        final int a = ll + j - p;
-        upper[0] = rr - q + i;
-
-        // Vector swap x[a:b] <-> x[b+1:c] means the first m = min(b+1-a, c-b)
-        // elements of the array x[a:c] are exchanged with its last m elements.
-        //vectorSwapL(x, ll, p, j, v);
-        //vectorSwapR(x, i, q - 1, rr, v);
-        // x[ll:p] <-> x[p+1:j]
-        for (int m = Math.min(p + 1 - ll, j - p); --m >= 0; ++ll, --j) {
-            x[ll] = x[j];
-            x[j] = v;
-        }
-        // x[i:q-1] <-> x[q:rr]
-        for (int m = Math.min(q - i, rr - q + 1); --m >= 0; ++i, --rr) {
-            x[rr] = x[i];
-            x[i] = v;
-        }
-        return a;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -7923,7 +6257,6 @@ final class Partition {
         // Dutch National Flag partitioning:
         // https://www.baeldung.com/java-sorting-arrays-with-repeated-entries
         // https://en.wikipedia.org/wiki/Dutch_national_flag_problem
-
         // Partition data using pivot P into less-than, greater-than or equal.
         // i traverses the unknown region ??? and values moved to the correct end.
         //
@@ -7932,21 +6265,17 @@ final class Partition {
         //
         // We can delay filling in [lt, gt) with P until the end and only
         // move values in the wrong place.
-
         final double value = data[pivot];
-
         // Fast-forward initial less-than region
         int lt = left;
         while (data[lt] < value) {
             lt++;
         }
-
         // Pointers positioned to use pre-increment/decrement
         lt--;
         int gt = right + 1;
-
         // DNF partitioning which inspects one position per loop iteration
-        for (int i = lt; ++i < gt;) {
+        for (int i = lt; ++i < gt; ) {
             final double v = data[i];
             if (v < value) {
                 data[++lt] = v;
@@ -7958,16 +6287,13 @@ final class Partition {
             }
             // else v == value and is in the central region to fill at the end
         }
-
         // Equal in (lt, gt) so adjust to [lt, gt]
         ++lt;
         upper[0] = --gt;
-
         // Fill the equal values gap
         for (int i = lt; i <= gt; i++) {
             data[i] = value;
         }
-
         return lt;
     }
 
@@ -7989,7 +6315,6 @@ final class Partition {
         // Dutch National Flag partitioning:
         // https://www.baeldung.com/java-sorting-arrays-with-repeated-entries
         // https://en.wikipedia.org/wiki/Dutch_national_flag_problem
-
         // Partition data using pivot P into less-than, greater-than or equal.
         // i traverses the unknown region ??? and values moved to the correct end.
         //
@@ -7998,22 +6323,18 @@ final class Partition {
         //
         // We can delay filling in [lt, gt) with P until the end and only
         // move values in the wrong place.
-
         final double value = data[pivot];
-
         // Fast-forward initial less-than region
         int lt = left;
         while (data[lt] < value) {
             lt++;
         }
-
         // Pointers positioned to use pre-increment/decrement: ++x / --x
         lt--;
         int gt = right + 1;
-
         // Modified DNF partitioning with fast-forward of the greater-than
         // pointer. Note the fast-forward must check bounds.
-        for (int i = lt; ++i < gt;) {
+        for (int i = lt; ++i < gt; ) {
             final double v = data[i];
             if (v < value) {
                 data[++lt] = v;
@@ -8032,16 +6353,13 @@ final class Partition {
             }
             // else v == value and is in the central region to fill at the end
         }
-
         // Equal in (lt, gt) so adjust to [lt, gt]
         ++lt;
         upper[0] = --gt;
-
         // Fill the equal values gap
         for (int i = lt; i <= gt; i++) {
             data[i] = value;
         }
-
         return lt;
     }
 
@@ -8063,7 +6381,6 @@ final class Partition {
         // Dutch National Flag partitioning:
         // https://www.baeldung.com/java-sorting-arrays-with-repeated-entries
         // https://en.wikipedia.org/wiki/Dutch_national_flag_problem
-
         // Partition data using pivot P into less-than, greater-than or equal.
         // i traverses the unknown region ??? and values moved to the correct end.
         //
@@ -8072,24 +6389,19 @@ final class Partition {
         //
         // This version writes in the value of P as it traverses. Any subsequent
         // less-than values will overwrite P values trailing behind i.
-
         final double value = data[pivot];
-
         // Fast-forward initial less-than region
         int lt = left;
         while (data[lt] < value) {
             lt++;
         }
-
         // Pointers positioned to use pre-increment/decrement: ++x / --x
         lt--;
         int gt = right + 1;
-
         // Note:
         // This benchmarks as faster than DNF1 and equal to DNF2 on random data.
         // On data with (many) repeat values it is faster than DNF2.
         // Both DNF2 & 3 have fast-forward of the gt pointer.
-
         // Modified DNF partitioning with fast-forward of the greater-than
         // pointer. Here we write in the pivot value at i during the sweep.
         // This acts as a sentinel when fast-forwarding greater-than.
@@ -8098,7 +6410,7 @@ final class Partition {
         // (lt, i)    == pivot
         // [i, gt)    == ???
         // [gt, end)   > pivot
-        for (int i = lt; ++i < gt;) {
+        for (int i = lt; ++i < gt; ) {
             final double v = data[i];
             if (v != value) {
                 // Overwrite with the pivot value
@@ -8122,14 +6434,11 @@ final class Partition {
                 }
             }
         }
-
         // Equal in (lt, gt) so adjust to [lt, gt]
         ++lt;
         upper[0] = --gt;
-
         // In contrast to version 1 and 2 there is no requirement to fill the central
         // region with the pivot value as it was filled during the sweep
-
         return lt;
     }
 
@@ -8176,193 +6485,7 @@ final class Partition {
      * @return Lower bound (inclusive) of the pivot range [k0].
      */
     static int partitionDP(double[] a, int left, int right, int pivot1, int pivot2, int[] bounds) {
-        // Allow caller to choose a single-pivot
-        if (pivot1 == pivot2) {
-            // Switch to a single pivot sort. This is used when there are
-            // estimated to be many equal values so use the fastest equal
-            // value single pivot method.
-            final int lower = partitionDNF3(a, left, right, pivot1, bounds);
-            // Set dual pivot range
-            bounds[2] = bounds[0];
-            // No unsorted internal region (set k1 = k3; k2 = k0)
-            // Note: It is extra work for the caller to detect that this region can be skipped.
-            bounds[1] = lower;
-            return lower;
-        }
-
-        // Dual-pivot quicksort method by Vladimir Yaroslavskiy.
-        //
-        // Partition data using pivots P1 and P2 into less-than, greater-than or between.
-        // Pivot values P1 & P2 are placed at the end. If P1 < P2, P2 acts as a sentinel.
-        // k traverses the unknown region ??? and values moved if less-than (lt) or
-        // greater-than (gt):
-        //
-        // left        lt                k           gt        right
-        // |P1|  <P1   |   P1 <= & <= P2 |    ???    |    >P2   |P2|
-        //
-        // <P1           (left, lt)
-        // P1<= & <= P2  [lt, k)
-        // >P2           (gt, right)
-        //
-        // At the end pivots are swapped back to behind the lt and gt pointers.
-        //
-        // |  <P1        |P1|     P1<= & <= P2    |P2|      >P2    |
-        //
-        // Adapted from Yaroslavskiy
-        // http://codeblab.com/wp-content/uploads/2009/09/DualPivotQuicksort.pdf
-        //
-        // Modified to allow partial sorting (partitioning):
-        // - Allow the caller to supply the pivot indices
-        // - Ignore insertion sort for tiny array (handled by calling code)
-        // - Ignore recursive calls for a full sort (handled by calling code)
-        // - Change to fast-forward over initial ascending / descending runs
-        // - Change to a single-pivot partition method if the pivots are equal
-        // - Change to fast-forward great when v > v2 and either break the sorting
-        //   loop, or move a[great] direct to the correct location.
-        // - Change to remove the 'div' parameter used to control the pivot selection
-        //   using the medians method (div initialises as 3 for 1/3 and 2/3 and increments
-        //   when the central region is too large).
-        // - Identify a large central region using ~5/8 of the length.
-
-        final double v1 = a[pivot1];
-        final double v2 = a[pivot2];
-
-        // Swap ends to the pivot locations.
-        a[pivot1] = a[left];
-        a[pivot2] = a[right];
-        a[left] = v1;
-        a[right] = v2;
-
-        // pointers
-        int less = left;
-        int great = right;
-
-        // Fast-forward ascending / descending runs to reduce swaps.
-        // Cannot overrun as end pivots (v1 <= v2) act as sentinels.
-        do {
-            ++less;
-        } while (a[less] < v1);
-        do {
-            --great;
-        } while (a[great] > v2);
-
-        // a[less - 1] < P1 : a[great + 1] > P2
-        // unvisited in [less, great]
-        SORTING:
-        for (int k = less - 1; ++k <= great;) {
-            final double v = a[k];
-            if (v < v1) {
-                // swap(a, k, less++)
-                a[k] = a[less];
-                a[less] = v;
-                less++;
-            } else if (v > v2) {
-                // while k < great and a[great] > v2:
-                //   great--
-                while (a[great] > v2) {
-                    if (great-- == k) {
-                        // Done
-                        break SORTING;
-                    }
-                }
-                // swap(a, k, great--)
-                // if a[k] < v1:
-                //   swap(a, k, less++)
-                final double w = a[great];
-                a[great] = v;
-                great--;
-                // delay a[k] = w
-                if (w < v1) {
-                    a[k] = a[less];
-                    a[less] = w;
-                    less++;
-                } else {
-                    a[k] = w;
-                }
-            }
-        }
-
-        // Change to inclusive ends : a[less] < P1 : a[great] > P2
-        less--;
-        great++;
-        // Move the pivots to correct locations
-        a[left] = a[less];
-        a[less] = v1;
-        a[right] = a[great];
-        a[great] = v2;
-
-        // Record the pivot locations
-        final int lower = less;
-        bounds[2] = great;
-
-        // equal elements
-        // Original paper: If middle partition is bigger than a threshold
-        // then check for equal elements.
-
-        // Note: This is extra work. When performing partitioning the region of interest
-        // may be entirely above or below the central region and this could be skipped.
-        // Versions that do this are not measurably faster. Skipping this may be faster
-        // if this step can be skipped on the initial largest region. The 5/8 size occurs
-        // approximately ~7% of the time on random data (verified using collated statistics).
-
-        // Here we look for equal elements if the centre is more than 5/8 the length.
-        // 5/8 = 1/2 + 1/8. Pivots must be different.
-        if ((great - less) > ((right - left) >>> 1) + ((right - left) >>> 3) && v1 != v2) {
-
-            // Fast-forward to reduce swaps. Changes inclusive ends to exclusive ends.
-            // Since v1 != v2 these act as sentinels to prevent overrun.
-            do {
-                ++less;
-            } while (a[less] == v1);
-            do {
-                --great;
-            } while (a[great] == v2);
-
-            // This copies the logic in the sorting loop using == comparisons
-            EQUAL:
-            for (int k = less - 1; ++k <= great;) {
-                final double v = a[k];
-                if (v == v1) {
-                    a[k] = a[less];
-                    a[less] = v;
-                    less++;
-                } else if (v == v2) {
-                    while (a[great] == v2) {
-                        if (great-- == k) {
-                            // Done
-                            break EQUAL;
-                        }
-                    }
-                    final double w = a[great];
-                    a[great] = v;
-                    great--;
-                    if (w == v1) {
-                        a[k] = a[less];
-                        a[less] = w;
-                        less++;
-                    } else {
-                        a[k] = w;
-                    }
-                }
-            }
-
-            // Change to inclusive ends
-            less--;
-            great++;
-        }
-
-        // Between pivots in (less, great)
-        if (v1 < v2 && less < great - 1) {
-            // Record the pivot end points
-            bounds[0] = less;
-            bounds[1] = great;
-        } else {
-            // No unsorted internal region (set k1 = k3; k2 = k0)
-            bounds[0] = bounds[2];
-            bounds[1] = lower;
-        }
-
-        return lower;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -8389,8 +6512,7 @@ final class Partition {
      * @param upper Upper bound (inclusive) of the pivot range [k1].
      * @return Lower bound (inclusive) of the pivot range [k0].
      */
-    private static int expandPartitionT1(double[] a, int left, int right, int start, int end,
-        int pivot0, int pivot1, int[] upper) {
+    private static int expandPartitionT1(double[] a, int left, int right, int start, int end, int pivot0, int pivot1, int[] upper) {
         // 3-way partition of the data using a pivot value into
         // less-than, equal or greater-than.
         // Based on Sedgewick's Bentley-McIroy partitioning: always swap i<->j then
@@ -8408,7 +6530,6 @@ final class Partition {
         //                                             j->
         // |l                       |p0  p1|           |         | r|
         // |         <              |  ==  |       >   |   ???   |<=|
-
         // Positioned for pre-in/decrement to write to pivot region
         int p0 = pivot0;
         int p1 = pivot1;
@@ -8432,7 +6553,6 @@ final class Partition {
             p1--;
             a[right] = v;
         }
-
         // Required to avoid index bound error first use of i/j
         assert left < start && end < right;
         int i = start;
@@ -8496,7 +6616,6 @@ final class Partition {
                 break;
             }
         }
-
         upper[0] = p1;
         return p0;
     }
@@ -8526,8 +6645,7 @@ final class Partition {
      * @param upper Upper bound (inclusive) of the pivot range [k1].
      * @return Lower bound (inclusive) of the pivot range [k0].
      */
-    private static int expandPartitionB1(double[] a, int left, int right, int start, int end,
-        int pivot0, int pivot1, int[] upper) {
+    private static int expandPartitionB1(double[] a, int left, int right, int start, int end, int pivot0, int pivot1, int[] upper) {
         // 2-way partition of the data using a pivot value into
         // less-than, or greater-than.
         //
@@ -8543,7 +6661,6 @@ final class Partition {
         //                                            j->
         // |l                         | p|            |         | r|
         // |         <                |==|        >   |   ???   |<=|
-
         // Pivot may be moved to use as a sentinel
         int p = pivot0;
         final double v = a[p];
@@ -8566,7 +6683,6 @@ final class Partition {
             p--;
             a[right] = v;
         }
-
         // Required to avoid index bound error first use of i/j
         assert left < start && end < right;
         int i = start;
@@ -8635,7 +6751,6 @@ final class Partition {
                 break;
             }
         }
-
         upper[0] = p;
         return p;
     }
@@ -8667,8 +6782,7 @@ final class Partition {
      * @param upper Upper bound (inclusive) of the pivot range [k1].
      * @return Lower bound (inclusive) of the pivot range [k0].
      */
-    private static int expandPartitionT2(double[] a, int left, int right, int start, int end,
-        int pivot0, int pivot1, int[] upper) {
+    private static int expandPartitionT2(double[] a, int left, int right, int start, int end, int pivot0, int pivot1, int[] upper) {
         // 3-way partition of the data using a pivot value into
         // less-than, equal or greater-than.
         // Based on Sedgewick's Bentley-McIroy partitioning: always swap i<->j then
@@ -8686,7 +6800,6 @@ final class Partition {
         //                                             j->
         // |l                       |p0  p1|           |         | r|
         // |         <              |  ==  |       >   |   ???   |<=|
-
         final double v = a[pivot0];
         // Use start/end as sentinels.
         // This requires start != end
@@ -8697,14 +6810,11 @@ final class Partition {
         a[end] = a[right];
         a[left] = vj;
         a[right] = vi;
-
         int i = start + 1;
         int j = end - 1;
-
         // Positioned for pre-in/decrement to write to pivot region
         int p0 = pivot0 == start ? i : pivot0;
         int p1 = pivot1 == end ? j : pivot1;
-
         while (true) {
             do {
                 --i;
@@ -8766,7 +6876,6 @@ final class Partition {
                 break;
             }
         }
-
         upper[0] = p1;
         return p0;
     }
@@ -8798,8 +6907,7 @@ final class Partition {
      * @param upper Upper bound (inclusive) of the pivot range [k1].
      * @return Lower bound (inclusive) of the pivot range [k0].
      */
-    private static int expandPartitionB2(double[] a, int left, int right, int start, int end,
-        int pivot0, int pivot1, int[] upper) {
+    private static int expandPartitionB2(double[] a, int left, int right, int start, int end, int pivot0, int pivot1, int[] upper) {
         // 2-way partition of the data using a pivot value into
         // less-than, or greater-than.
         //
@@ -8815,7 +6923,6 @@ final class Partition {
         //                                            j->
         // |l                         | p|            |         | r|
         // |         <                |==|        >   |   ???   |<=|
-
         // Pivot
         int p = pivot0;
         final double v = a[p];
@@ -8836,7 +6943,6 @@ final class Partition {
         a[end] = a[right];
         a[left] = vj;
         a[right] = vi;
-
         int i = start + 1;
         int j = end - 1;
         while (true) {
@@ -8876,7 +6982,6 @@ final class Partition {
                 break;
             }
         }
-
         upper[0] = p;
         return p;
     }
@@ -9109,8 +7214,7 @@ final class Partition {
         for (int i = s; i <= e; i++) {
             Sorting.sort3(a, i - f, i, i + f);
         }
-        p = quickSelectAdaptive(a, s, e, p, p, upper,
-            (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
+        p = quickSelectAdaptive(a, s, e, p, p, upper, (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
         return expandFunction.partition(a, l, r, s, e, p, upper[0], upper);
     }
 
@@ -9136,8 +7240,7 @@ final class Partition {
      * @param far Set to {@code true} to perform repeatedStepFarLeft.
      * @return Lower bound (inclusive) of the pivot range.
      */
-    private int repeatedStepLeft(double[] a, int l, int r, int k, int[] upper, AdaptMode mode,
-        boolean far) {
+    private int repeatedStepLeft(double[] a, int l, int r, int k, int[] upper, AdaptMode mode, boolean far) {
         // Adapted from Alexandrescu (2016), algorithm 9 and 10.
         // Moves the responsibility for selection when r-l <= 11 to the caller.
         final int f = (r - l + 1) >> 2;
@@ -9200,8 +7303,7 @@ final class Partition {
                 Sorting.sort3(a, i - fp, i, i + fp);
             }
         }
-        p = quickSelectAdaptive(a, s, e, p, p, upper,
-            (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
+        p = quickSelectAdaptive(a, s, e, p, p, upper, (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
         return expandFunction.partition(a, l, r, s, e, p, upper[0], upper);
     }
 
@@ -9227,8 +7329,7 @@ final class Partition {
      * @param far Set to {@code true} to perform repeatedStepFarRight.
      * @return Lower bound (inclusive) of the pivot range.
      */
-    private int repeatedStepRight(double[] a, int l, int r, int k, int[] upper, AdaptMode mode,
-        boolean far) {
+    private int repeatedStepRight(double[] a, int l, int r, int k, int[] upper, AdaptMode mode, boolean far) {
         // Mirror image repeatedStepLeft using upper median into 3rd quartile
         final int f = (r - l + 1) >> 2;
         if (!mode.isSampleMode()) {
@@ -9290,8 +7391,7 @@ final class Partition {
                 Sorting.sort3(a, i - fp, i, i + fp);
             }
         }
-        p = quickSelectAdaptive(a, s, e, p, p, upper,
-            (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
+        p = quickSelectAdaptive(a, s, e, p, p, upper, (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
         return expandFunction.partition(a, l, r, s, e, p, upper[0], upper);
     }
 
@@ -9353,8 +7453,7 @@ final class Partition {
         for (int i = s; i <= e; i++) {
             Sorting.sort3(a, i - fp, i, i + fp);
         }
-        p = quickSelectAdaptive(a, s, e, p, p, upper,
-            (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
+        p = quickSelectAdaptive(a, s, e, p, p, upper, (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
         return expandFunction.partition(a, l, r, s, e, p, upper[0], upper);
     }
 
@@ -9416,8 +7515,7 @@ final class Partition {
         for (int i = s; i <= e; i++) {
             Sorting.sort3(a, i - fp, i, i + fp);
         }
-        p = quickSelectAdaptive(a, s, e, p, p, upper,
-            (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
+        p = quickSelectAdaptive(a, s, e, p, p, upper, (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
         return expandFunction.partition(a, l, r, s, e, p, upper[0], upper);
     }
 
@@ -9458,7 +7556,7 @@ final class Partition {
             final IntUnaryOperator rng = createRNG(n, k);
             if (ll == l) {
                 // Shuffle [l, rr] from [l, r]
-                for (int i = l - 1; i < rr;) {
+                for (int i = l - 1; i < rr; ) {
                     // r - rand [0, r - i] : i is currently i-1
                     final int j = r - rng.applyAsInt(r - i);
                     final double t = a[++i];
@@ -9467,7 +7565,7 @@ final class Partition {
                 }
             } else if (rr == r) {
                 // Shuffle [ll, r] from [l, r]
-                for (int i = r + 1; i > ll;) {
+                for (int i = r + 1; i > ll; ) {
                     // l + rand [0, i - l] : i is currently i+1
                     final int j = l + rng.applyAsInt(i - l);
                     final double t = a[--i];
@@ -9477,7 +7575,7 @@ final class Partition {
             } else {
                 // Sample range [ll, rr] is internal
                 // Shuffle [ll, k) from [l, k)
-                for (int i = k; i > ll;) {
+                for (int i = k; i > ll; ) {
                     // l + rand [0, i - l + 1) : i is currently i+1
                     final int j = l + rng.applyAsInt(i - l);
                     final double t = a[--i];
@@ -9485,7 +7583,7 @@ final class Partition {
                     a[j] = t;
                 }
                 // Shuffle (k, rr] from (k, r]
-                for (int i = k; i < rr;) {
+                for (int i = k; i < rr; ) {
                     // r - rand [0, r - i + 1) : i is currently i-1
                     final int j = r - rng.applyAsInt(r - i);
                     final double t = a[++i];
@@ -9497,7 +7595,7 @@ final class Partition {
             final IntUnaryOperator rng = createRNG(n, k);
             // Shuffle [ll, k) from [l, k)
             if (ll > l) {
-                for (int i = k; i > ll;) {
+                for (int i = k; i > ll; ) {
                     // l + rand [0, i - l + 1) : i is currently i+1
                     final int j = l + rng.applyAsInt(i - l);
                     final double t = a[--i];
@@ -9507,7 +7605,7 @@ final class Partition {
             }
             // Shuffle (k, rr] from (k, r]
             if (rr < r) {
-                for (int i = k; i < rr;) {
+                for (int i = k; i < rr; ) {
                     // r - rand [0, r - i + 1) : i is currently i-1
                     final int j = r - rng.applyAsInt(r - i);
                     final double t = a[++i];
@@ -9517,13 +7615,10 @@ final class Partition {
             }
         }
         // Sample recursion restarts from [ll, rr]
-        final int p = quickSelectAdaptive(a, ll, rr, k, k, upper,
-            (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
-
+        final int p = quickSelectAdaptive(a, ll, rr, k, k, upper, (controlFlags & FLAG_QA_PROPAGATE) != 0 ? mode : adaptMode);
         // Expect a small sample and repartition the entire range...
         // Does not support a pivot range so use the centre
         //return spFunction.partition(a, l, r, (p + upper[0]) >>> 1, upper);
-
         return expandFunction.partition(a, l, r, ll, rr, p, upper[0], upper);
     }
 
@@ -9901,23 +7996,7 @@ final class Partition {
      * @return index of last non-NaN value (or -1)
      */
     static int sortNaN(double[] data) {
-        int end = data.length;
-        // Find first non-NaN
-        while (--end >= 0) {
-            if (!Double.isNaN(data[end])) {
-                break;
-            }
-        }
-        for (int i = end; --i >= 0;) {
-            final double v = data[i];
-            if (Double.isNaN(v)) {
-                // swap(data, i, end--)
-                data[i] = data[end];
-                data[end] = v;
-                end--;
-            }
-        }
-        return end;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -9929,23 +8008,7 @@ final class Partition {
      * @return count of valid indices
      */
     static int countIndices(int[] indices, int count, int right) {
-        int end = count;
-        // Find first valid index
-        while (--end >= 0) {
-            if (indices[end] <= right) {
-                break;
-            }
-        }
-        for (int i = end; --i >= 0;) {
-            final int k = indices[i];
-            if (k > right) {
-                // swap(indices, i, end--)
-                indices[i] = indices[end];
-                indices[end] = k;
-                end--;
-            }
-        }
-        return end + 1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -9963,18 +8026,7 @@ final class Partition {
      * @return the count of signed zeros if some positive zeros are also present
      */
     static int countMixedSignedZeros(double[] data, int left, int right) {
-        // Count negative zeros
-        int c = 0;
-        int cn = 0;
-        for (int i = left; i <= right; i++) {
-            if (data[i] == 0) {
-                c++;
-                if (Double.doubleToRawLongBits(data[i]) < 0) {
-                    cn++;
-                }
-            }
-        }
-        return c == cn ? 0 : cn;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -9988,23 +8040,7 @@ final class Partition {
      * @param right Upper bound (inclusive).
      */
     static void sortZero(double[] data, int left, int right) {
-        // Count negative zeros
-        int c = 0;
-        for (int i = left; i <= right; i++) {
-            if (Double.doubleToRawLongBits(data[i]) < 0) {
-                c++;
-            }
-        }
-        // Replace
-        if (c != 0) {
-            int i = left;
-            while (c-- > 0) {
-                data[i++] = -0.0;
-            }
-            while (i <= right) {
-                data[i++] = 0.0;
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -10071,7 +8107,7 @@ final class Partition {
      * @return {@code floor(log 2 (x))}
      */
     static int floorLog2(int x) {
-        return 31 - Integer.numberOfLeadingZeros(x);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -10113,12 +8149,7 @@ final class Partition {
      * @return {@code log3(x))}
      */
     static int log3(int x) {
-        // log3(2) ~ 1.5849625
-        // log3(x) ~ log2(x) * 0.630929753... ~ log2(x) * 323 / 512 (0.630859375)
-        // Use (floor(log2(x))+1) * 323 / 512
-        // This result is always between floor(log3(x)) and ceil(log3(x)).
-        // It is correctly rounded when x +/- 1 is a power of 3.
-        return ((32 - Integer.numberOfLeadingZeros(x)) * 323) >>> 9;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -10171,39 +8202,7 @@ final class Partition {
      * such index exists
      */
     static int searchLessOrEqual(int[] a, int left, int right, int k) {
-        int l = left;
-        int r = right;
-        while (l <= r) {
-            // Middle value
-            final int m = (l + r) >>> 1;
-            final int v = a[m];
-            // Test:
-            // l------m------r
-            //        v  k      update left
-            //     k  v         update right
-
-            // Full binary search
-            // Run time is up to log2(n) (fast exit on a match) but has more comparisons
-            if (v < k) {
-                l = m + 1;
-            } else if (v > k) {
-                r = m - 1;
-            } else {
-                // Equal
-                return m;
-            }
-
-            // Modified search that does not expect a match
-            // Run time is log2(n). Benchmarks as the same speed.
-            //if (v > k) {
-            //    r = m - 1;
-            //} else {
-            //    l = m + 1;
-            //}
-        }
-        // Return largest known value below:
-        // r is always moved downward when a middle index value is too high
-        return r;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -10256,39 +8255,7 @@ final class Partition {
      * such index exists
      */
     static int searchGreaterOrEqual(int[] a, int left, int right, int k) {
-        int l = left;
-        int r = right;
-        while (l <= r) {
-            // Middle value
-            final int m = (l + r) >>> 1;
-            final int v = a[m];
-            // Test:
-            // l------m------r
-            //        v  k      update left
-            //     k  v         update right
-
-            // Full binary search
-            // Run time is up to log2(n) (fast exit on a match) but has more comparisons
-            if (v < k) {
-                l = m + 1;
-            } else if (v > k) {
-                r = m - 1;
-            } else {
-                // Equal
-                return m;
-            }
-
-            // Modified search that does not expect a match
-            // Run time is log2(n). Benchmarks as the same speed.
-            //if (v < k) {
-            //    l = m + 1;
-            //} else {
-            //    r = m - 1;
-            //}
-        }
-        // Smallest known value above
-        // l is always moved upward when a middle index value is too low
-        return l;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -10332,7 +8299,7 @@ final class Partition {
      * @return the RNG
      */
     static IntUnaryOperator createFastRNG(int n, int k) {
-        return new Gen(n * 31L + k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -10344,7 +8311,10 @@ final class Partition {
      * https://en.wikipedia.org/wiki/Linear_congruential_generator
      */
     private static final class Gen implements IntUnaryOperator {
-        /** LCG state. */
+
+        /**
+         * LCG state.
+         */
         private long s;
 
         /**
@@ -10357,12 +8327,7 @@ final class Partition {
 
         @Override
         public int applyAsInt(int n) {
-            final long x = s;
-            // Update state
-            s = s * 6364136223846793005L + 1442695040888963407L;
-            // Use the upper 32-bits from the state as the random 32-bit sample
-            // result = n * [0, 2^32) / 2^32
-            return (int) ((n * (x >>> Integer.SIZE)) >>> Integer.SIZE);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

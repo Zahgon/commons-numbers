@@ -22,6 +22,7 @@ package org.apache.commons.numbers.core;
  * @param <T> Type of elements.
  */
 public interface Addition<T> {
+
     /**
      * Binary addition.
      *
@@ -59,6 +60,6 @@ public interface Addition<T> {
      * @since 1.2
      */
     default boolean isZero() {
-        return this.equals(zero());
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

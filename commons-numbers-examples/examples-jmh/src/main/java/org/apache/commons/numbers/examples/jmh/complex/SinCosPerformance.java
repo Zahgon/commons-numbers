@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.complex;
 
 import org.apache.commons.math3.util.FastMath;
@@ -49,24 +48,25 @@ import java.util.stream.DoubleStream;
 @Warmup(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @Measurement(iterations = 5, time = 1, timeUnit = TimeUnit.SECONDS)
 @State(Scope.Benchmark)
-@Fork(value = 1, jvmArgs = {"-server", "-Xms512M", "-Xmx512M"})
+@Fork(value = 1, jvmArgs = { "-server", "-Xms512M", "-Xmx512M" })
 public class SinCosPerformance {
+
     /**
      * An array of edge numbers that will produce edge case results from sin/cos functions:
      * {@code +/-inf, +/-0, nan}.
      */
-    private static final double[] EDGE_NUMBERS = {
-        Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, 0.0, -0.0, Double.NaN};
+    private static final double[] EDGE_NUMBERS = { Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, 0.0, -0.0, Double.NaN };
 
     /**
      * Contains the size of numbers.
      */
     @State(Scope.Benchmark)
     public static class NumberSize {
+
         /**
          * The size of the data.
          */
-        @Param({"1000"})
+        @Param({ "1000" })
         private int size;
 
         /**
@@ -75,7 +75,7 @@ public class SinCosPerformance {
          * @return the size
          */
         public int getSize() {
-            return size;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -83,7 +83,10 @@ public class SinCosPerformance {
      * Contains an array of numbers.
      */
     public abstract static class BaseNumbers extends NumberSize {
-        /** The numbers. */
+
+        /**
+         * The numbers.
+         */
         protected double[] numbers;
 
         /**
@@ -92,7 +95,7 @@ public class SinCosPerformance {
          * @return the numbers
          */
         public double[] getNumbers() {
-            return numbers;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -100,14 +103,7 @@ public class SinCosPerformance {
          */
         @Setup
         public void setup() {
-            numbers = createNumbers(new SplittableRandom());
-            // Verify functions
-            for (final double x : numbers) {
-                final double sin = Math.sin(x);
-                assertEquals(sin, FastMath.sin(x), 1, () -> "sin " + x);
-                final double cos = Math.cos(x);
-                assertEquals(cos, FastMath.cos(x), 1, () -> "cos " + x);
-            }
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -124,28 +120,19 @@ public class SinCosPerformance {
      */
     @State(Scope.Benchmark)
     public static class Numbers extends BaseNumbers {
+
         /**
          * The type of the data.
          */
-        @Param({"pi", "pi/2", "random", "edge"})
+        @Param({ "pi", "pi/2", "random", "edge" })
         private String type;
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected double[] createNumbers(SplittableRandom rng) {
-            DoubleSupplier generator;
-            if ("pi".equals(type)) {
-                generator = () -> rng.nextDouble() * 2 * Math.PI - Math.PI;
-            } else if ("pi/2".equals(type)) {
-                generator = () -> rng.nextDouble() * Math.PI - Math.PI / 2;
-            } else if ("random".equals(type)) {
-                generator = () -> createRandomNumber(rng);
-            } else if ("edge".equals(type)) {
-                generator = () -> createEdgeNumber(rng);
-            } else {
-                throw new IllegalStateException("Unknown number type: " + type);
-            }
-            return DoubleStream.generate(generator).limit(getSize()).toArray();
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -154,19 +141,22 @@ public class SinCosPerformance {
      */
     @State(Scope.Benchmark)
     public static class UniformNumbers extends BaseNumbers {
+
         /**
          * The range of the data.
          *
          * <p>Note: Representations of half-pi and pi are rounded down
          * to ensure the value is less than the exact representation.
          */
-        @Param({"1.57079", "3.14159", "10", "100", "1e4", "1e8", "1e16", "1e32"})
+        @Param({ "1.57079", "3.14159", "10", "100", "1e4", "1e8", "1e16", "1e32" })
         private double range;
 
-        /** {@inheritDoc} */
+        /**
+         * {@inheritDoc}
+         */
         @Override
         protected double[] createNumbers(SplittableRandom rng) {
-            return rng.doubles(getSize(), -range, range).toArray();
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -179,9 +169,7 @@ public class SinCosPerformance {
      * @param msg the message upon failure
      */
     static void assertEquals(double x, double y, int maxUlps, Supplier<String> msg) {
-        if (!Precision.equalsIncludingNaN(x, y, maxUlps)) {
-            throw new AssertionError(msg.get() + ": " + x + " != " + y);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -235,7 +223,6 @@ public class SinCosPerformance {
     // Benchmarks use function references to perform different operations on the numbers.
     // Tests show that explicit programming of the same benchmarks run in the same time.
     // For reference examples are provided for sin(x).
-
     /**
      * Explicit benchmark without using a method reference.
      * This is commented out as it exists for reference purposes.
@@ -245,10 +232,7 @@ public class SinCosPerformance {
      */
     //@Benchmark
     public void mathSin2(Numbers numbers, Blackhole bh) {
-        final double[] x = numbers.getNumbers();
-        for (int i = 0; i < x.length; i++) {
-            bh.consume(Math.sin(x[i]));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -260,7 +244,7 @@ public class SinCosPerformance {
      */
     @Benchmark
     public void baselineIdentity(Numbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), SinCosPerformance::identity, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -271,7 +255,7 @@ public class SinCosPerformance {
      */
     @Benchmark
     public void mathSin(Numbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Math::sin, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -282,7 +266,7 @@ public class SinCosPerformance {
      */
     @Benchmark
     public void mathCos(Numbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Math::cos, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -293,7 +277,7 @@ public class SinCosPerformance {
      */
     @Benchmark
     public void fastMathSin(Numbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), FastMath::sin, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -304,7 +288,7 @@ public class SinCosPerformance {
      */
     @Benchmark
     public void fastMathCos(Numbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), FastMath::cos, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -315,7 +299,7 @@ public class SinCosPerformance {
      */
     @Benchmark
     public void rangeMathSin(UniformNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), Math::sin, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -326,6 +310,6 @@ public class SinCosPerformance {
      */
     @Benchmark
     public void rangeFastMathSin(UniformNumbers numbers, Blackhole bh) {
-        apply(numbers.getNumbers(), FastMath::sin, bh);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

@@ -23,8 +23,11 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  */
 final class IndexIterators {
 
-    /** No instances. */
-    private IndexIterators() {}
+    /**
+     * No instances.
+     */
+    private IndexIterators() {
+    }
 
     /**
      * Creates an iterator for index {@code k}.
@@ -33,7 +36,7 @@ final class IndexIterators {
      * @return the iterator
      */
     static IndexIterator ofIndex(int k) {
-        return new SingleIndex(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -46,21 +49,17 @@ final class IndexIterators {
      * @return the iterator
      */
     static IndexIterator ofInterval(int k1, int k2) {
-        // Eliminate duplicates
-        if (k1 == k2) {
-            return new SingleIndex(k1);
-        }
-        // Sort
-        final int i1 = k1 < k2 ? k1 : k2;
-        final int i2 = k1 < k2 ? k2 : k1;
-        return new SingleInterval(i1, i2);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
      * {@link IndexIterator} for a single index.
      */
     private static final class SingleIndex implements IndexIterator {
-        /** Index. */
+
+        /**
+         * Index.
+         */
         private final int k;
 
         /**
@@ -72,33 +71,32 @@ final class IndexIterators {
 
         @Override
         public int left() {
-            return k;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int right() {
-            return k;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int end() {
-            return k;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean next() {
-            return false;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean positionAfter(int index) {
-            return k > index;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean nextAfter(int index) {
-            // right >= end : no next index
-            return true;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -106,9 +104,15 @@ final class IndexIterators {
      * {@link IndexIterator} for a single closed interval {@code [left, right]}.
      */
     private static final class SingleInterval implements IndexIterator {
-        /** Left index. */
+
+        /**
+         * Left index.
+         */
         private final int l;
-        /** Right index. */
+
+        /**
+         * Right index.
+         */
         private final int r;
 
         /**
@@ -122,33 +126,32 @@ final class IndexIterators {
 
         @Override
         public int left() {
-            return l;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int right() {
-            return r;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int end() {
-            return r;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean next() {
-            return false;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean positionAfter(int index) {
-            return r > index;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean nextAfter(int index) {
-            // right >= end : no next index
-            return true;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

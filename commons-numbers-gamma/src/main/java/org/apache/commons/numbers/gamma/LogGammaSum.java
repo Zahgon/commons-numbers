@@ -23,7 +23,10 @@ package org.apache.commons.numbers.gamma;
  * </p>
  */
 final class LogGammaSum {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private LogGammaSum() {
         // intentionally empty
     }
@@ -39,24 +42,7 @@ final class LogGammaSum {
      * @throws IllegalArgumentException if {@code a} or {@code b} is lower than 1
      * or larger than 2.
      */
-    static double value(double a,
-                        double b) {
-        if (a < 1 ||
-            a > 2) {
-            throw new GammaException(GammaException.OUT_OF_RANGE, a, 1, 2);
-        }
-        if (b < 1 ||
-            b > 2) {
-            throw new GammaException(GammaException.OUT_OF_RANGE, b, 1, 2);
-        }
-
-        final double x = (a - 1) + (b - 1);
-        if (x <= 0.5) {
-            return LogGamma1p.value(1 + x);
-        } else if (x <= 1.5) {
-            return LogGamma1p.value(x) + Math.log1p(x);
-        } else {
-            return LogGamma1p.value(x - 1) + Math.log(x * (1 + x));
-        }
+    static double value(double a, double b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

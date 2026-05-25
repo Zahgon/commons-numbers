@@ -43,6 +43,7 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 interface SearchableInterval2 {
+
     /**
      * Start pointer of the interval.
      *
@@ -128,7 +129,6 @@ interface SearchableInterval2 {
      * @return the lower pointer
      */
     default int split(int lo, int hi, int ka, int kb, int[] upper) {
-        upper[0] = next(hi, kb + 1);
-        return previous(lo, ka - 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

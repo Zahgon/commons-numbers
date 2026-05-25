@@ -23,50 +23,67 @@ import org.apache.commons.numbers.core.NativeOperators;
  *
  * @param <T> Type of the field elements.
  */
-public abstract class AbstractField<T extends NativeOperators<T>>
-    implements Field<T> {
-    /** Create an instance. */
-    public AbstractField() {}
+public abstract class AbstractField<T extends NativeOperators<T>> implements Field<T> {
 
-    /** {@inheritDoc} */
+    /**
+     * Create an instance.
+     */
+    public AbstractField() {
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T add(T a, T b) {
-        return a.add(b);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T subtract(T a, T b) {
-        return a.subtract(b);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T negate(T a) {
-        return a.negate();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T multiply(int n, T a) {
-        return a.multiply(n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T multiply(T a, T b) {
-        return a.multiply(b);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T divide(T a, T b) {
-        return a.divide(b);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** {@inheritDoc} */
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public T reciprocal(T a) {
-        return a.reciprocal();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

@@ -20,7 +20,10 @@ package org.apache.commons.numbers.gamma;
  * Inverse of the <a href="https://mathworld.wolfram.com/Erfc.html">complementary error function</a>.
  */
 public final class InverseErfc {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private InverseErfc() {
         // intentionally empty.
     }
@@ -41,6 +44,6 @@ public final class InverseErfc {
      * @return t such that {@code x =} {@link Erfc#value(double) Erfc.value(t)}.
      */
     public static double value(double x) {
-        return BoostErf.erfcInv(x);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

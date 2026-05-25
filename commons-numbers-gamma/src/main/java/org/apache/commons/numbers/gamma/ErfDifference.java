@@ -20,6 +20,7 @@ package org.apache.commons.numbers.gamma;
  * Computes the difference between {@link Erf error function values}.
  */
 public final class ErfDifference {
+
     /**
      * This number solves {@code erf(x) = 0.5} within 1 ulp.
      * More precisely, the current implementations of
@@ -33,7 +34,9 @@ public final class ErfDifference {
      */
     private static final double X_CRIT = 0.47693627620446993;
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private ErfDifference() {
         // intentionally empty.
     }
@@ -47,21 +50,7 @@ public final class ErfDifference {
      * @return {@link Erf#value(double) Erf.value(x2) - Erf.value(x1)}.
      * @throws ArithmeticException if the algorithm fails to converge.
      */
-    public static double value(double x1,
-                               double x2) {
-        if (x1 > x2) {
-            return -value(x2, x1);
-        }
-        if (x1 < -X_CRIT) {
-            if (x2 < 0) {
-                return Erfc.value(-x2) - Erfc.value(-x1);
-            }
-            return Erf.value(x2) - Erf.value(x1);
-        }
-        if (x2 > X_CRIT &&
-            x1 > 0) {
-            return Erfc.value(x1) - Erfc.value(x2);
-        }
-        return Erf.value(x2) - Erf.value(x1);
+    public static double value(double x1, double x2) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.arrays;
 
 /**
@@ -24,9 +23,15 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 final class BinarySearchKeyInterval implements SearchableInterval, SearchableInterval2 {
-    /** The ordered keys for descending search. */
+
+    /**
+     * The ordered keys for descending search.
+     */
     private final int[] keys;
-    /** The original number of keys - 1. This is more convenient to store for the use cases. */
+
+    /**
+     * The original number of keys - 1. This is more convenient to store for the use cases.
+     */
     private final int nm1;
 
     /**
@@ -50,110 +55,64 @@ final class BinarySearchKeyInterval implements SearchableInterval, SearchableInt
      * or {@code n <= 0}
      */
     static BinarySearchKeyInterval of(int[] indices, int n) {
-        // Check the indices are uniquely ordered
-        if (n <= 0) {
-            throw new IllegalArgumentException("No indices to define the range");
-        }
-        int p = indices[0];
-        for (int i = 0; ++i < n;) {
-            final int c = indices[i];
-            if (c <= p) {
-                throw new IllegalArgumentException("Indices are not unique and ordered");
-            }
-            p = c;
-        }
-        return new BinarySearchKeyInterval(indices, n);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int left() {
-        return keys[0];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int right() {
-        return keys[nm1];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int previousIndex(int k) {
-        // Assume left <= k <= right thus no index checks required.
-        // IndexOutOfBoundsException indicates incorrect usage by the caller.
-        return keys[Partition.searchLessOrEqual(keys, 0, nm1, k)];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int nextIndex(int k) {
-        // Assume left <= k <= right thus no index checks required.
-        // IndexOutOfBoundsException indicates incorrect usage by the caller.
-        return keys[Partition.searchGreaterOrEqual(keys, 0, nm1, k)];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int split(int ka, int kb, int[] upper) {
-        int i = Partition.searchGreaterOrEqual(keys, 0, nm1, kb + 1);
-        upper[0] = keys[i];
-        // Find the lower using a scan since a typical use case has ka == kb
-        // and a scan is faster than a second binary search.
-        do {
-            --i;
-        } while (keys[i] >= ka);
-        return keys[i];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int start() {
-        return 0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int end() {
-        return nm1;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int index(int i) {
-        return keys[i];
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // Use case for previous/next is when left/right is within
     // a partition pivot [p0, p1]. Most likely case is p0 == p1
     // and a scan is faster.
-
     @Override
     public int previous(int i, int k) {
-        // index(start) <= k < index(i)
-        int j = i;
-        do {
-            --j;
-        } while (keys[j] > k);
-        return j;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int next(int i, int k) {
-        // index(i) < k <= index(end)
-        int j = i;
-        do {
-            ++j;
-        } while (keys[j] < k);
-        return j;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int split(int lo, int hi, int ka, int kb, int[] upper) {
-        // index(lo) < ka <= kb < index(hi)
-
-        // We could test if ka/kb is above or below the
-        // median (keys[lo] + keys[hi]) >>> 1 to pick the side to search
-
-        int j = Partition.searchGreaterOrEqual(keys, lo, hi, kb + 1);
-        upper[0] = j;
-        // Find the lower using a scan since a typical use case has ka == kb
-        // and a scan is faster than a second binary search.
-        do {
-            --j;
-        } while (keys[j] >= ka);
-        return j;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.examples.jmh.arrays;
 
 /**
@@ -25,44 +24,49 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 enum PivotingStrategy {
+
     /**
      * Pivot around the centre of the range.
      */
     CENTRAL {
+
         @Override
         int pivotIndex(double[] data, int left, int right, int ignored) {
-            return med(left, right);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int[] getSampledIndices(int left, int right, int ignored) {
-            return new int[] {med(left, right)};
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int samplingEffect() {
-            return UNCHANGED;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
-    },
+    }
+    ,
     /**
      * Pivot around the median of 3 values within the range: the first; the centre; and the last.
      */
     MEDIAN_OF_3 {
+
         @Override
         int pivotIndex(double[] data, int left, int right, int ignored) {
-            return med3(data, left, med(left, right), right);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int[] getSampledIndices(int left, int right, int ignored) {
-            return new int[] {left, med(left, right), right};
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int samplingEffect() {
-            return UNCHANGED;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
-    },
+    }
+    ,
     /**
      * Pivot around the median of 9 values within the range.
      * Uses the median of 3 medians of 3. The returned value
@@ -70,34 +74,23 @@ enum PivotingStrategy {
      * This is also known in the literature as Tukey’s "ninther" pivot.
      */
     MEDIAN_OF_9 {
+
         @Override
         int pivotIndex(double[] data, int left, int right, int ignored) {
-            final int s = (right - left) >>> 3;
-            final int m = med(left, right);
-            final int x = med3(data, left, left + s, left + (s << 1));
-            final double a = data[x];
-            final int y = med3(data, m - s, m, m + s);
-            final double b = data[y];
-            final int z = med3(data, right - (s << 1), right - s, right);
-            return med3(a, b, data[z], x, y, z);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int[] getSampledIndices(int left, int right, int ignored) {
-            final int s = (right - left) >>> 3;
-            final int m = med(left, right);
-            return new int[] {
-                left, left + s, left + (s << 1),
-                m - s, m, m + s,
-                right - (s << 1), right - s, right
-            };
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int samplingEffect() {
-            return UNCHANGED;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
-    },
+    }
+    ,
     /**
      * Pivot around the median of 3 or 9 values within the range.
      *
@@ -106,27 +99,23 @@ enum PivotingStrategy {
      * This method does not switch to the central method for small sizes.
      */
     DYNAMIC {
+
         @Override
         int pivotIndex(double[] data, int left, int right, int ignored) {
-            if (right - left >= MED_9) {
-                return MEDIAN_OF_9.pivotIndex(data, left, right, ignored);
-            }
-            return MEDIAN_OF_3.pivotIndex(data, left, right, ignored);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int[] getSampledIndices(int left, int right, int ignored) {
-            if (right - left >= MED_9) {
-                return MEDIAN_OF_9.getSampledIndices(left, right, ignored);
-            }
-            return MEDIAN_OF_3.getSampledIndices(left, right, ignored);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int samplingEffect() {
-            return UNCHANGED;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
-    },
+    }
+    ,
     /**
      * Pivot around the median of 5 values within the range.
      * Requires that {@code right - left >= 4}.
@@ -136,40 +125,23 @@ enum PivotingStrategy {
      * <p>Uses the same spacing as {@link DualPivotingStrategy#SORT_5}.
      */
     MEDIAN_OF_5 {
+
         @Override
         int pivotIndex(double[] data, int left, int right, int ignored) {
-            // 1/6 = 5/30 ~ 1/8 + 1/32 + 1/64 : 0.1666 ~ 0.1719
-            // Ensure the value is above zero to choose different points!
-            // This is safe if len >= 4.
-            final int len = right - left;
-            final int sixth = 1 + (len >>> 3) + (len >>> 5) + (len >>> 6);
-            // Note: No use of median(left, right). This is not targeted by median of 3 killer
-            // input as it does not use the end points left and right.
-            final int p3 = left + (len >>> 1);
-            final int p2 = p3 - sixth;
-            final int p1 = p2 - sixth;
-            final int p4 = p3 + sixth;
-            final int p5 = p4 + sixth;
-            return Sorting.median5(data, p1, p2, p3, p4, p5);
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int[] getSampledIndices(int left, int right, int ignored) {
-            final int len = right - left;
-            final int sixth = 1 + (len >>> 3) + (len >>> 5) + (len >>> 6);
-            final int p3 = left + (len >>> 1);
-            final int p2 = p3 - sixth;
-            final int p1 = p2 - sixth;
-            final int p4 = p3 + sixth;
-            final int p5 = p4 + sixth;
-            return new int[] {p1, p2, p3, p4, p5};
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int samplingEffect() {
-            return PARTIAL_SORT;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
-    },
+    }
+    ,
     /**
      * Pivot around the median of 5 values within the range.
      * Requires that {@code right - left >= 4}.
@@ -179,70 +151,63 @@ enum PivotingStrategy {
      * <p>Uses the same spacing as {@link DualPivotingStrategy#SORT_5B}.
      */
     MEDIAN_OF_5B {
+
         @Override
         int pivotIndex(double[] data, int left, int right, int ignored) {
-            // 1/7 = 5/35 ~ 1/8 + 1/64 : 0.1429 ~ 0.1406
-            // Ensure the value is above zero to choose different points!
-            // This is safe if len >= 4.
-            final int len = right - left;
-            final int seventh = 1 + (len >>> 3) + (len >>> 6);
-            final int p3 = left + (len >>> 1);
-            final int p2 = p3 - seventh;
-            final int p1 = p2 - seventh;
-            final int p4 = p3 + seventh;
-            final int p5 = p4 + seventh;
-            Sorting.sort4(data, p1, p2, p4, p5);
-            // p2 and p4 are sorted: check if p3 is between them
-            if (data[p3] < data[p2]) {
-                return p2;
-            }
-            return data[p3] > data[p4] ? p4 : p3;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int[] getSampledIndices(int left, int right, int ignored) {
-            final int len = right - left;
-            final int seventh = 1 + (len >>> 3) + (len >>> 6);
-            final int p3 = left + (len >>> 1);
-            final int p2 = p3 - seventh;
-            final int p1 = p2 - seventh;
-            final int p4 = p3 + seventh;
-            final int p5 = p4 + seventh;
-            return new int[] {p1, p2, p3, p4, p5};
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int samplingEffect() {
-            return PARTIAL_SORT;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
-    },
+    }
+    ,
     /**
      * Pivot around the target index.
      */
     TARGET {
+
         @Override
         int pivotIndex(double[] data, int left, int right, int k) {
-            return k;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int[] getSampledIndices(int left, int right, int k) {
-            return new int[] {k};
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         int samplingEffect() {
-            return UNCHANGED;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
-    };
+    }
+    ;
 
-    /** Sampled points are unchanged. */
+    /**
+     * Sampled points are unchanged.
+     */
     static final int UNCHANGED = 0;
-    /** Sampled points are partially sorted. */
+
+    /**
+     * Sampled points are partially sorted.
+     */
     static final int PARTIAL_SORT = 0x1;
-    /** Sampled points are sorted. */
+
+    /**
+     * Sampled points are sorted.
+     */
     static final int SORT = 0x2;
-    /** Size to pivot around the median of 9. */
+
+    /**
+     * Size to pivot around the median of 9.
+     */
     private static final int MED_9 = 40;
 
     /**
@@ -320,7 +285,6 @@ enum PivotingStrategy {
     abstract int pivotIndex(double[] data, int left, int right, int k);
 
     // The following methods allow the strategy and side effects to be tested
-
     /**
      * Get the indices of points that will be sampled.
      *

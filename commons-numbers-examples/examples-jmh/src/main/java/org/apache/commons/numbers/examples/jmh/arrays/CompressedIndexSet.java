@@ -61,19 +61,35 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 final class CompressedIndexSet implements SearchableInterval, SearchableInterval2 {
-    /** All 64-bits bits set. */
+
+    /**
+     * All 64-bits bits set.
+     */
     private static final long LONG_MASK = -1L;
-    /** A bit shift to apply to an integer to divided by 64 (2^6). */
+
+    /**
+     * A bit shift to apply to an integer to divided by 64 (2^6).
+     */
     private static final int DIVIDE_BY_64 = 6;
 
-    /** Bit indexes. */
+    /**
+     * Bit indexes.
+     */
     private final long[] data;
 
-    /** Left bound of the support. */
+    /**
+     * Left bound of the support.
+     */
     private final int left;
-    /** Right bound of the support. */
+
+    /**
+     * Right bound of the support.
+     */
     private final int right;
-    /** Compression level. */
+
+    /**
+     * Compression level.
+     */
     private final int compression;
 
     /**
@@ -109,10 +125,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * or if {@code right < left}; or if {@code left < 0}
      */
     static CompressedIndexSet ofRange(int compression, int left, int right) {
-        checkCompression(compression);
-        checkLeft(left);
-        checkRange(left, right);
-        return new CompressedIndexSet(compression, left, right);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -130,7 +143,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * or if {@code indices.length == 0}; or if {@code left < 0}
      */
     static CompressedIndexSet of(int compression, int[] indices) {
-        return of(compression, indices, indices.length);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -149,22 +162,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * or if {@code n == 0}; or if {@code left < 0}
      */
     static CompressedIndexSet of(int compression, int[] indices, int n) {
-        if (n <= 0) {
-            throw new IllegalArgumentException("No indices to define the range");
-        }
-        checkCompression(compression);
-        int min = indices[0];
-        int max = min;
-        for (int i = 0; ++i < n;) {
-            min = Math.min(min, indices[i]);
-            max = Math.max(max, indices[i]);
-        }
-        checkLeft(min);
-        final CompressedIndexSet set = new CompressedIndexSet(compression, min, max);
-        for (int i = -1; ++i < n;) {
-            set.set(indices[i]);
-        }
-        return set;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -178,7 +176,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * or if {@code n == 0}; or if {@code left < 0}
      */
     static IndexIterator iterator(int compression, int[] indices, int n) {
-        return of(compression, indices, n).new Iterator();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -245,11 +243,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * @return the value of the bit with the specified index
      */
     boolean get(int bitIndex) {
-        // WARNING: No range checks !!!
-        final int index = compressIndex(bitIndex);
-        final int i = getLongIndex(index);
-        final long m = getLongBit(index);
-        return (data[i] & m) != 0;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -260,22 +254,17 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * @param bitIndex the bit index (assumed to be positive)
      */
     void set(int bitIndex) {
-        // WARNING: No range checks !!!
-        final int index = compressIndex(bitIndex);
-        final int i = getLongIndex(index);
-        final long m = getLongBit(index);
-        data[i] |= m;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
-
 
     @Override
     public int left() {
-        return left;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int right() {
-        return right;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -288,40 +277,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * @return the previous index, or {@code left - 1}
      */
     int previousIndexOrLeftMinus1(int k) {
-        if (k < left) {
-            // index is in an unknown range
-            return left - 1;
-        }
-        // Support searching backward through the known range
-        final int index = compressIndex(k > right ? right : k);
-
-        int i = getLongIndex(index);
-        long bits = data[i];
-
-        // Check if this is within a compressed index. If so return the exact result.
-        if ((bits & getLongBit(index)) != 0) {
-            return Math.min(k, right);
-        }
-
-        // Mask bits before the bit index
-        // mask = 00011111 = -1L >>> (64 - ((index + 1) % 64))
-        bits &= LONG_MASK >>> -(index + 1);
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |   c      |
-                // |   |      |
-                // 0  001010000
-                final int c = (i + 1) * Long.SIZE - Long.numberOfLeadingZeros(bits);
-                // Decompress the prior unset bit to an index. When inflated this is the
-                // next index above the upper bound of the compressed range so subtract 1.
-                return (c << compression) - 1 + left;
-            }
-            if (i == 0) {
-                return left - 1;
-            }
-            bits = data[--i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -334,140 +290,44 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * @return the next index, or {@code right + 1}
      */
     int nextIndexOrRightPlus1(int k) {
-        if (k > right) {
-            // index is in an unknown range
-            return right + 1;
-        }
-        // Support searching forward through the known range
-        final int index = compressIndex(k < left ? left : k);
-
-        int i = getLongIndex(index);
-        long bits = data[i];
-
-        // Check if this is within a compressed index. If so return the exact result.
-        if ((bits & getLongBit(index)) != 0) {
-            return Math.max(k, left);
-        }
-
-        // Mask bits after the bit index
-        // mask = 11111000 = -1L << (index % 64)
-        bits &= LONG_MASK << index;
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |      c   |
-                // |      |   |
-                // 0  001010000
-                final int c = i * Long.SIZE + Long.numberOfTrailingZeros(bits);
-                // Decompress the set bit to an index. When inflated this is the lower bound of
-                // the compressed range and is OK for next scanning.
-                return (c << compression) + left;
-            }
-            if (++i == data.length) {
-                return right + 1;
-            }
-            bits = data[i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int previousIndex(int k) {
-        // WARNING: No range checks !!!
-        // Assume left <= k <= right and that left and right are set bits acting as sentinals.
-        final int index = compressIndex(k);
-
-        int i = getLongIndex(index);
-        long bits = data[i];
-
-        // Check if this is within a compressed index. If so return the exact result.
-        if ((bits & getLongBit(index)) != 0) {
-            return k;
-        }
-
-        // Mask bits before the bit index
-        // mask = 00011111 = -1L >>> (64 - ((index + 1) % 64))
-        bits &= LONG_MASK >>> -(index + 1);
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |   c      |
-                // |   |      |
-                // 0  001010000
-                final int c = (i + 1) * Long.SIZE - Long.numberOfLeadingZeros(bits);
-                // Decompress the prior unset bit to an index. When inflated this is the
-                // next index above the upper bound of the compressed range so subtract 1.
-                return (c << compression) - 1 + left;
-            }
-            // Unsupported: the interval should contain k
-            //if (i == 0) {
-            //    return left - 1;
-            //}
-            bits = data[--i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int nextIndex(int k) {
-        // WARNING: No range checks !!!
-        // Assume left <= k <= right and that left and right are set bits acting as sentinals.
-        final int index = compressIndex(k);
-
-        int i = getLongIndex(index);
-        long bits = data[i];
-
-        // Check if this is within a compressed index. If so return the exact result.
-        if ((bits & getLongBit(index)) != 0) {
-            return k;
-        }
-
-        // Mask bits after the bit index
-        // mask = 11111000 = -1L << (index % 64)
-        bits &= LONG_MASK << index;
-        for (;;) {
-            if (bits != 0) {
-                //(i+1)       i
-                // |      c   |
-                // |      |   |
-                // 0  001010000
-                final int c = i * Long.SIZE + Long.numberOfTrailingZeros(bits);
-                // Decompress the set bit to an index. When inflated this is the lower bound of
-                // the compressed range and is OK for next scanning.
-                return (c << compression) + left;
-            }
-            // Unsupported: the interval should contain k
-            //if (++i == data.length) {
-            //    return right + 1;
-            //}
-            bits = data[++i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // SearchableInterval2
     // This is exactly the same as SearchableInterval as the pointers i are the same as the keys k
-
     @Override
     public int start() {
-        return left();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int end() {
-        return right();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int index(int i) {
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int previous(int i, int k) {
-        return previousIndex(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     @Override
     public int next(int i, int k) {
-        return nextIndex(k);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -481,29 +341,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * @return the index of the previous unset bit, or {@code left - 1} if there is no such bit
      */
     int previousClearBit(int k) {
-        // WARNING: No range checks !!!
-        // Assume left <= k <= right and that left and right are set bits acting as sentinals.
-        final int index = compressIndex(k);
-
-        int i = getLongIndex(index);
-
-        // Note: This method is conceptually the same as previousIndex with the exception
-        // that: all the data is bit-flipped; a check is made when the scan reaches the end;
-        // and no check is made for k within an unset compressed index.
-
-        // Mask bits before the bit index
-        // mask = 00011111 = -1L >>> (64 - ((index + 1) % 64))
-        long bits = ~data[i] & (LONG_MASK >>> -(index + 1));
-        for (;;) {
-            if (bits != 0) {
-                final int c = (i + 1) * Long.SIZE - Long.numberOfLeadingZeros(bits);
-                return (c << compression) - 1 + left;
-            }
-            if (i == 0) {
-                return left - 1;
-            }
-            bits = ~data[--i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -518,30 +356,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * @return the index of the next unset bit, or the {@code capacity} if there is no such bit
      */
     int nextClearBit(int k) {
-        // WARNING: No range checks !!!
-        // Assume left <= k <= right
-        final int index = compressIndex(k);
-
-        int i = getLongIndex(index);
-
-        // Note: This method is conceptually the same as nextIndex with the exception
-        // that: all the data is bit-flipped; a check is made for the capacity when the
-        // scan reaches the end; and no check is made for k within an unset compressed index.
-
-        // Mask bits after the bit index
-        // mask = 11111000 = -1L << (fromIndex % 64)
-        long bits = ~data[i] & (LONG_MASK << index);
-        for (;;) {
-            if (bits != 0) {
-                final int c = i * Long.SIZE + Long.numberOfTrailingZeros(bits);
-                return (c << compression) + left;
-            }
-            if (++i == data.length) {
-                // Capacity
-                return right + 1;
-            }
-            bits = ~data[i];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -577,8 +392,7 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      */
     private static void checkRange(int left, int right) {
         if (right < left) {
-            throw new IllegalArgumentException(
-                String.format("Invalid range: [%d, %d]", left, right));
+            throw new IllegalArgumentException(String.format("Invalid range: [%d, %d]", left, right));
         }
     }
 
@@ -590,11 +404,20 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
      * separation between indices.
      */
     private class Iterator implements IndexIterator {
-        /** Iterator left. l is a compressed index. */
+
+        /**
+         * Iterator left. l is a compressed index.
+         */
         private int l;
-        /** Iterator right. (r+1) is a clear bit. */
+
+        /**
+         * Iterator right. (r+1) is a clear bit.
+         */
         private int r;
-        /** Next iterator left. Cached for look ahead functionality. */
+
+        /**
+         * Next iterator left. Cached for look ahead functionality.
+         */
         private int nextL;
 
         /**
@@ -613,86 +436,32 @@ final class CompressedIndexSet implements SearchableInterval, SearchableInterval
 
         @Override
         public int left() {
-            return l;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int right() {
-            return r;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public int end() {
-            return CompressedIndexSet.this.right();
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean next() {
-            if (r < end()) {
-                // Reuse the cached next left and advance
-                l = nextL;
-                r = nextClearBit(l) - 1;
-                if (r < end()) {
-                    nextL = nextIndex(r + 1);
-                } else {
-                    r = end();
-                }
-                return true;
-            }
-            return false;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean positionAfter(int index) {
-            // Even though this can provide random access we only allow advancing
-            if (r > index) {
-                return true;
-            }
-            if (index < end()) {
-                // Note: Uses 3 scans as it maintains the next left.
-                // For low density indices scanning for next left will be expensive
-                // and it would be more efficient to only compute next left on demand.
-                // For high density indices the next left will be close to
-                // the new right and the cost is low.
-                // This iterator favours use on high density indices. A variant
-                // iterator could be created for comparison purposes.
-
-                if (get(index + 1)) {
-                    // (index+1) is set.
-                    // Find [left <= index+1 <= right]
-                    r = nextClearBit(index + 1) - 1;
-                    if (r < end()) {
-                        nextL = nextIndex(r + 1);
-                    } else {
-                        r = end();
-                    }
-                    l = index + 1;
-                    //l = previousClearBit(index) + 1;
-                } else {
-                    // (index+1) is clear.
-                    // Advance to the next [left, right] pair
-                    l = nextIndex(index + 1);
-                    r = nextClearBit(l) - 1;
-                    if (r < end()) {
-                        nextL = nextIndex(r + 1);
-                    } else {
-                        r = end();
-                    }
-                }
-                return true;
-            }
-            // Advance to end. No next left. Not positioned after the target index.
-            l = r = end();
-            return false;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         @Override
         public boolean nextAfter(int index) {
-            if (r < end()) {
-                return nextL > index;
-            }
-            // no more indices
-            return true;
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

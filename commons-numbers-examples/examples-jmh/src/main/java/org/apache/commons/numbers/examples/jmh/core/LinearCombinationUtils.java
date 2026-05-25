@@ -18,18 +18,24 @@ package org.apache.commons.numbers.examples.jmh.core;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
-
 import org.apache.commons.rng.UniformRandomProvider;
 
 /**
  * Utility class to create data for linear combinations.
  */
 final class LinearCombinationUtils {
-    /** ln(2). */
+
+    /**
+     * ln(2).
+     */
     private static final double LN_2 = Math.log(2);
 
-    /** No construction. */
-    private LinearCombinationUtils() {}
+    /**
+     * No construction.
+     */
+    private LinearCombinationUtils() {
+    }
+
     /**
      * Generates ill conditioned dot products.
      * See {@link #genDot(double, UniformRandomProvider, double[], double[], double[], MathContext)}.
@@ -45,9 +51,8 @@ final class LinearCombinationUtils {
      * @return the exact dot product
      * @throws IllegalArgumentException If the vector length is below 6
      */
-    static double genDot(double c, UniformRandomProvider rng,
-            double[] x, double[] y, double[] computeC) {
-        return genDot(c, rng, x, y, computeC, MathContext.UNLIMITED);
+    static double genDot(double c, UniformRandomProvider rng, double[] x, double[] y, double[] computeC) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -96,92 +101,8 @@ final class LinearCombinationUtils {
      * @see <a href="https://en.wikipedia.org/wiki/Condition_number">Condition number</a>
      * @see <a href="https://en.wikipedia.org/wiki/Dot_product">Dot product</a>
      */
-    static double genDot(double c, UniformRandomProvider rng,
-            double[] x, double[] y, double[] computeC, MathContext context) {
-        // Initialisation
-        if (x.length < 6) {
-            throw new IllegalArgumentException("Incorrect usage: n < 6: " + x.length);
-        }
-        final int n = x.length;
-        final int n2 = n / 2;
-
-        // log2(c)
-        final double b = Math.log(c) / LN_2;
-        final double b2 = b / 2;
-        // e vector of exponents between 0 and b/2
-        int[] e = new int[n2];
-        // make sure exponents b/2 and 0 actually occur in e
-        e[0] = (int) Math.round(b2) + 1;
-        for (int i = 1; i < n2 - 1; i++) {
-            e[i] = (int) Math.round(rng.nextDouble() * b2);
-        }
-        // e[end] = 0;
-
-        // Generate first half vectors.
-        // Maintain the exact dot product for use later
-        BigDecimal exact = BigDecimal.ZERO;
-        for (int i = 0; i < n2; i++) {
-            x[i] = Math.scalb(m1p1(rng), e[i]);
-            y[i] = Math.scalb(m1p1(rng), e[i]);
-            exact = exact.add(new BigDecimal(x[i]).multiply(new BigDecimal(y[i])), context);
-        }
-
-        // for i=n2+1:n and v=1:i,
-        // generate x(i), y(i) such that (*) x(v)’*y(v) ~ 2^e(i-n2)
-        // i.e. the dot product up to position i is a value that will increasingly approach 0
-        e = new int[n - n2];
-        // exponents for second half as a linear vector of exponents from b/2 to 0
-        // linspace(b/2, 0, n-n2)
-        for (int i = 0; i < e.length - 1; i++) {
-            e[i] = (int) Math.round(b2 * (e.length - i - 1) / (e.length - 1));
-        }
-
-        for (int i = n2; i < x.length; i++) {
-            // x(i) random with generated exponent
-            x[i] = Math.scalb(m1p1(rng), e[i - n2]);
-            // y(i) according to (*).
-            // sum(i) = xi * yi + sum(i-1)
-            // yi = (sum(i) - sum(i-1)) / xi
-            // Here the new sum(i) is a random number with the exponent gradually
-            // reducing to e[end] = 0 so the final result is in [-1, 1].
-            y[i] = (Math.scalb(m1p1(rng), e[i - n2]) - exact.doubleValue()) / x[i];
-            // Maintain the exact dot product
-            exact = exact.add(new BigDecimal(x[i]).multiply(new BigDecimal(y[i])), context);
-        }
-
-        // Shuffle x and y. Do a parallel Fisher-Yates shuffle.
-        for (int i = n; i > 1; i--) {
-            final int j = rng.nextInt(i);
-            swap(x, i - 1, j);
-            swap(y, i - 1, j);
-        }
-
-        // Ogita el at.
-        // Compute condition number:
-        // d = DotExact(x’,y);             % the true dot product rounded to nearest
-        // C = 2*(abs(x’)*abs(y))/abs(d);  % the actual condition number
-
-        // Compare to this:
-        // https://math.stackexchange.com/questions/3147927/condition-number-of-dot-product-of-vectors
-        // Compute the inverse of the cosine between the two vectors.
-        // ||y^t|| ||x|| / | y^t x |
-        // This value is similar to that computed by Ogita et al which effectively
-        // is using the magnitude of the largest component to approximate the vector
-        // length. This works as the vectors are created with matched magnitudes in their
-        // components. Here we compute the actual vector lengths ||y^t|| and ||x||.
-        final double d = exact.doubleValue();
-        if (computeC != null) {
-            // Sum should not overflow as elements are bounded to an exponent half the size
-            // of the input condition number.
-            double s1 = 0;
-            double s2 = 0;
-            for (int i = 0; i < n; i++) {
-                s1 += x[i] * x[i];
-                s2 += y[i] * y[i];
-            }
-            computeC[0] = Math.sqrt(s1) * Math.sqrt(s2) / Math.abs(d);
-        }
-        return d;
+    static double genDot(double c, UniformRandomProvider rng, double[] x, double[] y, double[] computeC, MathContext context) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**

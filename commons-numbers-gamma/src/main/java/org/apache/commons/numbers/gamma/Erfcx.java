@@ -29,7 +29,10 @@ package org.apache.commons.numbers.gamma;
  * @since 1.1
  */
 public final class Erfcx {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private Erfcx() {
         // intentionally empty.
     }
@@ -49,6 +52,6 @@ public final class Erfcx {
      * @return the scaled complementary error function.
      */
     public static double value(double x) {
-        return BoostErf.erfcx(x);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

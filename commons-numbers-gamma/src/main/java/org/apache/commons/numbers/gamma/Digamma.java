@@ -27,21 +27,40 @@ package org.apache.commons.numbers.gamma;
  * @see Gamma
  */
 public final class Digamma {
-    /** <a href="https://en.wikipedia.org/wiki/Euler-Mascheroni_constant">Euler-Mascheroni constant</a>. */
+
+    /**
+     * <a href="https://en.wikipedia.org/wiki/Euler-Mascheroni_constant">Euler-Mascheroni constant</a>.
+     */
     private static final double GAMMA = 0.577215664901532860606512090082;
 
-    /** C limit. */
+    /**
+     * C limit.
+     */
     private static final double C_LIMIT = 49;
-    /** S limit. */
+
+    /**
+     * S limit.
+     */
     private static final double S_LIMIT = 1e-5;
-    /** Fraction. */
+
+    /**
+     * Fraction.
+     */
     private static final double F_M1_12 = -1d / 12;
-    /** Fraction. */
+
+    /**
+     * Fraction.
+     */
     private static final double F_1_120 = 1d / 120;
-    /** Fraction. */
+
+    /**
+     * Fraction.
+     */
     private static final double F_M1_252 = -1d / 252;
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private Digamma() {
         // intentionally empty.
     }
@@ -65,34 +84,6 @@ public final class Digamma {
      * is larger.
      */
     public static double value(double x) {
-        if (!Double.isFinite(x)) {
-            return x;
-        }
-
-        double digamma = 0;
-        if (x < 0) {
-            // Use reflection formula to fall back into positive values.
-            digamma -= Math.PI / Math.tan(Math.PI * x);
-            x = 1 - x;
-        }
-
-        if (x > 0 && x <= S_LIMIT) {
-            // Use method 5 from Bernardo AS103, accurate to O(x).
-            return digamma - GAMMA - 1 / x;
-        }
-
-        while (x < C_LIMIT) {
-            digamma -= 1 / x;
-            x += 1;
-        }
-
-        // Use method 4, accurate to O(1/x^8)
-        final double inv = 1 / (x * x);
-        //            1       1        1         1
-        // log(x) -  --- - ------ + ------- - -------
-        //           2 x   12 x^2   120 x^4   252 x^6
-        digamma += Math.log(x) - 0.5 / x + inv * (F_M1_12 + inv * (F_1_120 + F_M1_252 * inv));
-
-        return digamma;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

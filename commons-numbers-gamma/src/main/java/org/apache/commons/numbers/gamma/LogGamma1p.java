@@ -22,7 +22,10 @@ package org.apache.commons.numbers.gamma;
  * Class is immutable.
  */
 final class LogGamma1p {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private LogGamma1p() {
         // intentionally empty
     }
@@ -38,10 +41,6 @@ final class LogGamma1p {
      * @throws IllegalArgumentException if {@code x < -0.5} or {@code x > 1.5}.
      */
     public static double value(final double x) {
-        if (x < -0.5 || x > 1.5) {
-            throw new GammaException(GammaException.OUT_OF_RANGE, x, -0.5, 1.5);
-        }
-
-        return -Math.log1p(InvGamma1pm1.value(x));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

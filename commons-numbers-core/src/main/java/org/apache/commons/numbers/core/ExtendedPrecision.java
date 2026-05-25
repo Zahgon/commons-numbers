@@ -23,6 +23,7 @@ package org.apache.commons.numbers.core;
  * are extensions to prevent overflow or underflow in intermediate computations.
  */
 final class ExtendedPrecision {
+
     /**
      * The upper limit above which a number may overflow during the split into a high part.
      * Assuming the multiplier is above 2^27 and the maximum exponent is 1023 then a safe
@@ -30,25 +31,38 @@ final class ExtendedPrecision {
      * 996 is the value obtained from {@code Math.getExponent(Double.MAX_VALUE / MULTIPLIER)}.
      */
     private static final double SAFE_UPPER = 0x1.0p996;
+
     /**
      * The lower limit for a product {@code x * y} below which the round-off component may be
      * sub-normal. This is set as 2^-1022 * 2^54.
      */
     private static final double SAFE_LOWER = 0x1.0p-968;
 
-    /** The scale to use when down-scaling during a split into a high part.
-     * This must be smaller than the inverse of the multiplier and a power of 2 for exact scaling. */
+    /**
+     * The scale to use when down-scaling during a split into a high part.
+     * This must be smaller than the inverse of the multiplier and a power of 2 for exact scaling.
+     */
     private static final double DOWN_SCALE = 0x1.0p-30;
-    /** The scale to use when up-scaling during a split into a high part.
-     * This is the inverse of {@link #DOWN_SCALE}. */
+
+    /**
+     * The scale to use when up-scaling during a split into a high part.
+     * This is the inverse of {@link #DOWN_SCALE}.
+     */
     private static final double UP_SCALE = 0x1.0p30;
 
-    /** The upscale factor squared. */
+    /**
+     * The upscale factor squared.
+     */
     private static final double UP_SCALE2 = 0x1.0p60;
-    /** The downscale factor squared. */
+
+    /**
+     * The downscale factor squared.
+     */
     private static final double DOWN_SCALE2 = 0x1.0p-60;
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private ExtendedPrecision() {
         // intentionally empty.
     }
@@ -87,50 +101,6 @@ final class ExtendedPrecision {
      * @see DD#twoProductLow(double, double, double)
      */
     static double productLow(double x, double y, double xy) {
-        // Verify the input. This must be NaN safe.
-        //assert Double.compare(x * y, xy) == 0
-
-        // If the number is sub-normal, inf or nan there is no round-off.
-        if (DD.isNotNormal(xy)) {
-            // Returns 0.0 for sub-normal xy, otherwise NaN for inf/nan:
-            return xy - xy;
-        }
-
-        // The result xy is finite and normal.
-        // Use Dekker's mul12 algorithm that splits the values into high and low parts.
-        // Dekker's split using multiplication will overflow if the value is within 2^27
-        // of double max value. It can also produce 26-bit approximations that are larger
-        // than the input numbers for the high part causing overflow in hx * hy when
-        // x * y does not overflow. So we must scale down big numbers.
-        // We only have to scale the largest number as we know the product does not overflow
-        // (if one is too big then the other cannot be).
-        // We also scale if the product is close to overflow to avoid intermediate overflow.
-        // This could be done at a higher limit (e.g. Math.abs(xy) > Double.MAX_VALUE / 4)
-        // but is included here to have a single low probability branch condition.
-
-        // Add the absolute inputs for a single comparison. The sum will not be more than
-        // 3-fold higher than any component.
-        final double a = Math.abs(x);
-        final double b = Math.abs(y);
-        final double ab = Math.abs(xy);
-        if (a + b + ab >= SAFE_UPPER) {
-            // Only required to scale the largest number as x*y does not overflow.
-            if (a > b) {
-                return DD.twoProductLow(x * DOWN_SCALE, y, xy * DOWN_SCALE) * UP_SCALE;
-            }
-            return DD.twoProductLow(x, y * DOWN_SCALE, xy * DOWN_SCALE) * UP_SCALE;
-        }
-
-        // The result is computed using a product of the low parts.
-        // To avoid underflow in the low parts we note that these are approximately a factor
-        // of 2^27 smaller than the original inputs so their product will be ~2^54 smaller
-        // than the product xy. Ensure the product is at least 2^54 above a sub-normal.
-        if (ab <= SAFE_LOWER) {
-            // Scaling up here is safe: the largest magnitude cannot be above SAFE_LOWER / MIN_VALUE.
-            return DD.twoProductLow(x * UP_SCALE, y * UP_SCALE, xy * UP_SCALE2) * DOWN_SCALE2;
-        }
-
-        // No scaling required
-        return DD.twoProductLow(x, y, xy);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

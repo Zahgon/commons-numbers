@@ -70,6 +70,7 @@ package org.apache.commons.numbers.examples.jmh.arrays;
  * @since 1.2
  */
 interface PivotCache extends PivotStore {
+
     /**
      * The start (inclusive) of the range of indices supported.
      *
@@ -150,7 +151,7 @@ interface PivotCache extends PivotStore {
      * @return the index of the next pivot, or {@code -1} if there is no index
      */
     default int nextPivot(int k) {
-        return nextPivotOrElse(k, -1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**

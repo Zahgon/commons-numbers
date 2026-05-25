@@ -38,7 +38,10 @@ package org.apache.commons.numbers.gamma;
  * Boost C++ Gamma functions</a>
  */
 public final class Gamma {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private Gamma() {
         // intentionally empty.
     }
@@ -50,6 +53,6 @@ public final class Gamma {
      * @return \( \Gamma(x) \)
      */
     public static double value(final double x) {
-        return BoostGamma.tgamma(x);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

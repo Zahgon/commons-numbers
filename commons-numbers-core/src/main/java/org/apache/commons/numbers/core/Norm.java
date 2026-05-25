@@ -26,23 +26,32 @@ package org.apache.commons.numbers.core;
  * and Shin'ichi Oishi published in <em>SIAM J. Sci. Comput</em>.
  */
 public enum Norm {
+
     /**
      * <a href="https://en.wikipedia.org/wiki/Norm_(mathematics)#Taxicab_norm_or_Manhattan_norm">
      *  Manhattan norm</a> (sum of the absolute values of the arguments).
      */
     L1(Norm::manhattan, Norm::manhattan, Norm::manhattan),
-    /** Alias for {@link #L1}. */
+    /**
+     * Alias for {@link #L1}.
+     */
     MANHATTAN(L1),
-    /** <a href="https://en.wikipedia.org/wiki/Norm_(mathematics)#Euclidean_norm">Euclidean norm</a>. */
+    /**
+     * <a href="https://en.wikipedia.org/wiki/Norm_(mathematics)#Euclidean_norm">Euclidean norm</a>.
+     */
     L2(Norm::euclidean, Norm::euclidean, Norm::euclidean),
-    /** Alias for {@link #L2}. */
+    /**
+     * Alias for {@link #L2}.
+     */
     EUCLIDEAN(L2),
     /**
      * <a href="https://en.wikipedia.org/wiki/Norm_(mathematics)#Maximum_norm_(special_case_of:_infinity_norm,_uniform_norm,_or_supremum_norm)">
      *  Maximum norm</a> (maximum of the absolute values of the arguments).
      */
     LINF(Norm::maximum, Norm::maximum, Norm::maximum),
-    /** Alias for {@link #LINF}. */
+    /**
+     * Alias for {@link #LINF}.
+     */
     MAXIMUM(LINF);
 
     /**
@@ -51,37 +60,57 @@ public enum Norm {
      * be scaled up.
      */
     private static final double SMALL_THRESH = 0x1.0p-511;
+
     /**
      * Threshold for scaling large numbers. This value is chosen such that 2^31 doubles
      * set to this value can be squared and added without overflow. Values greater than
      * this must be scaled down.
      */
     private static final double LARGE_THRESH = 0x1.0p+496;
+
     /**
      * Threshold for scaling up a single value by {@link #SCALE_UP} without risking
      * overflow when the value is squared.
      */
     private static final double SAFE_SCALE_UP_THRESH = 0x1.0p-100;
-    /** Value used to scale down large numbers. */
+
+    /**
+     * Value used to scale down large numbers.
+     */
     private static final double SCALE_DOWN = 0x1.0p-600;
-    /** Value used to scale up small numbers. */
+
+    /**
+     * Value used to scale up small numbers.
+     */
     private static final double SCALE_UP = 0x1.0p+600;
 
-    /** Threshold for the difference between the exponents of two Euclidean 2D input values
+    /**
+     * Threshold for the difference between the exponents of two Euclidean 2D input values
      * where the larger value dominates the calculation.
      */
     private static final int EXP_DIFF_THRESHOLD_2D = 54;
 
-    /** Function of 2 arguments. */
+    /**
+     * Function of 2 arguments.
+     */
     private final Two two;
-    /** Function of 3 arguments. */
+
+    /**
+     * Function of 3 arguments.
+     */
     private final Three three;
-    /** Function of array argument. */
+
+    /**
+     * Function of array argument.
+     */
     private final Array array;
 
-    /** Function of 2 arguments. */
+    /**
+     * Function of 2 arguments.
+     */
     @FunctionalInterface
     private interface Two {
+
         /**
          * @param x Argument.
          * @param y Argument.
@@ -89,9 +118,13 @@ public enum Norm {
          */
         double of(double x, double y);
     }
-    /** Function of 3 arguments. */
+
+    /**
+     * Function of 3 arguments.
+     */
     @FunctionalInterface
     private interface Three {
+
         /**
          * @param x Argument.
          * @param y Argument.
@@ -100,9 +133,13 @@ public enum Norm {
          */
         double of(double x, double y, double z);
     }
-    /** Function of array argument. */
+
+    /**
+     * Function of array argument.
+     */
     @FunctionalInterface
     private interface Array {
+
         /**
          * @param v Array of arguments.
          * @return the norm.
@@ -115,9 +152,7 @@ public enum Norm {
      * @param three Function of 3 arguments.
      * @param array Function of array argument.
      */
-    Norm(Two two,
-         Three three,
-         Array array) {
+    Norm(Two two, Three three, Array array) {
         this.two = two;
         this.three = three;
         this.array = array;
@@ -146,9 +181,8 @@ public enum Norm {
      * @param y Argument.
      * @return the norm.
      */
-    public double of(double x,
-                     double y) {
-        return two.of(x, y);
+    public double of(double x, double y) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -166,10 +200,8 @@ public enum Norm {
      * @param z Argument.
      * @return the norm.
      */
-    public double of(double x,
-                     double y,
-                     double z) {
-        return three.of(x, y, z);
+    public double of(double x, double y, double z) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -187,11 +219,11 @@ public enum Norm {
      * @throws IllegalArgumentException if the array is empty.
      */
     public double of(double[] v) {
-        ensureNonEmpty(v);
-        return array.of(v);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
-    /** Computes the Manhattan norm.
+    /**
+     * Computes the Manhattan norm.
      *
      * @param x first input value
      * @param y second input value
@@ -201,12 +233,12 @@ public enum Norm {
      * @see #MANHATTAN
      * @see #of(double,double)
      */
-    private static double manhattan(final double x,
-                                    final double y) {
+    private static double manhattan(final double x, final double y) {
         return Math.abs(x) + Math.abs(y);
     }
 
-    /** Computes the Manhattan norm.
+    /**
+     * Computes the Manhattan norm.
      *
      * @param x first input value
      * @param y second input value
@@ -217,16 +249,12 @@ public enum Norm {
      * @see #MANHATTAN
      * @see #of(double,double,double)
      */
-    private static double manhattan(final double x,
-                                    final double y,
-                                    final double z) {
-        return Sum.of(Math.abs(x))
-            .add(Math.abs(y))
-            .add(Math.abs(z))
-            .getAsDouble();
+    private static double manhattan(final double x, final double y, final double z) {
+        return Sum.of(Math.abs(x)).add(Math.abs(y)).add(Math.abs(z)).getAsDouble();
     }
 
-    /** Computes the Manhattan norm.
+    /**
+     * Computes the Manhattan norm.
      *
      * @param v input values
      * @return \(|v_0| + ... + |v_i|\)
@@ -237,15 +265,14 @@ public enum Norm {
      */
     private static double manhattan(final double[] v) {
         final Sum sum = Sum.create();
-
         for (final double d : v) {
             sum.add(Math.abs(d));
         }
-
         return sum.getAsDouble();
     }
 
-    /** Computes the Euclidean norm.
+    /**
+     * Computes the Euclidean norm.
      * This implementation handles possible overflow or underflow.
      *
      * <p><strong>Comparison with Math.hypot()</strong>
@@ -261,11 +288,9 @@ public enum Norm {
      * @see #EUCLIDEAN
      * @see #of(double,double)
      */
-    private static double euclidean(final double x,
-                                    final double y) {
+    private static double euclidean(final double x, final double y) {
         final double xabs = Math.abs(x);
         final double yabs = Math.abs(y);
-
         final double max;
         final double min;
         // the compare method considers NaN greater than other values, meaning that our
@@ -277,7 +302,6 @@ public enum Norm {
             max = yabs;
             min = xabs;
         }
-
         // if the max is not finite, then one of the inputs must not have
         // been finite
         if (!Double.isFinite(max)) {
@@ -287,7 +311,6 @@ public enum Norm {
             // value is completely dominated by max; just return max
             return max;
         }
-
         // compute the scale and rescale values
         final double scale;
         final double rescale;
@@ -301,12 +324,10 @@ public enum Norm {
             scale = 1d;
             rescale = 1d;
         }
-
         // initialise sum and compensation using scaled x
         final double sx = xabs * scale;
         double sum = sx * sx;
         double comp = DD.twoSquareLow(sx, sum);
-
         // add scaled y
         final double sy = yabs * scale;
         final double py = sy * sy;
@@ -314,11 +335,11 @@ public enum Norm {
         final double sumPy = sum + py;
         comp += DD.twoSumLow(sum, py, sumPy);
         sum = sumPy;
-
         return Math.sqrt(sum + comp) * rescale;
     }
 
-    /** Computes the Euclidean norm.
+    /**
+     * Computes the Euclidean norm.
      * This implementation handles possible overflow or underflow.
      *
      * @param x first input
@@ -330,15 +351,11 @@ public enum Norm {
      * @see #EUCLIDEAN
      * @see #of(double,double,double)
      */
-    private static double euclidean(final double x,
-                                    final double y,
-                                    final double z) {
+    private static double euclidean(final double x, final double y, final double z) {
         final double xabs = Math.abs(x);
         final double yabs = Math.abs(y);
         final double zabs = Math.abs(z);
-
         final double max = Math.max(Math.max(xabs, yabs), zabs);
-
         // if the max is not finite, then one of the inputs must not have
         // been finite
         if (!Double.isFinite(max)) {
@@ -346,7 +363,6 @@ public enum Norm {
             // return NaN or infinite
             return xabs * yabs * zabs;
         }
-
         // compute the scale and rescale values
         final double scale;
         final double rescale;
@@ -360,13 +376,10 @@ public enum Norm {
             scale = 1d;
             rescale = 1d;
         }
-
-
         // initialise sum and compensation using scaled x
         final double sx = xabs * scale;
         double sum = sx * sx;
         double comp = DD.twoSquareLow(sx, sum);
-
         // add scaled y
         final double sy = yabs * scale;
         final double py = sy * sy;
@@ -374,7 +387,6 @@ public enum Norm {
         final double sumPy = sum + py;
         comp += DD.twoSumLow(sum, py, sumPy);
         sum = sumPy;
-
         // add scaled z
         final double sz = zabs * scale;
         final double pz = sz * sz;
@@ -382,11 +394,11 @@ public enum Norm {
         final double sumPz = sum + pz;
         comp += DD.twoSumLow(sum, pz, sumPz);
         sum = sumPz;
-
         return Math.sqrt(sum + comp) * rescale;
     }
 
-    /** Computes the Euclidean norm.
+    /**
+     * Computes the Euclidean norm.
      * This implementation handles possible overflow or underflow.
      *
      * @param v input values
@@ -401,12 +413,10 @@ public enum Norm {
         double s1 = 0;
         double s2 = 0;
         double s3 = 0;
-
         // sum compensation values
         double c1 = 0;
         double c2 = 0;
         double c3 = 0;
-
         for (int i = 0; i < v.length; ++i) {
             final double x = Math.abs(v[i]);
             if (!Double.isFinite(x)) {
@@ -415,30 +425,24 @@ public enum Norm {
             } else if (x > LARGE_THRESH) {
                 // scale down
                 final double sx = x * SCALE_DOWN;
-
                 // compute the product and product compensation
                 final double p = sx * sx;
                 final double cp = DD.twoSquareLow(sx, p);
-
                 // compute the running sum and sum compensation
                 final double s = s1 + p;
                 final double cs = DD.twoSumLow(s1, p, s);
-
                 // update running totals
                 c1 += cp + cs;
                 s1 = s;
             } else if (x < SMALL_THRESH) {
                 // scale up
                 final double sx = x * SCALE_UP;
-
                 // compute the product and product compensation
                 final double p = sx * sx;
                 final double cp = DD.twoSquareLow(sx, p);
-
                 // compute the running sum and sum compensation
                 final double s = s3 + p;
                 final double cs = DD.twoSumLow(s3, p, s);
-
                 // update running totals
                 c3 += cp + cs;
                 s3 = s;
@@ -447,17 +451,14 @@ public enum Norm {
                 // compute the product and product compensation
                 final double p = x * x;
                 final double cp = DD.twoSquareLow(x, p);
-
                 // compute the running sum and sum compensation
                 final double s = s2 + p;
                 final double cs = DD.twoSumLow(s2, p, s);
-
                 // update running totals
                 c2 += cp + cs;
                 s2 = s;
             }
         }
-
         // The highest sum is the significant component. Add the next significant.
         // Note that the "x * SCALE_DOWN * SCALE_DOWN" expressions must be executed
         // in the order given. If the two scale factors are multiplied together first,
@@ -466,29 +467,27 @@ public enum Norm {
             // add s1, s2, c1, c2
             final double s2Adj = s2 * SCALE_DOWN * SCALE_DOWN;
             final double sum = s1 + s2Adj;
-            final double comp = DD.twoSumLow(s1, s2Adj, sum) +
-                c1 + (c2 * SCALE_DOWN * SCALE_DOWN);
+            final double comp = DD.twoSumLow(s1, s2Adj, sum) + c1 + (c2 * SCALE_DOWN * SCALE_DOWN);
             return Math.sqrt(sum + comp) * SCALE_UP;
         } else if (s2 != 0) {
             // add s2, s3, c2, c3
             final double s3Adj = s3 * SCALE_DOWN * SCALE_DOWN;
             final double sum = s2 + s3Adj;
-            final double comp = DD.twoSumLow(s2, s3Adj, sum) +
-                c2 + (c3 * SCALE_DOWN * SCALE_DOWN);
+            final double comp = DD.twoSumLow(s2, s3Adj, sum) + c2 + (c3 * SCALE_DOWN * SCALE_DOWN);
             return Math.sqrt(sum + comp);
         }
         // add s3, c3
         return Math.sqrt(s3 + c3) * SCALE_DOWN;
     }
 
-    /** Special cases of non-finite input.
+    /**
+     * Special cases of non-finite input.
      *
      * @param v input vector
      * @param start index to start examining the input vector from
      * @return Euclidean norm special value
      */
-    private static double euclideanNormSpecial(final double[] v,
-                                               final int start) {
+    private static double euclideanNormSpecial(final double[] v, final int start) {
         for (int i = start; i < v.length; ++i) {
             if (Double.isNaN(v[i])) {
                 return Double.NaN;
@@ -497,7 +496,8 @@ public enum Norm {
         return Double.POSITIVE_INFINITY;
     }
 
-    /** Computes the maximum norm.
+    /**
+     * Computes the maximum norm.
      *
      * @param x first input
      * @param y second input
@@ -507,12 +507,12 @@ public enum Norm {
      * @see #MAXIMUM
      * @see #of(double,double)
      */
-    private static double maximum(final double x,
-                                  final double y) {
+    private static double maximum(final double x, final double y) {
         return Math.max(Math.abs(x), Math.abs(y));
     }
 
-    /** Computes the maximum norm.
+    /**
+     * Computes the maximum norm.
      *
      * @param x first input
      * @param y second input
@@ -523,15 +523,12 @@ public enum Norm {
      * @see #MAXIMUM
      * @see #of(double,double,double)
      */
-    private static double maximum(final double x,
-                                  final double y,
-                                  final double z) {
-        return Math.max(Math.abs(x),
-                        Math.max(Math.abs(y),
-                                 Math.abs(z)));
+    private static double maximum(final double x, final double y, final double z) {
+        return Math.max(Math.abs(x), Math.max(Math.abs(y), Math.abs(z)));
     }
 
-    /** Computes the maximum norm.
+    /**
+     * Computes the maximum norm.
      *
      * @param v input values
      * @return \(\max{(|v_0|, \ldots, |v_{n-1}|)}\)

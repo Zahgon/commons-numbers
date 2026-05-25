@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.arrays;
 
 /**
@@ -30,6 +29,7 @@ package org.apache.commons.numbers.arrays;
  * @since 1.2
  */
 final class QuickSelect {
+
     // Implementation Notes
     //
     // Selection is performed using a quickselect variant to recursively divide the range
@@ -133,29 +133,46 @@ final class QuickSelect {
     // multiple indices. If heapselect is used for small range handling the performance on
     // saturated indices is significantly slower. Hence the presence of two final selection
     // methods for different purposes.
-
-    /** Sampling mode using Floyd-Rivest sampling. */
+    /**
+     * Sampling mode using Floyd-Rivest sampling.
+     */
     static final int MODE_FR_SAMPLING = -1;
-    /** Sampling mode. */
+
+    /**
+     * Sampling mode.
+     */
     static final int MODE_SAMPLING = 0;
-    /** No sampling but use adaption of the target k. */
+
+    /**
+     * No sampling but use adaption of the target k.
+     */
     static final int MODE_ADAPTION = 1;
-    /** No sampling and no adaption of target k (strict margins). */
+
+    /**
+     * No sampling and no adaption of target k (strict margins).
+     */
     static final int MODE_STRICT = 2;
 
-    /** Minimum size for sortselect.
+    /**
+     * Minimum size for sortselect.
      * Below this perform a sort rather than selection. This is used to avoid
-     * sort select on tiny data. */
+     * sort select on tiny data.
+     */
     private static final int MIN_SORTSELECT_SIZE = 4;
-    /** Single-pivot sortselect size for quickselect adaptive. Note that quickselect adaptive
+
+    /**
+     * Single-pivot sortselect size for quickselect adaptive. Note that quickselect adaptive
      * recursively calls quickselect so very small lengths are included with an initial medium
      * length. Using lengths of 1023-5 and 2043-53 indicate optimum performance around 20-30.
      * Note: The expand partition function assumes a sample of at least length 2 as each end
      * of the sample is used as a sentinel; this imposes a minimum length of 24 on the range
      * to ensure it contains a 12-th tile of length 2. Thus the absolute minimum for the
-     * distance from the edge is 12. */
+     * distance from the edge is 12.
+     */
     private static final int LINEAR_SORTSELECT_SIZE = 24;
-    /** Dual-pivot sortselect size for the distance of a single k from the edge of the
+
+    /**
+     * Dual-pivot sortselect size for the distance of a single k from the edge of the
      * range length n. Benchmarking in range [81+81, 243+243] suggests a value of ~20 (or
      * higher on some hardware). Ranges are chosen based on third interval spacing between
      * powers of 3.
@@ -165,35 +182,58 @@ final class QuickSelect {
      * allows selection of multiple close indices to be performed with effectively the
      * same speed. High density indices will result in recursion to very short fragments
      * which also trigger use of sort select. The threshold for sorting short lengths is
-     * configured in {@link #dualPivotSortSelectSize(int, int)}. */
+     * configured in {@link #dualPivotSortSelectSize(int, int)}.
+     */
     private static final int DP_SORTSELECT_SIZE = 20;
-    /** Threshold to use Floyd-Rivest sub-sampling. This partitions a sample of the data to
+
+    /**
+     * Threshold to use Floyd-Rivest sub-sampling. This partitions a sample of the data to
      * identify a pivot so that the target element is in the smaller set after partitioning.
      * The original FR paper used 600 otherwise reverted to the target index as the pivot.
      * This implementation reverts to quickselect adaptive which increases robustness
-     * at small size on a variety of data and allows raising the original FR threshold. */
+     * at small size on a variety of data and allows raising the original FR threshold.
+     */
     private static final int FR_SAMPLING_SIZE = 1200;
 
-    /** Increment used for the recursion counter. The counter will overflow to negative when
+    /**
+     * Increment used for the recursion counter. The counter will overflow to negative when
      * recursion has exceeded the maximum level. The counter is maintained in the upper bits
-     * of the dual-pivot control flags. */
+     * of the dual-pivot control flags.
+     */
     private static final int RECURSION_INCREMENT = 1 << 20;
-    /** Mask to extract the sort select size from the dual-pivot control flags. Currently
+
+    /**
+     * Mask to extract the sort select size from the dual-pivot control flags. Currently
      * the bits below those used for the recursion counter are only used for the sort select size
-     * so this can use a mask with all bits below the increment. */
+     * so this can use a mask with all bits below the increment.
+     */
     private static final int SORTSELECT_MASK = RECURSION_INCREMENT - 1;
 
-    /** Threshold to use repeated step left: 7 / 16. */
+    /**
+     * Threshold to use repeated step left: 7 / 16.
+     */
     private static final double STEP_LEFT = 0.4375;
-    /** Threshold to use repeated step right: 9 / 16. */
+
+    /**
+     * Threshold to use repeated step right: 9 / 16.
+     */
     private static final double STEP_RIGHT = 0.5625;
-    /** Threshold to use repeated step far-left: 1 / 12. */
+
+    /**
+     * Threshold to use repeated step far-left: 1 / 12.
+     */
     private static final double STEP_FAR_LEFT = 0.08333333333333333;
-    /** Threshold to use repeated step far-right: 11 / 12. */
+
+    /**
+     * Threshold to use repeated step far-right: 11 / 12.
+     */
     private static final double STEP_FAR_RIGHT = 0.9166666666666666;
 
-    /** No instances. */
-    private QuickSelect() {}
+    /**
+     * No instances.
+     */
+    private QuickSelect() {
+    }
 
     /**
      * Partition the elements between {@code ka} and {@code kb} using a heap select
@@ -206,15 +246,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelect(double[] a, int left, int right, int ka, int kb) {
-        if (right <= left) {
-            return;
-        }
-        // Use the smallest heap
-        if (kb - left < right - ka) {
-            heapSelectLeft(a, left, right, ka, kb);
-        } else {
-            heapSelectRight(a, left, right, ka, kb);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -231,36 +263,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelectLeft(double[] a, int left, int right, int ka, int kb) {
-        // Create a max heap in-place in [left, k], rooted at a[left] = max
-        // |l|-max-heap-|k|--------------|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = k - left
-        int end = kb + 1;
-        for (int p = left + ((kb - left - 1) >> 1); p >= left; p--) {
-            maxHeapSiftDown(a, a[p], p, left, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double max = a[left];
-        for (int i = right; i > kb; i--) {
-            final double v = a[i];
-            if (v < max) {
-                a[i] = max;
-                maxHeapSiftDown(a, v, left, left, end);
-                max = a[left];
-            }
-        }
-        // Partition [ka, kb]
-        // |l|-max-heap-|k|--------------|
-        //  |  <-swap->  |   then sift down reduced size heap
-        // Avoid sifting heap of size 1
-        final int last = Math.max(left, ka - 1);
-        while (--end > last) {
-            maxHeapSiftDown(a, a[end], left, left, end);
-            a[end] = max;
-            max = a[left];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -313,36 +316,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelectRight(double[] a, int left, int right, int ka, int kb) {
-        // Create a min heap in-place in [k, right], rooted at a[right] = min
-        // |--------------|k|-min-heap-|r|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = right - k
-        int end = ka - 1;
-        for (int p = right - ((right - ka - 1) >> 1); p <= right; p++) {
-            minHeapSiftDown(a, a[p], p, right, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double min = a[right];
-        for (int i = left; i < ka; i++) {
-            final double v = a[i];
-            if (v > min) {
-                a[i] = min;
-                minHeapSiftDown(a, v, right, right, end);
-                min = a[right];
-            }
-        }
-        // Partition [ka, kb]
-        // |--------------|k|-min-heap-|r|
-        //                 |  <-swap->  |   then sift down reduced size heap
-        // Avoid sifting heap of size 1
-        final int last = Math.min(right, kb + 1);
-        while (++end < last) {
-            minHeapSiftDown(a, a[end], right, right, end);
-            a[end] = min;
-            min = a[right];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -392,18 +366,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void sortSelect(double[] a, int left, int right, int ka, int kb) {
-        // Combine the test for right <= left with
-        // avoiding the overhead of sort select on tiny data.
-        if (right - left <= MIN_SORTSELECT_SIZE) {
-            Sorting.sort(a, left, right);
-            return;
-        }
-        // Sort the smallest side
-        if (kb - left < right - ka) {
-            sortSelectLeft(a, left, right, kb);
-        } else {
-            sortSelectRight(a, left, right, ka);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -423,33 +386,7 @@ final class QuickSelect {
      * @param k Index to select.
      */
     static void sortSelectLeft(double[] a, int left, int right, int k) {
-        // Sort
-        for (int i = left; ++i <= k;) {
-            final double v = a[i];
-            // Move preceding higher elements above (if required)
-            if (v < a[i - 1]) {
-                int j = i;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double m = a[k];
-        for (int i = right; i > k; i--) {
-            final double v = a[i];
-            if (v < m) {
-                a[i] = m;
-                int j = k;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -469,33 +406,7 @@ final class QuickSelect {
      * @param k Index to select.
      */
     static void sortSelectRight(double[] a, int left, int right, int k) {
-        // Sort
-        for (int i = right; --i >= k;) {
-            final double v = a[i];
-            // Move succeeding lower elements below (if required)
-            if (v > a[i + 1]) {
-                int j = i;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        double m = a[k];
-        for (int i = left; i < k; i++) {
-            final double v = a[i];
-            if (v > m) {
-                a[i] = m;
-                int j = k;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -510,7 +421,7 @@ final class QuickSelect {
      * @param k Index.
      */
     static void select(double[] a, int left, int right, int k) {
-        quickSelectAdaptive(a, left, right, k, k, new int[1], MODE_FR_SAMPLING);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -528,32 +439,7 @@ final class QuickSelect {
      * @return the count of used indices
      */
     static int select(double[] a, int left, int right, int[] k, int n) {
-        if (n < 1) {
-            return 0;
-        }
-        if (n == 1) {
-            quickSelectAdaptive(a, left, right, k[0], k[0], new int[1], MODE_FR_SAMPLING);
-            return -1;
-        }
-
-        // Interval creation validates the indices are in [left, right]
-        final UpdatingInterval keys = IndexSupport.createUpdatingInterval(k, n);
-
-        // Save number of used indices
-        final int count = IndexSupport.countIndices(keys, n);
-
-        // Note: If the keys are not separated then they are effectively a single key.
-        // Any split of keys separated by the sort select size
-        // will be finished on the next iteration.
-        final int k1 = keys.left();
-        final int kn = keys.right();
-        if (kn - k1 < DP_SORTSELECT_SIZE) {
-            quickSelectAdaptive(a, left, right, k1, kn, new int[1], MODE_FR_SAMPLING);
-        } else {
-            // Dual-pivot mode with small range sort length configured using index density
-            dualPivotQuickSelect(a, left, right, keys, dualPivotFlags(left, right, k1, kn));
-        }
-        return count;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -584,90 +470,8 @@ final class QuickSelect {
      * @param flags Adaption flags.
      * @return Lower bound of the range containing {@code [ka, kb]} (inclusive).
      */
-    static int quickSelectAdaptive(double[] a, int left, int right, int ka, int kb,
-            int[] bounds, int flags) {
-        int l = left;
-        int r = right;
-        int m = flags;
-        while (true) {
-            // Select when ka and kb are close to the same end
-            // |l|-----|ka|kkkkkkkk|kb|------|r|
-            if (Math.min(kb - l, r - ka) < LINEAR_SORTSELECT_SIZE) {
-                sortSelect(a, l, r, ka, kb);
-                bounds[0] = kb;
-                return ka;
-            }
-
-            // Only target ka; kb is assumed to be close
-            int p0;
-            final int n = r - l;
-            // f in [0, 1]
-            final double f = (double) (ka - l) / n;
-            // Record the larger margin (start at 1/4) to create the estimated size.
-            // step        L     R
-            // far left    1/12  1/3   (use 1/4 + 1/32 + 1/64 ~ 0.328)
-            // left        1/6   1/4
-            // middle      2/9   2/9   (use 1/4 - 1/32 ~ 0.219)
-            int margin = n >> 2;
-            if (m < MODE_SAMPLING && r - l > FR_SAMPLING_SIZE) {
-                // Floyd-Rivest sample step uses the same margins
-                p0 = sampleStep(a, l, r, ka, bounds);
-                if (f <= STEP_FAR_LEFT || f >= STEP_FAR_RIGHT) {
-                    margin += (n >> 5) + (n >> 6);
-                } else if (f > STEP_LEFT && f < STEP_RIGHT) {
-                    margin -= n >> 5;
-                }
-            } else if (f <= STEP_LEFT) {
-                if (f <= STEP_FAR_LEFT) {
-                    margin += (n >> 5) + (n >> 6);
-                    p0 = repeatedStepFarLeft(a, l, r, ka, bounds, m);
-                } else {
-                    p0 = repeatedStepLeft(a, l, r, ka, bounds, m);
-                }
-            } else if (f >= STEP_RIGHT) {
-                if (f >= STEP_FAR_RIGHT) {
-                    margin += (n >> 5) + (n >> 6);
-                    p0 = repeatedStepFarRight(a, l, r, ka, bounds, m);
-                } else {
-                    p0 = repeatedStepRight(a, l, r, ka, bounds, m);
-                }
-            } else {
-                margin -= n >> 5;
-                p0 = repeatedStep(a, l, r, ka, bounds, m);
-            }
-
-            // Note: Here we expect [ka, kb] to be small and splitting is unlikely.
-            //                   p0 p1
-            // |l|--|ka|kkkk|kb|--|P|-------------------|r|
-            // |l|----------------|P|--|ka|kkk|kb|------|r|
-            // |l|-----------|ka|k|P|k|kb|--------------|r|
-            final int p1 = bounds[0];
-            if (kb < p0) {
-                // Entirely on left side
-                r = p0 - 1;
-            } else if (ka > p1) {
-                // Entirely on right side
-                l = p1 + 1;
-            } else {
-                // Pivot splits [ka, kb]. Expect ends to be close to the pivot and finish.
-                // Here we set the bounds for use after median-of-medians pivot selection.
-                // In the event there are many equal values this allows collecting those
-                // known to be equal together when moving around the medians sample.
-                if (kb > p1) {
-                    sortSelectLeft(a, p1 + 1, r, kb);
-                    bounds[0] = kb;
-                }
-                if (ka < p0) {
-                    sortSelectRight(a, l, p0 - 1, ka);
-                    p0 = ka;
-                }
-                return p0;
-            }
-            // Update mode based on target partition size
-            if (r - l > n - margin) {
-                m++;
-            }
-        }
+    static int quickSelectAdaptive(double[] a, int left, int right, int ka, int kb, int[] bounds, int flags) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1047,104 +851,8 @@ final class QuickSelect {
      * @return Lower bound (inclusive) of the pivot range [k0].
      */
     // package-private for testing
-    static int expandPartition(double[] a, int left, int right, int start, int end,
-        int pivot0, int pivot1, int[] upper) {
-        // 3-way partition of the data using a pivot value into
-        // less-than, equal or greater-than.
-        // Based on Sedgewick's Bentley-McIroy partitioning: always swap i<->j then
-        // check for equal to the pivot and move again.
-        //
-        // Move sentinels from start and end to left and right. Scan towards the
-        // sentinels until >=,<=. Swap then move == to the pivot region.
-        //           <-i                           j->
-        // |l |        |            |p0  p1|       |             | r|
-        // |>=|   ???  |     <      |  ==  |   >   |     ???     |<=|
-        //
-        // When either i or j reach the edge perform finishing loop.
-        // Finish loop for a[j] <= v replaces j with p1+1, optionally moves value
-        // to p0 for < and updates the pivot range p1 (and optionally p0):
-        //                                             j->
-        // |l                       |p0  p1|           |         | r|
-        // |         <              |  ==  |       >   |   ???   |<=|
-
-        final double v = a[pivot0];
-        // Use start/end as sentinels (requires start != end)
-        double vi = a[start];
-        double vj = a[end];
-        a[start] = a[left];
-        a[end] = a[right];
-        a[left] = vj;
-        a[right] = vi;
-
-        int i = start + 1;
-        int j = end - 1;
-
-        // Positioned for pre-in/decrement to write to pivot region
-        int p0 = pivot0 == start ? i : pivot0;
-        int p1 = pivot1 == end ? j : pivot1;
-
-        while (true) {
-            do {
-                --i;
-            } while (a[i] < v);
-            do {
-                ++j;
-            } while (a[j] > v);
-            vj = a[i];
-            vi = a[j];
-            a[i] = vi;
-            a[j] = vj;
-            // Move the equal values to pivot region
-            if (vi == v) {
-                a[i] = a[--p0];
-                a[p0] = v;
-            }
-            if (vj == v) {
-                a[j] = a[++p1];
-                a[p1] = v;
-            }
-            // Termination check and finishing loops.
-            // Note: This works even if pivot region is zero length (p1 == p0-1 due to
-            // length 1 pivot region at either start/end) because we pre-inc/decrement
-            // one side and post-inc/decrement the other side.
-            if (i == left) {
-                while (j < right) {
-                    do {
-                        ++j;
-                    } while (a[j] > v);
-                    final double w = a[j];
-                    // Move upper bound of pivot region
-                    a[j] = a[++p1];
-                    a[p1] = v;
-                    // Move lower bound of pivot region
-                    if (w != v) {
-                        a[p0] = w;
-                        p0++;
-                    }
-                }
-                break;
-            }
-            if (j == right) {
-                while (i > left) {
-                    do {
-                        --i;
-                    } while (a[i] < v);
-                    final double w = a[i];
-                    // Move lower bound of pivot region
-                    a[i] = a[--p0];
-                    a[p0] = v;
-                    // Move upper bound of pivot region
-                    if (w != v) {
-                        a[p1] = w;
-                        p1--;
-                    }
-                }
-                break;
-            }
-        }
-
-        upper[0] = p1;
-        return p0;
+    static int expandPartition(double[] a, int left, int right, int start, int end, int pivot0, int pivot1, int[] upper) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1177,92 +885,7 @@ final class QuickSelect {
      */
     // package-private for testing
     static void dualPivotQuickSelect(double[] a, int left, int right, UpdatingInterval k, int flags) {
-        // If partitioning splits the interval then recursion is used for the left-most side(s)
-        // and the right-most side remains within this function. If partitioning does
-        // not split the interval then it remains within this function.
-        int l = left;
-        int r = right;
-        int f = flags;
-        int ka = k.left();
-        int kb = k.right();
-        final int[] upper = {0, 0, 0};
-        while (true) {
-            // Select when ka and kb are close to the same end,
-            // or the entire range is small
-            // |l|-----|ka|--------|kb|------|r|
-            final int n = r - l;
-            if (Math.min(kb - l, r - ka) < DP_SORTSELECT_SIZE ||
-                n < (f & SORTSELECT_MASK)) {
-                sortSelect(a, l, r, ka, kb);
-                return;
-            }
-            if (kb - ka < DP_SORTSELECT_SIZE) {
-                // Switch to single-pivot mode with Floyd-Rivest sub-sampling
-                quickSelectAdaptive(a, l, r, ka, kb, upper, MODE_FR_SAMPLING);
-                return;
-            }
-            if (f < 0) {
-                // Excess recursion, switch to heap select
-                heapSelect(a, l, r, ka, kb);
-                return;
-            }
-
-            // Dual-pivot partitioning
-            final int p0 = partition(a, l, r, upper);
-            final int p1 = upper[0];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left, middle and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set in each region.
-            //                   p0 p1               p2 p3
-            // |l|--|ka|--k----k--|P|------k--|kb|----|P|----|r|
-            //                 kb  |      ka
-            f += RECURSION_INCREMENT;
-            // Recurse left side if required
-            if (ka < p0) {
-                if (kb <= p1) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                dualPivotQuickSelect(a, l, p0 - 1, k.splitLeft(p0, p1), f);
-                // Here we must process middle and/or right
-                ka = k.left();
-            } else if (kb <= p1) {
-                // No middle/right side
-                return;
-            } else if (ka <= p1) {
-                // Advance lower bound
-                ka = k.updateLeft(p1 + 1);
-            }
-            // Recurse middle if required
-            final int p2 = upper[1];
-            final int p3 = upper[2];
-            if (ka < p2) {
-                l = p1 + 1;
-                if (kb <= p3) {
-                    // Entirely in middle
-                    r = p2 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                dualPivotQuickSelect(a, l, p2 - 1, k.splitLeft(p2, p3), f);
-                ka = k.left();
-            } else if (kb <= p3) {
-                // No right side
-                return;
-            } else if (ka <= p3) {
-                ka = k.updateLeft(p3 + 1);
-            }
-            // Continue right
-            l = p3 + 1;
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1310,7 +933,6 @@ final class QuickSelect {
         final int i4 = i3 + step;
         final int i5 = i4 + step;
         Sorting.sort5(a, i1, i2, i3, i4, i5);
-
         // Partition data using pivots P1 and P2 into less-than, greater-than or between.
         // Pivot values P1 & P2 are placed at the end. If P1 < P2, P2 acts as a sentinel.
         // k traverses the unknown region ??? and values moved if less-than or
@@ -1326,7 +948,6 @@ final class QuickSelect {
         // At the end pivots are swapped back to behind the less and great pointers.
         //
         // |  <P1        |P1|     P1<= & <= P2    |P2|      >P2    |
-
         // Swap ends to the pivot locations.
         final double v1 = a[i2];
         a[i2] = a[left];
@@ -1334,11 +955,9 @@ final class QuickSelect {
         final double v2 = a[i4];
         a[i4] = a[right];
         a[right] = v2;
-
         // pointers
         int less = left;
         int great = right;
-
         // Fast-forward ascending / descending runs to reduce swaps.
         // Cannot overrun as end pivots (v1 <= v2) act as sentinels.
         do {
@@ -1347,11 +966,9 @@ final class QuickSelect {
         do {
             --great;
         } while (a[great] > v2);
-
         // a[less - 1] < P1 : a[great + 1] > P2
         // unvisited in [less, great]
-        SORTING:
-        for (int k = less; k <= great; k++) {
+        SORTING: for (int k = less; k <= great; k++) {
             final double v = a[k];
             if (v < v1) {
                 // swap(a, k, less++)
@@ -1383,7 +1000,6 @@ final class QuickSelect {
                 }
             }
         }
-
         // Change to inclusive ends : a[less] < P1 : a[great] > P2
         less--;
         great++;
@@ -1392,22 +1008,17 @@ final class QuickSelect {
         a[less] = v1;
         a[right] = a[great];
         a[great] = v2;
-
         // Record the pivot locations
         final int lower = less;
         bounds[2] = great;
-
         // equal elements
         // Original paper: If middle partition is bigger than a threshold
         // then check for equal elements.
-
         // Note: This is extra work. When performing partitioning the region of interest
         // may be entirely above or below the central region and this can be skipped.
-
         // Here we look for equal elements if the centre is more than 5/8 the length.
         // 5/8 = 1/2 + 1/8. Pivots must be different.
         if ((great - less) > (n >>> 1) + (n >>> 3) && v1 != v2) {
-
             // Fast-forward to reduce swaps. Changes inclusive ends to exclusive ends.
             // Since v1 != v2 these act as sentinels to prevent overrun.
             do {
@@ -1416,10 +1027,8 @@ final class QuickSelect {
             do {
                 --great;
             } while (a[great] == v2);
-
             // This copies the logic in the sorting loop using == comparisons
-            EQUAL:
-            for (int k = less; k <= great; k++) {
+            EQUAL: for (int k = less; k <= great; k++) {
                 final double v = a[k];
                 if (v == v1) {
                     a[k] = a[less];
@@ -1444,12 +1053,10 @@ final class QuickSelect {
                     }
                 }
             }
-
             // Change to inclusive ends
             less--;
             great++;
         }
-
         // Between pivots in (less, great)
         if (v1 != v2 && less < great - 1) {
             // Record the pivot end points
@@ -1460,7 +1067,6 @@ final class QuickSelect {
             bounds[0] = bounds[2];
             bounds[1] = lower;
         }
-
         return lower;
     }
 
@@ -1475,15 +1081,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelect(int[] a, int left, int right, int ka, int kb) {
-        if (right <= left) {
-            return;
-        }
-        // Use the smallest heap
-        if (kb - left < right - ka) {
-            heapSelectLeft(a, left, right, ka, kb);
-        } else {
-            heapSelectRight(a, left, right, ka, kb);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1500,36 +1098,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelectLeft(int[] a, int left, int right, int ka, int kb) {
-        // Create a max heap in-place in [left, k], rooted at a[left] = max
-        // |l|-max-heap-|k|--------------|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = k - left
-        int end = kb + 1;
-        for (int p = left + ((kb - left - 1) >> 1); p >= left; p--) {
-            maxHeapSiftDown(a, a[p], p, left, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        int max = a[left];
-        for (int i = right; i > kb; i--) {
-            final int v = a[i];
-            if (v < max) {
-                a[i] = max;
-                maxHeapSiftDown(a, v, left, left, end);
-                max = a[left];
-            }
-        }
-        // Partition [ka, kb]
-        // |l|-max-heap-|k|--------------|
-        //  |  <-swap->  |   then sift down reduced size heap
-        // Avoid sifting heap of size 1
-        final int last = Math.max(left, ka - 1);
-        while (--end > last) {
-            maxHeapSiftDown(a, a[end], left, left, end);
-            a[end] = max;
-            max = a[left];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1582,36 +1151,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelectRight(int[] a, int left, int right, int ka, int kb) {
-        // Create a min heap in-place in [k, right], rooted at a[right] = min
-        // |--------------|k|-min-heap-|r|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = right - k
-        int end = ka - 1;
-        for (int p = right - ((right - ka - 1) >> 1); p <= right; p++) {
-            minHeapSiftDown(a, a[p], p, right, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        int min = a[right];
-        for (int i = left; i < ka; i++) {
-            final int v = a[i];
-            if (v > min) {
-                a[i] = min;
-                minHeapSiftDown(a, v, right, right, end);
-                min = a[right];
-            }
-        }
-        // Partition [ka, kb]
-        // |--------------|k|-min-heap-|r|
-        //                 |  <-swap->  |   then sift down reduced size heap
-        // Avoid sifting heap of size 1
-        final int last = Math.min(right, kb + 1);
-        while (++end < last) {
-            minHeapSiftDown(a, a[end], right, right, end);
-            a[end] = min;
-            min = a[right];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1661,18 +1201,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void sortSelect(int[] a, int left, int right, int ka, int kb) {
-        // Combine the test for right <= left with
-        // avoiding the overhead of sort select on tiny data.
-        if (right - left <= MIN_SORTSELECT_SIZE) {
-            Sorting.sort(a, left, right);
-            return;
-        }
-        // Sort the smallest side
-        if (kb - left < right - ka) {
-            sortSelectLeft(a, left, right, kb);
-        } else {
-            sortSelectRight(a, left, right, ka);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1692,33 +1221,7 @@ final class QuickSelect {
      * @param k Index to select.
      */
     static void sortSelectLeft(int[] a, int left, int right, int k) {
-        // Sort
-        for (int i = left; ++i <= k;) {
-            final int v = a[i];
-            // Move preceding higher elements above (if required)
-            if (v < a[i - 1]) {
-                int j = i;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        int m = a[k];
-        for (int i = right; i > k; i--) {
-            final int v = a[i];
-            if (v < m) {
-                a[i] = m;
-                int j = k;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1738,33 +1241,7 @@ final class QuickSelect {
      * @param k Index to select.
      */
     static void sortSelectRight(int[] a, int left, int right, int k) {
-        // Sort
-        for (int i = right; --i >= k;) {
-            final int v = a[i];
-            // Move succeeding lower elements below (if required)
-            if (v > a[i + 1]) {
-                int j = i;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        int m = a[k];
-        for (int i = left; i < k; i++) {
-            final int v = a[i];
-            if (v > m) {
-                a[i] = m;
-                int j = k;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1779,7 +1256,7 @@ final class QuickSelect {
      * @param k Index.
      */
     static void select(int[] a, int left, int right, int k) {
-        quickSelectAdaptive(a, left, right, k, k, new int[1], MODE_FR_SAMPLING);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1793,25 +1270,7 @@ final class QuickSelect {
      * @param n Count of indices.
      */
     static void select(int[] a, int left, int right, int[] k, int n) {
-        if (n == 1) {
-            quickSelectAdaptive(a, left, right, k[0], k[0], new int[1], MODE_FR_SAMPLING);
-            return;
-        }
-
-        // Interval creation validates the indices are in [left, right]
-        final UpdatingInterval keys = IndexSupport.createUpdatingInterval(k, n);
-
-        // Note: If the keys are not separated then they are effectively a single key.
-        // Any split of keys separated by the sort select size
-        // will be finished on the next iteration.
-        final int k1 = keys.left();
-        final int kn = keys.right();
-        if (kn - k1 < DP_SORTSELECT_SIZE) {
-            quickSelectAdaptive(a, left, right, k1, kn, new int[1], MODE_FR_SAMPLING);
-        } else {
-            // Dual-pivot mode with small range sort length configured using index density
-            dualPivotQuickSelect(a, left, right, keys, dualPivotFlags(left, right, k1, kn));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1842,90 +1301,8 @@ final class QuickSelect {
      * @param flags Adaption flags.
      * @return Lower bound of the range containing {@code [ka, kb]} (inclusive).
      */
-    static int quickSelectAdaptive(int[] a, int left, int right, int ka, int kb,
-            int[] bounds, int flags) {
-        int l = left;
-        int r = right;
-        int m = flags;
-        while (true) {
-            // Select when ka and kb are close to the same end
-            // |l|-----|ka|kkkkkkkk|kb|------|r|
-            if (Math.min(kb - l, r - ka) < LINEAR_SORTSELECT_SIZE) {
-                sortSelect(a, l, r, ka, kb);
-                bounds[0] = kb;
-                return ka;
-            }
-
-            // Only target ka; kb is assumed to be close
-            int p0;
-            final int n = r - l;
-            // f in [0, 1]
-            final double f = (double) (ka - l) / n;
-            // Record the larger margin (start at 1/4) to create the estimated size.
-            // step        L     R
-            // far left    1/12  1/3   (use 1/4 + 1/32 + 1/64 ~ 0.328)
-            // left        1/6   1/4
-            // middle      2/9   2/9   (use 1/4 - 1/32 ~ 0.219)
-            int margin = n >> 2;
-            if (m < MODE_SAMPLING && r - l > FR_SAMPLING_SIZE) {
-                // Floyd-Rivest sample step uses the same margins
-                p0 = sampleStep(a, l, r, ka, bounds);
-                if (f <= STEP_FAR_LEFT || f >= STEP_FAR_RIGHT) {
-                    margin += (n >> 5) + (n >> 6);
-                } else if (f > STEP_LEFT && f < STEP_RIGHT) {
-                    margin -= n >> 5;
-                }
-            } else if (f <= STEP_LEFT) {
-                if (f <= STEP_FAR_LEFT) {
-                    margin += (n >> 5) + (n >> 6);
-                    p0 = repeatedStepFarLeft(a, l, r, ka, bounds, m);
-                } else {
-                    p0 = repeatedStepLeft(a, l, r, ka, bounds, m);
-                }
-            } else if (f >= STEP_RIGHT) {
-                if (f >= STEP_FAR_RIGHT) {
-                    margin += (n >> 5) + (n >> 6);
-                    p0 = repeatedStepFarRight(a, l, r, ka, bounds, m);
-                } else {
-                    p0 = repeatedStepRight(a, l, r, ka, bounds, m);
-                }
-            } else {
-                margin -= n >> 5;
-                p0 = repeatedStep(a, l, r, ka, bounds, m);
-            }
-
-            // Note: Here we expect [ka, kb] to be small and splitting is unlikely.
-            //                   p0 p1
-            // |l|--|ka|kkkk|kb|--|P|-------------------|r|
-            // |l|----------------|P|--|ka|kkk|kb|------|r|
-            // |l|-----------|ka|k|P|k|kb|--------------|r|
-            final int p1 = bounds[0];
-            if (kb < p0) {
-                // Entirely on left side
-                r = p0 - 1;
-            } else if (ka > p1) {
-                // Entirely on right side
-                l = p1 + 1;
-            } else {
-                // Pivot splits [ka, kb]. Expect ends to be close to the pivot and finish.
-                // Here we set the bounds for use after median-of-medians pivot selection.
-                // In the event there are many equal values this allows collecting those
-                // known to be equal together when moving around the medians sample.
-                if (kb > p1) {
-                    sortSelectLeft(a, p1 + 1, r, kb);
-                    bounds[0] = kb;
-                }
-                if (ka < p0) {
-                    sortSelectRight(a, l, p0 - 1, ka);
-                    p0 = ka;
-                }
-                return p0;
-            }
-            // Update mode based on target partition size
-            if (r - l > n - margin) {
-                m++;
-            }
-        }
+    static int quickSelectAdaptive(int[] a, int left, int right, int ka, int kb, int[] bounds, int flags) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2305,104 +1682,8 @@ final class QuickSelect {
      * @return Lower bound (inclusive) of the pivot range [k0].
      */
     // package-private for testing
-    static int expandPartition(int[] a, int left, int right, int start, int end,
-        int pivot0, int pivot1, int[] upper) {
-        // 3-way partition of the data using a pivot value into
-        // less-than, equal or greater-than.
-        // Based on Sedgewick's Bentley-McIroy partitioning: always swap i<->j then
-        // check for equal to the pivot and move again.
-        //
-        // Move sentinels from start and end to left and right. Scan towards the
-        // sentinels until >=,<=. Swap then move == to the pivot region.
-        //           <-i                           j->
-        // |l |        |            |p0  p1|       |             | r|
-        // |>=|   ???  |     <      |  ==  |   >   |     ???     |<=|
-        //
-        // When either i or j reach the edge perform finishing loop.
-        // Finish loop for a[j] <= v replaces j with p1+1, optionally moves value
-        // to p0 for < and updates the pivot range p1 (and optionally p0):
-        //                                             j->
-        // |l                       |p0  p1|           |         | r|
-        // |         <              |  ==  |       >   |   ???   |<=|
-
-        final int v = a[pivot0];
-        // Use start/end as sentinels (requires start != end)
-        int vi = a[start];
-        int vj = a[end];
-        a[start] = a[left];
-        a[end] = a[right];
-        a[left] = vj;
-        a[right] = vi;
-
-        int i = start + 1;
-        int j = end - 1;
-
-        // Positioned for pre-in/decrement to write to pivot region
-        int p0 = pivot0 == start ? i : pivot0;
-        int p1 = pivot1 == end ? j : pivot1;
-
-        while (true) {
-            do {
-                --i;
-            } while (a[i] < v);
-            do {
-                ++j;
-            } while (a[j] > v);
-            vj = a[i];
-            vi = a[j];
-            a[i] = vi;
-            a[j] = vj;
-            // Move the equal values to pivot region
-            if (vi == v) {
-                a[i] = a[--p0];
-                a[p0] = v;
-            }
-            if (vj == v) {
-                a[j] = a[++p1];
-                a[p1] = v;
-            }
-            // Termination check and finishing loops.
-            // Note: This works even if pivot region is zero length (p1 == p0-1 due to
-            // length 1 pivot region at either start/end) because we pre-inc/decrement
-            // one side and post-inc/decrement the other side.
-            if (i == left) {
-                while (j < right) {
-                    do {
-                        ++j;
-                    } while (a[j] > v);
-                    final int w = a[j];
-                    // Move upper bound of pivot region
-                    a[j] = a[++p1];
-                    a[p1] = v;
-                    // Move lower bound of pivot region
-                    if (w != v) {
-                        a[p0] = w;
-                        p0++;
-                    }
-                }
-                break;
-            }
-            if (j == right) {
-                while (i > left) {
-                    do {
-                        --i;
-                    } while (a[i] < v);
-                    final int w = a[i];
-                    // Move lower bound of pivot region
-                    a[i] = a[--p0];
-                    a[p0] = v;
-                    // Move upper bound of pivot region
-                    if (w != v) {
-                        a[p1] = w;
-                        p1--;
-                    }
-                }
-                break;
-            }
-        }
-
-        upper[0] = p1;
-        return p0;
+    static int expandPartition(int[] a, int left, int right, int start, int end, int pivot0, int pivot1, int[] upper) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2435,92 +1716,7 @@ final class QuickSelect {
      */
     // package-private for testing
     static void dualPivotQuickSelect(int[] a, int left, int right, UpdatingInterval k, int flags) {
-        // If partitioning splits the interval then recursion is used for the left-most side(s)
-        // and the right-most side remains within this function. If partitioning does
-        // not split the interval then it remains within this function.
-        int l = left;
-        int r = right;
-        int f = flags;
-        int ka = k.left();
-        int kb = k.right();
-        final int[] upper = {0, 0, 0};
-        while (true) {
-            // Select when ka and kb are close to the same end,
-            // or the entire range is small
-            // |l|-----|ka|--------|kb|------|r|
-            final int n = r - l;
-            if (Math.min(kb - l, r - ka) < DP_SORTSELECT_SIZE ||
-                n < (f & SORTSELECT_MASK)) {
-                sortSelect(a, l, r, ka, kb);
-                return;
-            }
-            if (kb - ka < DP_SORTSELECT_SIZE) {
-                // Switch to single-pivot mode with Floyd-Rivest sub-sampling
-                quickSelectAdaptive(a, l, r, ka, kb, upper, MODE_FR_SAMPLING);
-                return;
-            }
-            if (f < 0) {
-                // Excess recursion, switch to heap select
-                heapSelect(a, l, r, ka, kb);
-                return;
-            }
-
-            // Dual-pivot partitioning
-            final int p0 = partition(a, l, r, upper);
-            final int p1 = upper[0];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left, middle and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set in each region.
-            //                   p0 p1               p2 p3
-            // |l|--|ka|--k----k--|P|------k--|kb|----|P|----|r|
-            //                 kb  |      ka
-            f += RECURSION_INCREMENT;
-            // Recurse left side if required
-            if (ka < p0) {
-                if (kb <= p1) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                dualPivotQuickSelect(a, l, p0 - 1, k.splitLeft(p0, p1), f);
-                // Here we must process middle and/or right
-                ka = k.left();
-            } else if (kb <= p1) {
-                // No middle/right side
-                return;
-            } else if (ka <= p1) {
-                // Advance lower bound
-                ka = k.updateLeft(p1 + 1);
-            }
-            // Recurse middle if required
-            final int p2 = upper[1];
-            final int p3 = upper[2];
-            if (ka < p2) {
-                l = p1 + 1;
-                if (kb <= p3) {
-                    // Entirely in middle
-                    r = p2 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                dualPivotQuickSelect(a, l, p2 - 1, k.splitLeft(p2, p3), f);
-                ka = k.left();
-            } else if (kb <= p3) {
-                // No right side
-                return;
-            } else if (ka <= p3) {
-                ka = k.updateLeft(p3 + 1);
-            }
-            // Continue right
-            l = p3 + 1;
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2568,7 +1764,6 @@ final class QuickSelect {
         final int i4 = i3 + step;
         final int i5 = i4 + step;
         Sorting.sort5(a, i1, i2, i3, i4, i5);
-
         // Partition data using pivots P1 and P2 into less-than, greater-than or between.
         // Pivot values P1 & P2 are placed at the end. If P1 < P2, P2 acts as a sentinel.
         // k traverses the unknown region ??? and values moved if less-than or
@@ -2584,7 +1779,6 @@ final class QuickSelect {
         // At the end pivots are swapped back to behind the less and great pointers.
         //
         // |  <P1        |P1|     P1<= & <= P2    |P2|      >P2    |
-
         // Swap ends to the pivot locations.
         final int v1 = a[i2];
         a[i2] = a[left];
@@ -2592,11 +1786,9 @@ final class QuickSelect {
         final int v2 = a[i4];
         a[i4] = a[right];
         a[right] = v2;
-
         // pointers
         int less = left;
         int great = right;
-
         // Fast-forward ascending / descending runs to reduce swaps.
         // Cannot overrun as end pivots (v1 <= v2) act as sentinels.
         do {
@@ -2605,11 +1797,9 @@ final class QuickSelect {
         do {
             --great;
         } while (a[great] > v2);
-
         // a[less - 1] < P1 : a[great + 1] > P2
         // unvisited in [less, great]
-        SORTING:
-        for (int k = less; k <= great; k++) {
+        SORTING: for (int k = less; k <= great; k++) {
             final int v = a[k];
             if (v < v1) {
                 // swap(a, k, less++)
@@ -2641,7 +1831,6 @@ final class QuickSelect {
                 }
             }
         }
-
         // Change to inclusive ends : a[less] < P1 : a[great] > P2
         less--;
         great++;
@@ -2650,22 +1839,17 @@ final class QuickSelect {
         a[less] = v1;
         a[right] = a[great];
         a[great] = v2;
-
         // Record the pivot locations
         final int lower = less;
         bounds[2] = great;
-
         // equal elements
         // Original paper: If middle partition is bigger than a threshold
         // then check for equal elements.
-
         // Note: This is extra work. When performing partitioning the region of interest
         // may be entirely above or below the central region and this can be skipped.
-
         // Here we look for equal elements if the centre is more than 5/8 the length.
         // 5/8 = 1/2 + 1/8. Pivots must be different.
         if ((great - less) > (n >>> 1) + (n >>> 3) && v1 != v2) {
-
             // Fast-forward to reduce swaps. Changes inclusive ends to exclusive ends.
             // Since v1 != v2 these act as sentinels to prevent overrun.
             do {
@@ -2674,10 +1858,8 @@ final class QuickSelect {
             do {
                 --great;
             } while (a[great] == v2);
-
             // This copies the logic in the sorting loop using == comparisons
-            EQUAL:
-            for (int k = less; k <= great; k++) {
+            EQUAL: for (int k = less; k <= great; k++) {
                 final int v = a[k];
                 if (v == v1) {
                     a[k] = a[less];
@@ -2702,12 +1884,10 @@ final class QuickSelect {
                     }
                 }
             }
-
             // Change to inclusive ends
             less--;
             great++;
         }
-
         // Between pivots in (less, great)
         if (v1 != v2 && less < great - 1) {
             // Record the pivot end points
@@ -2718,7 +1898,6 @@ final class QuickSelect {
             bounds[0] = bounds[2];
             bounds[1] = lower;
         }
-
         return lower;
     }
 
@@ -2733,15 +1912,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelect(long[] a, int left, int right, int ka, int kb) {
-        if (right <= left) {
-            return;
-        }
-        // Use the smallest heap
-        if (kb - left < right - ka) {
-            heapSelectLeft(a, left, right, ka, kb);
-        } else {
-            heapSelectRight(a, left, right, ka, kb);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2758,36 +1929,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelectLeft(long[] a, int left, int right, int ka, int kb) {
-        // Create a max heap in-place in [left, k], rooted at a[left] = max
-        // |l|-max-heap-|k|--------------|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = k - left
-        int end = kb + 1;
-        for (int p = left + ((kb - left - 1) >> 1); p >= left; p--) {
-            maxHeapSiftDown(a, a[p], p, left, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        long max = a[left];
-        for (int i = right; i > kb; i--) {
-            final long v = a[i];
-            if (v < max) {
-                a[i] = max;
-                maxHeapSiftDown(a, v, left, left, end);
-                max = a[left];
-            }
-        }
-        // Partition [ka, kb]
-        // |l|-max-heap-|k|--------------|
-        //  |  <-swap->  |   then sift down reduced size heap
-        // Avoid sifting heap of size 1
-        final int last = Math.max(left, ka - 1);
-        while (--end > last) {
-            maxHeapSiftDown(a, a[end], left, left, end);
-            a[end] = max;
-            max = a[left];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2840,36 +1982,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void heapSelectRight(long[] a, int left, int right, int ka, int kb) {
-        // Create a min heap in-place in [k, right], rooted at a[right] = min
-        // |--------------|k|-min-heap-|r|
-        // Build the heap using Floyd's heap-construction algorithm for heap size n.
-        // Start at parent of the last element in the heap (k),
-        // i.e. start = parent(n-1) : parent(c) = floor((c - 1) / 2) : c = right - k
-        int end = ka - 1;
-        for (int p = right - ((right - ka - 1) >> 1); p <= right; p++) {
-            minHeapSiftDown(a, a[p], p, right, end);
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        long min = a[right];
-        for (int i = left; i < ka; i++) {
-            final long v = a[i];
-            if (v > min) {
-                a[i] = min;
-                minHeapSiftDown(a, v, right, right, end);
-                min = a[right];
-            }
-        }
-        // Partition [ka, kb]
-        // |--------------|k|-min-heap-|r|
-        //                 |  <-swap->  |   then sift down reduced size heap
-        // Avoid sifting heap of size 1
-        final int last = Math.min(right, kb + 1);
-        while (++end < last) {
-            minHeapSiftDown(a, a[end], right, right, end);
-            a[end] = min;
-            min = a[right];
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2919,18 +2032,7 @@ final class QuickSelect {
      * @param kb Upper index to select.
      */
     static void sortSelect(long[] a, int left, int right, int ka, int kb) {
-        // Combine the test for right <= left with
-        // avoiding the overhead of sort select on tiny data.
-        if (right - left <= MIN_SORTSELECT_SIZE) {
-            Sorting.sort(a, left, right);
-            return;
-        }
-        // Sort the smallest side
-        if (kb - left < right - ka) {
-            sortSelectLeft(a, left, right, kb);
-        } else {
-            sortSelectRight(a, left, right, ka);
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2950,33 +2052,7 @@ final class QuickSelect {
      * @param k Index to select.
      */
     static void sortSelectLeft(long[] a, int left, int right, int k) {
-        // Sort
-        for (int i = left; ++i <= k;) {
-            final long v = a[i];
-            // Move preceding higher elements above (if required)
-            if (v < a[i - 1]) {
-                int j = i;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        long m = a[k];
-        for (int i = right; i > k; i--) {
-            final long v = a[i];
-            if (v < m) {
-                a[i] = m;
-                int j = k;
-                while (--j >= left && v < a[j]) {
-                    a[j + 1] = a[j];
-                }
-                a[j + 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2996,33 +2072,7 @@ final class QuickSelect {
      * @param k Index to select.
      */
     static void sortSelectRight(long[] a, int left, int right, int k) {
-        // Sort
-        for (int i = right; --i >= k;) {
-            final long v = a[i];
-            // Move succeeding lower elements below (if required)
-            if (v > a[i + 1]) {
-                int j = i;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-            }
-        }
-        // Scan the remaining data and insert
-        // Mitigate worst case performance on descending data by backward sweep
-        long m = a[k];
-        for (int i = left; i < k; i++) {
-            final long v = a[i];
-            if (v > m) {
-                a[i] = m;
-                int j = k;
-                while (++j <= right && v > a[j]) {
-                    a[j - 1] = a[j];
-                }
-                a[j - 1] = v;
-                m = a[k];
-            }
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3037,7 +2087,7 @@ final class QuickSelect {
      * @param k Index.
      */
     static void select(long[] a, int left, int right, int k) {
-        quickSelectAdaptive(a, left, right, k, k, new int[1], MODE_FR_SAMPLING);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3051,25 +2101,7 @@ final class QuickSelect {
      * @param n Count of indices.
      */
     static void select(long[] a, int left, int right, int[] k, int n) {
-        if (n == 1) {
-            quickSelectAdaptive(a, left, right, k[0], k[0], new int[1], MODE_FR_SAMPLING);
-            return;
-        }
-
-        // Interval creation validates the indices are in [left, right]
-        final UpdatingInterval keys = IndexSupport.createUpdatingInterval(k, n);
-
-        // Note: If the keys are not separated then they are effectively a single key.
-        // Any split of keys separated by the sort select size
-        // will be finished on the next iteration.
-        final int k1 = keys.left();
-        final int kn = keys.right();
-        if (kn - k1 < DP_SORTSELECT_SIZE) {
-            quickSelectAdaptive(a, left, right, k1, kn, new int[1], MODE_FR_SAMPLING);
-        } else {
-            // Dual-pivot mode with small range sort length configured using index density
-            dualPivotQuickSelect(a, left, right, keys, dualPivotFlags(left, right, k1, kn));
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3100,90 +2132,8 @@ final class QuickSelect {
      * @param flags Adaption flags.
      * @return Lower bound of the range containing {@code [ka, kb]} (inclusive).
      */
-    static int quickSelectAdaptive(long[] a, int left, int right, int ka, int kb,
-            int[] bounds, int flags) {
-        int l = left;
-        int r = right;
-        int m = flags;
-        while (true) {
-            // Select when ka and kb are close to the same end
-            // |l|-----|ka|kkkkkkkk|kb|------|r|
-            if (Math.min(kb - l, r - ka) < LINEAR_SORTSELECT_SIZE) {
-                sortSelect(a, l, r, ka, kb);
-                bounds[0] = kb;
-                return ka;
-            }
-
-            // Only target ka; kb is assumed to be close
-            int p0;
-            final int n = r - l;
-            // f in [0, 1]
-            final double f = (double) (ka - l) / n;
-            // Record the larger margin (start at 1/4) to create the estimated size.
-            // step        L     R
-            // far left    1/12  1/3   (use 1/4 + 1/32 + 1/64 ~ 0.328)
-            // left        1/6   1/4
-            // middle      2/9   2/9   (use 1/4 - 1/32 ~ 0.219)
-            int margin = n >> 2;
-            if (m < MODE_SAMPLING && r - l > FR_SAMPLING_SIZE) {
-                // Floyd-Rivest sample step uses the same margins
-                p0 = sampleStep(a, l, r, ka, bounds);
-                if (f <= STEP_FAR_LEFT || f >= STEP_FAR_RIGHT) {
-                    margin += (n >> 5) + (n >> 6);
-                } else if (f > STEP_LEFT && f < STEP_RIGHT) {
-                    margin -= n >> 5;
-                }
-            } else if (f <= STEP_LEFT) {
-                if (f <= STEP_FAR_LEFT) {
-                    margin += (n >> 5) + (n >> 6);
-                    p0 = repeatedStepFarLeft(a, l, r, ka, bounds, m);
-                } else {
-                    p0 = repeatedStepLeft(a, l, r, ka, bounds, m);
-                }
-            } else if (f >= STEP_RIGHT) {
-                if (f >= STEP_FAR_RIGHT) {
-                    margin += (n >> 5) + (n >> 6);
-                    p0 = repeatedStepFarRight(a, l, r, ka, bounds, m);
-                } else {
-                    p0 = repeatedStepRight(a, l, r, ka, bounds, m);
-                }
-            } else {
-                margin -= n >> 5;
-                p0 = repeatedStep(a, l, r, ka, bounds, m);
-            }
-
-            // Note: Here we expect [ka, kb] to be small and splitting is unlikely.
-            //                   p0 p1
-            // |l|--|ka|kkkk|kb|--|P|-------------------|r|
-            // |l|----------------|P|--|ka|kkk|kb|------|r|
-            // |l|-----------|ka|k|P|k|kb|--------------|r|
-            final int p1 = bounds[0];
-            if (kb < p0) {
-                // Entirely on left side
-                r = p0 - 1;
-            } else if (ka > p1) {
-                // Entirely on right side
-                l = p1 + 1;
-            } else {
-                // Pivot splits [ka, kb]. Expect ends to be close to the pivot and finish.
-                // Here we set the bounds for use after median-of-medians pivot selection.
-                // In the event there are many equal values this allows collecting those
-                // known to be equal together when moving around the medians sample.
-                if (kb > p1) {
-                    sortSelectLeft(a, p1 + 1, r, kb);
-                    bounds[0] = kb;
-                }
-                if (ka < p0) {
-                    sortSelectRight(a, l, p0 - 1, ka);
-                    p0 = ka;
-                }
-                return p0;
-            }
-            // Update mode based on target partition size
-            if (r - l > n - margin) {
-                m++;
-            }
-        }
+    static int quickSelectAdaptive(long[] a, int left, int right, int ka, int kb, int[] bounds, int flags) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3563,104 +2513,8 @@ final class QuickSelect {
      * @return Lower bound (inclusive) of the pivot range [k0].
      */
     // package-private for testing
-    static int expandPartition(long[] a, int left, int right, int start, int end,
-        int pivot0, int pivot1, int[] upper) {
-        // 3-way partition of the data using a pivot value into
-        // less-than, equal or greater-than.
-        // Based on Sedgewick's Bentley-McIroy partitioning: always swap i<->j then
-        // check for equal to the pivot and move again.
-        //
-        // Move sentinels from start and end to left and right. Scan towards the
-        // sentinels until >=,<=. Swap then move == to the pivot region.
-        //           <-i                           j->
-        // |l |        |            |p0  p1|       |             | r|
-        // |>=|   ???  |     <      |  ==  |   >   |     ???     |<=|
-        //
-        // When either i or j reach the edge perform finishing loop.
-        // Finish loop for a[j] <= v replaces j with p1+1, optionally moves value
-        // to p0 for < and updates the pivot range p1 (and optionally p0):
-        //                                             j->
-        // |l                       |p0  p1|           |         | r|
-        // |         <              |  ==  |       >   |   ???   |<=|
-
-        final long v = a[pivot0];
-        // Use start/end as sentinels (requires start != end)
-        long vi = a[start];
-        long vj = a[end];
-        a[start] = a[left];
-        a[end] = a[right];
-        a[left] = vj;
-        a[right] = vi;
-
-        int i = start + 1;
-        int j = end - 1;
-
-        // Positioned for pre-in/decrement to write to pivot region
-        int p0 = pivot0 == start ? i : pivot0;
-        int p1 = pivot1 == end ? j : pivot1;
-
-        while (true) {
-            do {
-                --i;
-            } while (a[i] < v);
-            do {
-                ++j;
-            } while (a[j] > v);
-            vj = a[i];
-            vi = a[j];
-            a[i] = vi;
-            a[j] = vj;
-            // Move the equal values to pivot region
-            if (vi == v) {
-                a[i] = a[--p0];
-                a[p0] = v;
-            }
-            if (vj == v) {
-                a[j] = a[++p1];
-                a[p1] = v;
-            }
-            // Termination check and finishing loops.
-            // Note: This works even if pivot region is zero length (p1 == p0-1 due to
-            // length 1 pivot region at either start/end) because we pre-inc/decrement
-            // one side and post-inc/decrement the other side.
-            if (i == left) {
-                while (j < right) {
-                    do {
-                        ++j;
-                    } while (a[j] > v);
-                    final long w = a[j];
-                    // Move upper bound of pivot region
-                    a[j] = a[++p1];
-                    a[p1] = v;
-                    // Move lower bound of pivot region
-                    if (w != v) {
-                        a[p0] = w;
-                        p0++;
-                    }
-                }
-                break;
-            }
-            if (j == right) {
-                while (i > left) {
-                    do {
-                        --i;
-                    } while (a[i] < v);
-                    final long w = a[i];
-                    // Move lower bound of pivot region
-                    a[i] = a[--p0];
-                    a[p0] = v;
-                    // Move upper bound of pivot region
-                    if (w != v) {
-                        a[p1] = w;
-                        p1--;
-                    }
-                }
-                break;
-            }
-        }
-
-        upper[0] = p1;
-        return p0;
+    static int expandPartition(long[] a, int left, int right, int start, int end, int pivot0, int pivot1, int[] upper) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3693,92 +2547,7 @@ final class QuickSelect {
      */
     // package-private for testing
     static void dualPivotQuickSelect(long[] a, int left, int right, UpdatingInterval k, int flags) {
-        // If partitioning splits the interval then recursion is used for the left-most side(s)
-        // and the right-most side remains within this function. If partitioning does
-        // not split the interval then it remains within this function.
-        int l = left;
-        int r = right;
-        int f = flags;
-        int ka = k.left();
-        int kb = k.right();
-        final int[] upper = {0, 0, 0};
-        while (true) {
-            // Select when ka and kb are close to the same end,
-            // or the entire range is small
-            // |l|-----|ka|--------|kb|------|r|
-            final int n = r - l;
-            if (Math.min(kb - l, r - ka) < DP_SORTSELECT_SIZE ||
-                n < (f & SORTSELECT_MASK)) {
-                sortSelect(a, l, r, ka, kb);
-                return;
-            }
-            if (kb - ka < DP_SORTSELECT_SIZE) {
-                // Switch to single-pivot mode with Floyd-Rivest sub-sampling
-                quickSelectAdaptive(a, l, r, ka, kb, upper, MODE_FR_SAMPLING);
-                return;
-            }
-            if (f < 0) {
-                // Excess recursion, switch to heap select
-                heapSelect(a, l, r, ka, kb);
-                return;
-            }
-
-            // Dual-pivot partitioning
-            final int p0 = partition(a, l, r, upper);
-            final int p1 = upper[0];
-
-            // Recursion to max depth
-            // Note: Here we possibly branch left, middle and right with multiple keys.
-            // It is possible that the partition has split the keys
-            // and the recursion proceeds with a reduced set in each region.
-            //                   p0 p1               p2 p3
-            // |l|--|ka|--k----k--|P|------k--|kb|----|P|----|r|
-            //                 kb  |      ka
-            f += RECURSION_INCREMENT;
-            // Recurse left side if required
-            if (ka < p0) {
-                if (kb <= p1) {
-                    // Entirely on left side
-                    r = p0 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                dualPivotQuickSelect(a, l, p0 - 1, k.splitLeft(p0, p1), f);
-                // Here we must process middle and/or right
-                ka = k.left();
-            } else if (kb <= p1) {
-                // No middle/right side
-                return;
-            } else if (ka <= p1) {
-                // Advance lower bound
-                ka = k.updateLeft(p1 + 1);
-            }
-            // Recurse middle if required
-            final int p2 = upper[1];
-            final int p3 = upper[2];
-            if (ka < p2) {
-                l = p1 + 1;
-                if (kb <= p3) {
-                    // Entirely in middle
-                    r = p2 - 1;
-                    if (r < kb) {
-                        kb = k.updateRight(r);
-                    }
-                    continue;
-                }
-                dualPivotQuickSelect(a, l, p2 - 1, k.splitLeft(p2, p3), f);
-                ka = k.left();
-            } else if (kb <= p3) {
-                // No right side
-                return;
-            } else if (ka <= p3) {
-                ka = k.updateLeft(p3 + 1);
-            }
-            // Continue right
-            l = p3 + 1;
-        }
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3826,7 +2595,6 @@ final class QuickSelect {
         final int i4 = i3 + step;
         final int i5 = i4 + step;
         Sorting.sort5(a, i1, i2, i3, i4, i5);
-
         // Partition data using pivots P1 and P2 into less-than, greater-than or between.
         // Pivot values P1 & P2 are placed at the end. If P1 < P2, P2 acts as a sentinel.
         // k traverses the unknown region ??? and values moved if less-than or
@@ -3842,7 +2610,6 @@ final class QuickSelect {
         // At the end pivots are swapped back to behind the less and great pointers.
         //
         // |  <P1        |P1|     P1<= & <= P2    |P2|      >P2    |
-
         // Swap ends to the pivot locations.
         final long v1 = a[i2];
         a[i2] = a[left];
@@ -3850,11 +2617,9 @@ final class QuickSelect {
         final long v2 = a[i4];
         a[i4] = a[right];
         a[right] = v2;
-
         // pointers
         int less = left;
         int great = right;
-
         // Fast-forward ascending / descending runs to reduce swaps.
         // Cannot overrun as end pivots (v1 <= v2) act as sentinels.
         do {
@@ -3863,11 +2628,9 @@ final class QuickSelect {
         do {
             --great;
         } while (a[great] > v2);
-
         // a[less - 1] < P1 : a[great + 1] > P2
         // unvisited in [less, great]
-        SORTING:
-        for (int k = less; k <= great; k++) {
+        SORTING: for (int k = less; k <= great; k++) {
             final long v = a[k];
             if (v < v1) {
                 // swap(a, k, less++)
@@ -3899,7 +2662,6 @@ final class QuickSelect {
                 }
             }
         }
-
         // Change to inclusive ends : a[less] < P1 : a[great] > P2
         less--;
         great++;
@@ -3908,22 +2670,17 @@ final class QuickSelect {
         a[less] = v1;
         a[right] = a[great];
         a[great] = v2;
-
         // Record the pivot locations
         final int lower = less;
         bounds[2] = great;
-
         // equal elements
         // Original paper: If middle partition is bigger than a threshold
         // then check for equal elements.
-
         // Note: This is extra work. When performing partitioning the region of interest
         // may be entirely above or below the central region and this can be skipped.
-
         // Here we look for equal elements if the centre is more than 5/8 the length.
         // 5/8 = 1/2 + 1/8. Pivots must be different.
         if ((great - less) > (n >>> 1) + (n >>> 3) && v1 != v2) {
-
             // Fast-forward to reduce swaps. Changes inclusive ends to exclusive ends.
             // Since v1 != v2 these act as sentinels to prevent overrun.
             do {
@@ -3932,10 +2689,8 @@ final class QuickSelect {
             do {
                 --great;
             } while (a[great] == v2);
-
             // This copies the logic in the sorting loop using == comparisons
-            EQUAL:
-            for (int k = less; k <= great; k++) {
+            EQUAL: for (int k = less; k <= great; k++) {
                 final long v = a[k];
                 if (v == v1) {
                     a[k] = a[less];
@@ -3960,12 +2715,10 @@ final class QuickSelect {
                     }
                 }
             }
-
             // Change to inclusive ends
             less--;
             great++;
         }
-
         // Between pivots in (less, great)
         if (v1 != v2 && less < great - 1) {
             // Record the pivot end points
@@ -3976,7 +2729,6 @@ final class QuickSelect {
             bounds[0] = bounds[2];
             bounds[1] = lower;
         }
-
         return lower;
     }
 
@@ -4023,11 +2775,7 @@ final class QuickSelect {
      * @return the flags
      */
     static int dualPivotFlags(int maxDepth, int ss) {
-        // The flags are packed using the upper bits to count back from -1 in
-        // step sizes. The lower bits pack the sort select size.
-        int flags = Integer.MIN_VALUE - maxDepth * RECURSION_INCREMENT;
-        flags &= ~SORTSELECT_MASK;
-        return flags | ss;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -4041,10 +2789,7 @@ final class QuickSelect {
      * @return maximum recursion depth
      */
     static int dualPivotMaxDepth(int x) {
-        // log3(2) ~ 1.5849625
-        // log3(x) ~ log2(x) * 0.630929753... ~ log2(x) * 323 / 512 (0.630859375)
-        // Use (floor(log2(x))+1) * 323 / 256
-        return ((32 - Integer.numberOfLeadingZeros(x)) * 323) >>> 8;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -4135,7 +2880,6 @@ final class QuickSelect {
         // the gains with separation of 64-128 on random keys, and on machines with slow
         // insertion sort. The transition to using an insertion sort of a longer length
         // is difficult to predict for all situations.
-
         // Let partitioning run if the initial length is small.
         // Use kn - k1 as a proxy for the length. If length is actually very large then
         // the final selection is insignificant. This avoids slowdown for small lengths

@@ -33,7 +33,9 @@ package org.apache.commons.numbers.gamma;
  */
 public final class Beta {
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private Beta() {
         // intentionally empty.
     }
@@ -51,8 +53,7 @@ public final class Beta {
      * @param b Parameter {@code b}.
      * @return the beta function \( B(a, b) \).
      */
-    public static double value(double a,
-                               double b) {
-        return BoostBeta.beta(a, b);
+    public static double value(double a, double b) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

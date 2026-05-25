@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.complex;
 
 import java.io.Serializable;
@@ -61,19 +60,22 @@ import java.util.function.DoubleUnaryOperator;
  * @see <a href="https://www.open-std.org/JTC1/SC22/WG14/www/standards">
  *    ISO/IEC 9899 - Programming languages - C</a>
  */
-public final class Complex implements Serializable  {
+public final class Complex implements Serializable {
+
     /**
      * A complex number representing \( i \), the square root of \( -1 \).
      *
      * <p>\( (0 + i 1) \).
      */
     public static final Complex I = new Complex(0, 1);
+
     /**
      * A complex number representing one.
      *
      * <p>\( (1 + i 0) \).
      */
     public static final Complex ONE = new Complex(1, 0);
+
     /**
      * A complex number representing zero.
      *
@@ -81,31 +83,63 @@ public final class Complex implements Serializable  {
      */
     public static final Complex ZERO = new Complex(0, 0);
 
-    /** A complex number representing {@code NaN + i NaN}. */
+    /**
+     * A complex number representing {@code NaN + i NaN}.
+     */
     private static final Complex NAN = new Complex(Double.NaN, Double.NaN);
-    /** &pi;/2. */
+
+    /**
+     * &pi;/2.
+     */
     private static final double PI_OVER_2 = 0.5 * Math.PI;
-    /** &pi;/4. */
+
+    /**
+     * &pi;/4.
+     */
     private static final double PI_OVER_4 = 0.25 * Math.PI;
-    /** Natural logarithm of 2 (ln(2)). */
+
+    /**
+     * Natural logarithm of 2 (ln(2)).
+     */
     private static final double LN_2 = Math.log(2);
-    /** Base 10 logarithm of 10 divided by 2 (log10(e)/2). */
+
+    /**
+     * Base 10 logarithm of 10 divided by 2 (log10(e)/2).
+     */
     private static final double LOG_10E_O_2 = Math.log10(Math.E) / 2;
-    /** Base 10 logarithm of 2 (log10(2)). */
+
+    /**
+     * Base 10 logarithm of 2 (log10(2)).
+     */
     private static final double LOG10_2 = Math.log10(2);
-    /** {@code 1/2}. */
+
+    /**
+     * {@code 1/2}.
+     */
     private static final double HALF = 0.5;
-    /** {@code sqrt(2)}. */
+
+    /**
+     * {@code sqrt(2)}.
+     */
     private static final double ROOT2 = 1.4142135623730951;
-    /** {@code 1.0 / sqrt(2)}.
+
+    /**
+     * {@code 1.0 / sqrt(2)}.
      * This is pre-computed to the closest double from the exact result.
      * It is 1 ULP different from 1.0 / Math.sqrt(2) but equal to Math.sqrt(2) / 2.
      */
     private static final double ONE_OVER_ROOT2 = 0.7071067811865476;
-    /** The bit representation of {@code -0.0}. */
+
+    /**
+     * The bit representation of {@code -0.0}.
+     */
     private static final long NEGATIVE_ZERO_LONG_BITS = Double.doubleToLongBits(-0.0);
-    /** Exponent offset in IEEE754 representation. */
+
+    /**
+     * Exponent offset in IEEE754 representation.
+     */
     private static final int EXPONENT_OFFSET = 1023;
+
     /**
      * Largest double-precision floating-point number such that
      * {@code 1 + EPSILON} is numerically equal to 1. This value is an upper
@@ -118,13 +152,22 @@ public final class Complex implements Serializable  {
      * @see <a href="https://en.wikipedia.org/wiki/Machine_epsilon">Machine epsilon</a>
      */
     private static final double EPSILON = Double.longBitsToDouble((EXPONENT_OFFSET - 53L) << 52);
-    /** Mask to remove the sign bit from a long. */
+
+    /**
+     * Mask to remove the sign bit from a long.
+     */
     private static final long UNSIGN_MASK = 0x7fff_ffff_ffff_ffffL;
-    /** Mask to extract the 52-bit mantissa from a long representation of a double. */
+
+    /**
+     * Mask to extract the 52-bit mantissa from a long representation of a double.
+     */
     private static final long MANTISSA_MASK = 0x000f_ffff_ffff_ffffL;
-    /** The multiplier used to split the double value into hi and low parts. This must be odd
+
+    /**
+     * The multiplier used to split the double value into hi and low parts. This must be odd
      * and a value of 2^s + 1 in the range {@code p/2 <= s <= p-1} where p is the number of
-     * bits of precision of the floating point number. Here {@code s = 27}.*/
+     * bits of precision of the floating point number. Here {@code s = 27}.
+     */
     private static final double MULTIPLIER = 1.34217729E8;
 
     /**
@@ -134,30 +177,41 @@ public final class Complex implements Serializable  {
      * @see <a href="https://svn.boost.org/trac/boost/ticket/7290">Boost ticket 7290</a>
      */
     private static final double A_CROSSOVER = 10.0;
-    /** Crossover point to switch computation for asin/acos factor B. */
+
+    /**
+     * Crossover point to switch computation for asin/acos factor B.
+     */
     private static final double B_CROSSOVER = 0.6471;
+
     /**
      * The safe maximum double value {@code x} to avoid loss of precision in asin/acos.
      * Equal to sqrt(M) / 8 in Hull, et al (1997) with M the largest normalised floating-point value.
      */
     private static final double SAFE_MAX = Math.sqrt(Double.MAX_VALUE) / 8;
+
     /**
      * The safe minimum double value {@code x} to avoid loss of precision/underflow in asin/acos.
      * Equal to sqrt(u) * 4 in Hull, et al (1997) with u the smallest normalised floating-point value.
      */
     private static final double SAFE_MIN = Math.sqrt(Double.MIN_NORMAL) * 4;
+
     /**
      * The safe maximum double value {@code x} to avoid loss of precision in atanh.
      * Equal to sqrt(M) / 2 with M the largest normalised floating-point value.
      */
     private static final double SAFE_UPPER = Math.sqrt(Double.MAX_VALUE) / 2;
+
     /**
      * The safe minimum double value {@code x} to avoid loss of precision/underflow in atanh.
      * Equal to sqrt(u) * 2 with u the smallest normalised floating-point value.
      */
     private static final double SAFE_LOWER = Math.sqrt(Double.MIN_NORMAL) * 2;
-    /** The safe maximum double value {@code x} to avoid overflow in sqrt. */
+
+    /**
+     * The safe maximum double value {@code x} to avoid overflow in sqrt.
+     */
     private static final double SQRT_SAFE_UPPER = Double.MAX_VALUE / 8;
+
     /**
      * A safe maximum double value {@code m} where {@code e^m} is not infinite.
      * This can be used when functions require approximations of sinh(x) or cosh(x)
@@ -185,27 +239,47 @@ public final class Complex implements Serializable  {
      * 2.0 / e^m / e^m = 0.0 </pre>
      */
     private static final double SAFE_EXP = 708;
+
     /**
      * The value of Math.exp(SAFE_EXP): e^708.
      * To be used in overflow/underflow safe products of e^m to approximate e^x where {@code x > m}.
      */
     private static final double EXP_M = Math.exp(SAFE_EXP);
 
-    /** 54 shifted 20-bits to align with the exponent of the upper 32-bits of a double. */
+    /**
+     * 54 shifted 20-bits to align with the exponent of the upper 32-bits of a double.
+     */
     private static final int EXP_54 = 0x36_00000;
-    /** Represents an exponent of 500 in unbiased form shifted 20-bits to align with the upper 32-bits of a double. */
+
+    /**
+     * Represents an exponent of 500 in unbiased form shifted 20-bits to align with the upper 32-bits of a double.
+     */
     private static final int EXP_500 = 0x5f3_00000;
-    /** Represents an exponent of 1024 in unbiased form (infinite or nan)
-     * shifted 20-bits to align with the upper 32-bits of a double. */
+
+    /**
+     * Represents an exponent of 1024 in unbiased form (infinite or nan)
+     * shifted 20-bits to align with the upper 32-bits of a double.
+     */
     private static final int EXP_1024 = 0x7ff_00000;
-    /** Represents an exponent of -500 in unbiased form shifted 20-bits to align with the upper 32-bits of a double. */
+
+    /**
+     * Represents an exponent of -500 in unbiased form shifted 20-bits to align with the upper 32-bits of a double.
+     */
     private static final int EXP_NEG_500 = 0x20b_00000;
-    /** 2^600. */
+
+    /**
+     * 2^600.
+     */
     private static final double TWO_POW_600 = 0x1.0p+600;
-    /** 2^-600. */
+
+    /**
+     * 2^-600.
+     */
     private static final double TWO_POW_NEG_600 = 0x1.0p-600;
 
-    /** Serializable version identifier. */
+    /**
+     * Serializable version identifier.
+     */
     private static final long serialVersionUID = 20180201L;
 
     /**
@@ -217,20 +291,40 @@ public final class Complex implements Serializable  {
      * allowing for formatting characters. The size is 64.
      */
     private static final int TO_STRING_SIZE = 64;
-    /** The minimum number of characters in the format. This is 5, e.g. {@code "(0,0)"}. */
+
+    /**
+     * The minimum number of characters in the format. This is 5, e.g. {@code "(0,0)"}.
+     */
     private static final int FORMAT_MIN_LEN = 5;
-    /** {@link #toString() String representation}. */
+
+    /**
+     * {@link #toString() String representation}.
+     */
     private static final char FORMAT_START = '(';
-    /** {@link #toString() String representation}. */
+
+    /**
+     * {@link #toString() String representation}.
+     */
     private static final char FORMAT_END = ')';
-    /** {@link #toString() String representation}. */
+
+    /**
+     * {@link #toString() String representation}.
+     */
     private static final char FORMAT_SEP = ',';
-    /** The minimum number of characters before the separator. This is 2, e.g. {@code "(0"}. */
+
+    /**
+     * The minimum number of characters before the separator. This is 2, e.g. {@code "(0"}.
+     */
     private static final int BEFORE_SEP = 2;
 
-    /** The imaginary part. */
+    /**
+     * The imaginary part.
+     */
     private final double imaginary;
-    /** The real part. */
+
+    /**
+     * The real part.
+     */
     private final double real;
 
     /**
@@ -239,6 +333,7 @@ public final class Complex implements Serializable  {
      */
     @FunctionalInterface
     private interface ComplexConstructor {
+
         /**
          * Create a complex number given the real and imaginary parts.
          *
@@ -268,7 +363,7 @@ public final class Complex implements Serializable  {
      * @return {@code Complex} number.
      */
     public static Complex ofCartesian(double real, double imaginary) {
-        return new Complex(real, imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -313,13 +408,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://mathworld.wolfram.com/PolarCoordinates.html">Polar Coordinates</a>
      */
     public static Complex ofPolar(double rho, double theta) {
-        // Require finite theta and non-negative, non-nan rho
-        if (!Double.isFinite(theta) || negative(rho) || Double.isNaN(rho)) {
-            return NAN;
-        }
-        final double x = rho * Math.cos(theta);
-        final double y = rho * Math.sin(theta);
-        return new Complex(x, y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -332,7 +421,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://mathworld.wolfram.com/Cis.html">Cis</a>
      */
     public static Complex ofCis(double x) {
-        return new Complex(Math.cos(x), Math.sin(x));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -364,62 +453,7 @@ public final class Complex implements Serializable  {
      * @see #toString()
      */
     public static Complex parse(String s) {
-        final int len = s.length();
-        if (len < FORMAT_MIN_LEN) {
-            throw new NumberFormatException(
-                parsingExceptionMsg("Input too short, expected format",
-                                    FORMAT_START + "x" + FORMAT_SEP + "y" + FORMAT_END, s));
-        }
-
-        // Confirm start: '('
-        if (s.charAt(0) != FORMAT_START) {
-            throw new NumberFormatException(
-                parsingExceptionMsg("Expected start delimiter", FORMAT_START, s));
-        }
-
-        // Confirm end: ')'
-        if (s.charAt(len - 1) != FORMAT_END) {
-            throw new NumberFormatException(
-                parsingExceptionMsg("Expected end delimiter", FORMAT_END, s));
-        }
-
-        // Confirm separator ',' is between at least 2 characters from
-        // either end: "(x,x)"
-        // Count back from the end ignoring the last 2 characters.
-        final int sep = s.lastIndexOf(FORMAT_SEP, len - 3);
-        if (sep < BEFORE_SEP) {
-            throw new NumberFormatException(
-                parsingExceptionMsg("Expected separator between two numbers", FORMAT_SEP, s));
-        }
-
-        // Should be no more separators
-        if (s.indexOf(FORMAT_SEP, sep + 1) != -1) {
-            throw new NumberFormatException(
-                parsingExceptionMsg("Incorrect number of parts, expected only 2 using separator",
-                                    FORMAT_SEP, s));
-        }
-
-        // Try to parse the parts
-
-        final String rePart = s.substring(1, sep);
-        final double re;
-        try {
-            re = Double.parseDouble(rePart);
-        } catch (final NumberFormatException ex) {
-            throw new NumberFormatException(
-                parsingExceptionMsg("Could not parse real part", rePart, s));
-        }
-
-        final String imPart = s.substring(sep + 1, len - 1);
-        final double im;
-        try {
-            im = Double.parseDouble(imPart);
-        } catch (final NumberFormatException ex) {
-            throw new NumberFormatException(
-                parsingExceptionMsg("Could not parse imaginary part", imPart, s));
-        }
-
-        return ofCartesian(re, im);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -430,13 +464,8 @@ public final class Complex implements Serializable  {
      * @param s String representation.
      * @return A message.
      */
-    private static String parsingExceptionMsg(String message,
-                                              Object error,
-                                              String s) {
-        final StringBuilder sb = new StringBuilder(100)
-            .append(message)
-            .append(" '").append(error)
-            .append("' for input \"").append(s).append('"');
+    private static String parsingExceptionMsg(String message, Object error, String s) {
+        final StringBuilder sb = new StringBuilder(100).append(message).append(" '").append(error).append("' for input \"").append(s).append('"');
         return sb.toString();
     }
 
@@ -446,7 +475,7 @@ public final class Complex implements Serializable  {
      * @return The real part.
      */
     public double getReal() {
-        return real;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -458,7 +487,7 @@ public final class Complex implements Serializable  {
      * @see #getReal()
      */
     public double real() {
-        return getReal();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -467,7 +496,7 @@ public final class Complex implements Serializable  {
      * @return The imaginary part.
      */
     public double getImaginary() {
-        return imaginary;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -479,7 +508,7 @@ public final class Complex implements Serializable  {
      * @see #getImaginary()
      */
     public double imag() {
-        return getImaginary();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -513,7 +542,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://mathworld.wolfram.com/ComplexModulus.html">Complex modulus</a>
      */
     public double abs() {
-        return abs(real, imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -567,8 +596,7 @@ public final class Complex implements Serializable  {
      * @see Math#atan2(double, double)
      */
     public double arg() {
-        // Delegate
-        return Math.atan2(imaginary, real);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -594,10 +622,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://mathworld.wolfram.com/AbsoluteSquare.html">Absolute square</a>
      */
     public double norm() {
-        if (isInfinite()) {
-            return Double.POSITIVE_INFINITY;
-        }
-        return real * real + imaginary * imaginary;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -617,10 +642,7 @@ public final class Complex implements Serializable  {
      * @see #equals(Object) Complex.equals(Object)
      */
     public boolean isNaN() {
-        if (Double.isNaN(real) || Double.isNaN(imaginary)) {
-            return !isInfinite();
-        }
-        return false;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -633,7 +655,7 @@ public final class Complex implements Serializable  {
      * @see Double#isInfinite(double)
      */
     public boolean isInfinite() {
-        return Double.isInfinite(real) || Double.isInfinite(imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -643,7 +665,7 @@ public final class Complex implements Serializable  {
      * @see Double#isFinite(double)
      */
     public boolean isFinite() {
-        return Double.isFinite(real) && Double.isFinite(imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -658,7 +680,7 @@ public final class Complex implements Serializable  {
      * @return The conjugate (\( \overline{z} \)) of this complex number.
      */
     public Complex conj() {
-        return new Complex(real, -imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -672,7 +694,7 @@ public final class Complex implements Serializable  {
      * @return \( -z \).
      */
     public Complex negate() {
-        return new Complex(-real, -imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -691,10 +713,7 @@ public final class Complex implements Serializable  {
      * IEEE and ISO C standards: cproj</a>
      */
     public Complex proj() {
-        if (isInfinite()) {
-            return new Complex(Double.POSITIVE_INFINITY, Math.copySign(0.0, imaginary));
-        }
-        return this;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -708,8 +727,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://mathworld.wolfram.com/ComplexAddition.html">Complex Addition</a>
      */
     public Complex add(Complex addend) {
-        return new Complex(real + addend.real,
-                           imaginary + addend.imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -733,7 +751,7 @@ public final class Complex implements Serializable  {
      * @see #ofCartesian(double, double)
      */
     public Complex add(double addend) {
-        return new Complex(real + addend, imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -757,7 +775,7 @@ public final class Complex implements Serializable  {
      * @see #ofCartesian(double, double)
      */
     public Complex addImaginary(double addend) {
-        return new Complex(real, imaginary + addend);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -771,8 +789,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://mathworld.wolfram.com/ComplexSubtraction.html">Complex Subtraction</a>
      */
     public Complex subtract(Complex subtrahend) {
-        return new Complex(real - subtrahend.real,
-                           imaginary - subtrahend.imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -790,7 +807,7 @@ public final class Complex implements Serializable  {
      * @see #subtract(Complex)
      */
     public Complex subtract(double subtrahend) {
-        return new Complex(real - subtrahend, imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -808,7 +825,7 @@ public final class Complex implements Serializable  {
      * @see #subtract(Complex)
      */
     public Complex subtractImaginary(double subtrahend) {
-        return new Complex(real, imaginary - subtrahend);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -831,7 +848,7 @@ public final class Complex implements Serializable  {
      * @see #ofCartesian(double, double)
      */
     public Complex subtractFrom(double minuend) {
-        return new Complex(minuend - real, -imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -854,7 +871,7 @@ public final class Complex implements Serializable  {
      * @see #ofCartesian(double, double)
      */
     public Complex subtractFromImaginary(double minuend) {
-        return new Complex(-real, minuend - imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -870,7 +887,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://mathworld.wolfram.com/ComplexMultiplication.html">Complex Muliplication</a>
      */
     public Complex multiply(Complex factor) {
-        return multiply(real, imaginary, factor.real, factor.imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -897,7 +914,6 @@ public final class Complex implements Serializable  {
         final double bc = b * c;
         double x = ac - bd;
         double y = ad + bc;
-
         // --------------
         // NaN can occur if:
         // - any of (a,b,c,d) are NaN (for NaN or Infinite complex numbers)
@@ -910,12 +926,10 @@ public final class Complex implements Serializable  {
         // Modification from the listing in ISO C99 G.5.1 (6)
         // Do not correct infinity multiplied by zero. This is left as NaN.
         // --------------
-
         if (Double.isNaN(x) && Double.isNaN(y)) {
             // Recover infinities that computed as NaN+iNaN ...
             boolean recalc = false;
-            if ((Double.isInfinite(a) || Double.isInfinite(b)) &&
-                isNotZero(c, d)) {
+            if ((Double.isInfinite(a) || Double.isInfinite(b)) && isNotZero(c, d)) {
                 // This complex is infinite.
                 // "Box" the infinity and change NaNs in the other factor to 0.
                 a = boxInfinity(a);
@@ -924,8 +938,7 @@ public final class Complex implements Serializable  {
                 d = changeNaNtoZero(d);
                 recalc = true;
             }
-            if ((Double.isInfinite(c) || Double.isInfinite(d)) &&
-                isNotZero(a, b)) {
+            if ((Double.isInfinite(c) || Double.isInfinite(d)) && isNotZero(a, b)) {
                 // The other complex is infinite.
                 // "Box" the infinity and change NaNs in the other factor to 0.
                 c = boxInfinity(c);
@@ -934,8 +947,7 @@ public final class Complex implements Serializable  {
                 b = changeNaNtoZero(b);
                 recalc = true;
             }
-            if (!recalc && (Double.isInfinite(ac) || Double.isInfinite(bd) ||
-                            Double.isInfinite(ad) || Double.isInfinite(bc))) {
+            if (!recalc && (Double.isInfinite(ac) || Double.isInfinite(bd) || Double.isInfinite(ad) || Double.isInfinite(bc))) {
                 // The result overflowed to infinity.
                 // Recover infinities from overflow by changing NaNs to 0 ...
                 a = changeNaNtoZero(a);
@@ -1017,7 +1029,7 @@ public final class Complex implements Serializable  {
      * @see #multiply(Complex)
      */
     public Complex multiply(double factor) {
-        return new Complex(real * factor, imaginary * factor);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1050,7 +1062,7 @@ public final class Complex implements Serializable  {
      * @see #multiply(Complex)
      */
     public Complex multiplyImaginary(double factor) {
-        return new Complex(-imaginary * factor, real * factor);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1066,7 +1078,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://mathworld.wolfram.com/ComplexDivision.html">Complex Division</a>
      */
     public Complex divide(Complex divisor) {
-        return divide(real, imaginary, divisor.real, divisor.imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1108,7 +1120,6 @@ public final class Complex implements Serializable  {
             d = Math.scalb(d, -ilogbw);
         }
         final double denom = c * c + d * d;
-
         // Note: Modification from the listing in ISO C99 G.5.1 (8):
         // Avoid overflow if a or b are very big.
         // Since (c, d) in the range [1, 2) the sum (ac + bd) could overflow
@@ -1120,28 +1131,24 @@ public final class Complex implements Serializable  {
             a /= 4;
             b /= 4;
         }
-
         double x = Math.scalb((a * c + b * d) / denom, -ilogbw);
         double y = Math.scalb((b * c - a * d) / denom, -ilogbw);
         // Recover infinities and zeros that computed as NaN+iNaN
         // the only cases are nonzero/zero, infinite/finite, and finite/infinite, ...
         if (Double.isNaN(x) && Double.isNaN(y)) {
-            if (denom == 0.0 &&
-                    (!Double.isNaN(a) || !Double.isNaN(b))) {
+            if (denom == 0.0 && (!Double.isNaN(a) || !Double.isNaN(b))) {
                 // nonzero/zero
                 // This case produces the same result as divide by a real-only zero
                 // using Complex.divide(+/-0.0)
                 x = Math.copySign(Double.POSITIVE_INFINITY, c) * a;
                 y = Math.copySign(Double.POSITIVE_INFINITY, c) * b;
-            } else if ((Double.isInfinite(a) || Double.isInfinite(b)) &&
-                    Double.isFinite(c) && Double.isFinite(d)) {
+            } else if ((Double.isInfinite(a) || Double.isInfinite(b)) && Double.isFinite(c) && Double.isFinite(d)) {
                 // infinite/finite
                 a = boxInfinity(a);
                 b = boxInfinity(b);
                 x = Double.POSITIVE_INFINITY * (a * c + b * d);
                 y = Double.POSITIVE_INFINITY * (b * c - a * d);
-            } else if ((Double.isInfinite(c) || Double.isInfinite(d)) &&
-                    Double.isFinite(a) && Double.isFinite(b)) {
+            } else if ((Double.isInfinite(c) || Double.isInfinite(d)) && Double.isFinite(a) && Double.isFinite(b)) {
                 // finite/infinite
                 c = boxInfinity(c);
                 d = boxInfinity(d);
@@ -1174,7 +1181,7 @@ public final class Complex implements Serializable  {
      * @see #divide(Complex)
      */
     public Complex divide(double divisor) {
-        return new Complex(real / divisor, imaginary / divisor);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1208,7 +1215,7 @@ public final class Complex implements Serializable  {
      * @see #divide(double)
      */
     public Complex divideImaginary(double divisor) {
-        return new Complex(imaginary / divisor, -real / divisor);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1246,55 +1253,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Exp/">Exp</a>
      */
     public Complex exp() {
-        if (Double.isInfinite(real)) {
-            // Set the scale factor applied to cis(y)
-            final double zeroOrInf;
-            if (real < 0) {
-                if (!Double.isFinite(imaginary)) {
-                    // (−∞ + i∞) or (−∞ + iNaN) returns (±0 ± i0) (where the signs of the
-                    // real and imaginary parts of the result are unspecified).
-                    // Here we preserve the conjugate equality.
-                    return new Complex(0, Math.copySign(0, imaginary));
-                }
-                // (−∞ + iy) returns +0 cis(y), for finite y
-                zeroOrInf = 0;
-            } else {
-                // (+∞ + i0) returns +∞ + i0.
-                if (imaginary == 0) {
-                    return this;
-                }
-                // (+∞ + i∞) or (+∞ + iNaN) returns (±∞ + iNaN) and raises the invalid
-                // floating-point exception (where the sign of the real part of the
-                // result is unspecified).
-                if (!Double.isFinite(imaginary)) {
-                    return new Complex(real, Double.NaN);
-                }
-                // (+∞ + iy) returns (+∞ cis(y)), for finite nonzero y.
-                zeroOrInf = real;
-            }
-            return new Complex(zeroOrInf * Math.cos(imaginary),
-                               zeroOrInf * Math.sin(imaginary));
-        } else if (Double.isNaN(real)) {
-            // (NaN + i0) returns (NaN + i0)
-            // (NaN + iy) returns (NaN + iNaN) and optionally raises the invalid floating-point exception
-            // (NaN + iNaN) returns (NaN + iNaN)
-            return imaginary == 0 ? this : NAN;
-        } else if (!Double.isFinite(imaginary)) {
-            // (x + i∞) or (x + iNaN) returns (NaN + iNaN) and raises the invalid
-            // floating-point exception, for finite x.
-            return NAN;
-        }
-        // real and imaginary are finite.
-        // Compute e^a * (cos(b) + i sin(b)).
-
-        // Special case:
-        // (±0 + i0) returns (1 + i0)
-        final double exp = Math.exp(real);
-        if (imaginary == 0) {
-            return new Complex(exp, imaginary);
-        }
-        return new Complex(exp * Math.cos(imaginary),
-                           exp * Math.sin(imaginary));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1343,7 +1302,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Log/">Log</a>
      */
     public Complex log() {
-        return log(Math::log, HALF, LN_2, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1368,7 +1327,7 @@ public final class Complex implements Serializable  {
      * @see #arg()
      */
     public Complex log10() {
-        return log(Math::log10, LOG_10E_O_2, LOG10_2, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1400,37 +1359,29 @@ public final class Complex implements Serializable  {
             // No-use of the input constructor
             return NAN;
         }
-
         // Returns the real part:
         // log(sqrt(x^2 + y^2))
         // log(x^2 + y^2) / 2
-
         // Compute with positive values
         double x = Math.abs(real);
         double y = Math.abs(imaginary);
-
         // Find the larger magnitude.
         if (x < y) {
             final double tmp = x;
             x = y;
             y = tmp;
         }
-
         if (x == 0) {
             // Handle zero: raises the ‘‘divide-by-zero’’ floating-point exception.
-            return constructor.create(Double.NEGATIVE_INFINITY,
-                                      negative(real) ? Math.copySign(Math.PI, imaginary) : imaginary);
+            return constructor.create(Double.NEGATIVE_INFINITY, negative(real) ? Math.copySign(Math.PI, imaginary) : imaginary);
         }
-
         double re;
-
         // This alters the implementation of Hull et al (1994) which used a standard
         // precision representation of |z|: sqrt(x*x + y*y).
         // This formula should use the same definition of the magnitude returned
         // by Complex.abs() which is a high precision computation with scaling.
         // The checks for overflow thus only require ensuring the output of |z|
         // will not overflow or underflow.
-
         if (x > HALF && x < ROOT2) {
             // x^2+y^2 close to 1. Use log1p(x^2+y^2 - 1) / 2.
             re = Math.log1p(x2y2m1(x, y)) * logOfeOver2;
@@ -1466,7 +1417,6 @@ public final class Complex implements Serializable  {
             }
             re += log.applyAsDouble(abs(x, y));
         }
-
         // All ISO C99 edge cases for the imaginary are satisfied by the Math library.
         return constructor.create(re, arg());
     }
@@ -1490,18 +1440,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Power/">Power</a>
      */
     public Complex pow(Complex x) {
-        if (real == 0 &&
-            imaginary == 0) {
-            // This value is zero. Test the other.
-            if (x.real > 0 &&
-                x.imaginary == 0) {
-                // 0 raised to positive number is 0
-                return ZERO;
-            }
-            // 0 raised to anything else is NaN
-            return NAN;
-        }
-        return log().multiply(x).exp();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1523,17 +1462,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Power/">Power</a>
      */
     public Complex pow(double x) {
-        if (real == 0 &&
-            imaginary == 0) {
-            // This value is zero. Test the other.
-            if (x > 0) {
-                // 0 raised to positive number is 0
-                return ZERO;
-            }
-            // 0 raised to anything else is NaN
-            return NAN;
-        }
-        return log().multiply(x).exp();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1584,7 +1513,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Sqrt/">Sqrt</a>
      */
     public Complex sqrt() {
-        return sqrt(real, imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1609,27 +1538,22 @@ public final class Complex implements Serializable  {
             }
             return NAN;
         }
-
         // Compute with positive values and determine sign at the end
         final double x = Math.abs(real);
         final double y = Math.abs(imaginary);
-
         // Compute
         final double t;
-
         // This alters the implementation of Hull et al (1994) which used a standard
         // precision representation of |z|: sqrt(x*x + y*y).
         // This formula should use the same definition of the magnitude returned
         // by Complex.abs() which is a high precision computation with scaling.
         // Worry about overflow if 2 * (|z| + |x|) will overflow.
         // Worry about underflow if |z| or |x| are sub-normal components.
-
         if (inRegion(x, y, Double.MIN_NORMAL, SQRT_SAFE_UPPER)) {
             // No over/underflow
             t = Math.sqrt(2 * (abs(x, y) + x));
         } else {
             // Potential over/underflow. First check infinites and real/imaginary only.
-
             // Check for infinite
             if (isPosInfinite(y)) {
                 return new Complex(Double.POSITIVE_INFINITY, imaginary);
@@ -1661,7 +1585,6 @@ public final class Complex implements Serializable  {
                 // Note if we scale by an even power of 2, we can re-scale by sqrt of the number.
                 // a = sqrt(b)
                 // a = sqrt(b/4) * sqrt(4)
-
                 final double rescale;
                 final double sx;
                 final double sy;
@@ -1680,7 +1603,6 @@ public final class Complex implements Serializable  {
                 t = rescale * Math.sqrt(2 * (abs(sx, sy) + sx));
             }
         }
-
         if (real >= 0) {
             return new Complex(t / 2, imaginary / t);
         }
@@ -1709,10 +1631,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Sin/">Sin</a>
      */
     public Complex sin() {
-        // Define in terms of sinh
-        // sin(z) = -i sinh(iz)
-        // Multiply this number by I, compute sinh, then multiply by back
-        return sinh(-imaginary, real, Complex::multiplyNegativeI);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1737,10 +1656,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Cos/">Cos</a>
      */
     public Complex cos() {
-        // Define in terms of cosh
-        // cos(z) = cosh(iz)
-        // Multiply this number by I and compute cosh.
-        return cosh(-imaginary, real, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1763,10 +1679,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Tan/">Tangent</a>
      */
     public Complex tan() {
-        // Define in terms of tanh
-        // tan(z) = -i tanh(iz)
-        // Multiply this number by I, compute tanh, then multiply by back
-        return tanh(-imaginary, real, Complex::multiplyNegativeI);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1808,7 +1721,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/ArcSin/">ArcSin</a>
      */
     public Complex asin() {
-        return asin(real, imaginary, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1831,15 +1744,13 @@ public final class Complex implements Serializable  {
      * @param constructor Constructor.
      * @return The inverse sine of this complex number.
      */
-    private static Complex asin(final double real, final double imaginary,
-                                final ComplexConstructor constructor) {
+    private static Complex asin(final double real, final double imaginary, final ComplexConstructor constructor) {
         // Compute with positive values and determine sign at the end
         final double x = Math.abs(real);
         final double y = Math.abs(imaginary);
         // The result (without sign correction)
         final double re;
         final double im;
-
         // Handle C99 special cases
         if (Double.isNaN(x)) {
             if (isPosInfinite(y)) {
@@ -1871,17 +1782,14 @@ public final class Complex implements Serializable  {
             if (y == 0 && x <= 1) {
                 return constructor.create(Math.asin(real), imaginary);
             }
-
             final double xp1 = x + 1;
             final double xm1 = x - 1;
-
             if (inRegion(x, y, SAFE_MIN, SAFE_MAX)) {
                 final double yy = y * y;
                 final double r = Math.sqrt(xp1 * xp1 + yy);
                 final double s = Math.sqrt(xm1 * xm1 + yy);
                 final double a = 0.5 * (r + s);
                 final double b = x / a;
-
                 if (b <= B_CROSSOVER) {
                     re = Math.asin(b);
                 } else {
@@ -1892,7 +1800,6 @@ public final class Complex implements Serializable  {
                         re = Math.atan(x / (y * Math.sqrt(0.5 * (apx / (r + xp1) + apx / (s + xm1)))));
                     }
                 }
-
                 if (a <= A_CROSSOVER) {
                     final double am1;
                     if (x < 1) {
@@ -1944,9 +1851,7 @@ public final class Complex implements Serializable  {
                 }
             }
         }
-
-        return constructor.create(changeSign(re, real),
-                                  changeSign(im, imaginary));
+        return constructor.create(changeSign(re, real), changeSign(im, imaginary));
     }
 
     /**
@@ -2003,7 +1908,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/ArcCos/">ArcCos</a>
      */
     public Complex acos() {
-        return acos(real, imaginary, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2026,15 +1931,13 @@ public final class Complex implements Serializable  {
      * @param constructor Constructor.
      * @return The inverse cosine of the complex number.
      */
-    private static Complex acos(final double real, final double imaginary,
-                                final ComplexConstructor constructor) {
+    private static Complex acos(final double real, final double imaginary, final ComplexConstructor constructor) {
         // Compute with positive values and determine sign at the end
         final double x = Math.abs(real);
         final double y = Math.abs(imaginary);
         // The result (without sign correction)
         final double re;
         final double im;
-
         // Handle C99 special cases
         if (isPosInfinite(x)) {
             if (isPosInfinite(y)) {
@@ -2063,17 +1966,14 @@ public final class Complex implements Serializable  {
             if (y == 0 && x <= 1) {
                 return constructor.create(x == 0 ? PI_OVER_2 : Math.acos(real), -imaginary);
             }
-
             final double xp1 = x + 1;
             final double xm1 = x - 1;
-
             if (inRegion(x, y, SAFE_MIN, SAFE_MAX)) {
                 final double yy = y * y;
                 final double r = Math.sqrt(xp1 * xp1 + yy);
                 final double s = Math.sqrt(xm1 * xm1 + yy);
                 final double a = 0.5 * (r + s);
                 final double b = x / a;
-
                 if (b <= B_CROSSOVER) {
                     re = Math.acos(b);
                 } else {
@@ -2084,7 +1984,6 @@ public final class Complex implements Serializable  {
                         re = Math.atan((y * Math.sqrt(0.5 * (apx / (r + xp1) + apx / (s + xm1)))) / x);
                     }
                 }
-
                 if (a <= A_CROSSOVER) {
                     final double am1;
                     if (x < 1) {
@@ -2137,9 +2036,7 @@ public final class Complex implements Serializable  {
                 }
             }
         }
-
-        return constructor.create(negative(real) ? Math.PI - re : re,
-                                  negative(imaginary) ? im : -im);
+        return constructor.create(negative(real) ? Math.PI - re : re, negative(imaginary) ? im : -im);
     }
 
     /**
@@ -2163,10 +2060,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/ArcTan/">ArcTan</a>
      */
     public Complex atan() {
-        // Define in terms of atanh
-        // atan(z) = -i atanh(iz)
-        // Multiply this number by I, compute atanh, then multiply by back
-        return atanh(-imaginary, real, Complex::multiplyNegativeI);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2205,7 +2099,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Sinh/">Sinh</a>
      */
     public Complex sinh() {
-        return sinh(real, imaginary, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2228,8 +2122,7 @@ public final class Complex implements Serializable  {
             if (Double.isFinite(imaginary)) {
                 // Maintain periodic property with respect to the imaginary component.
                 // sinh(+/-0.0) * cos(+/-x) = +/-0 * cos(x)
-                return constructor.create(changeSign(real, Math.cos(imaginary)),
-                                          Math.sin(imaginary));
+                return constructor.create(changeSign(real, Math.cos(imaginary)), Math.sin(imaginary));
             }
             // If imaginary is inf/NaN the sign of the real part is unspecified.
             // Returning the same real value maintains the conjugate equality.
@@ -2246,8 +2139,7 @@ public final class Complex implements Serializable  {
             return coshsinh(x, real, imaginary, true, constructor);
         }
         // No overflow of sinh/cosh
-        return constructor.create(Math.sinh(real) * Math.cos(imaginary),
-                                  Math.cosh(real) * Math.sin(imaginary));
+        return constructor.create(Math.sinh(real) * Math.cos(imaginary), Math.cosh(real) * Math.sin(imaginary));
     }
 
     /**
@@ -2286,7 +2178,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Cosh/">Cosh</a>
      */
     public Complex cosh() {
-        return cosh(real, imaginary, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2311,8 +2203,7 @@ public final class Complex implements Serializable  {
             if (Double.isFinite(imaginary)) {
                 // Maintain periodic property with respect to the imaginary component.
                 // sinh(+/-0.0) * sin(+/-x) = +/-0 * sin(x)
-                return constructor.create(Math.cos(imaginary),
-                                          changeSign(real, Math.sin(imaginary)));
+                return constructor.create(Math.cos(imaginary), changeSign(real, Math.sin(imaginary)));
             }
             // If imaginary is inf/NaN the sign of the imaginary part is unspecified.
             // Although not required by C99 changing the sign maintains the conjugate equality.
@@ -2333,8 +2224,7 @@ public final class Complex implements Serializable  {
             return coshsinh(x, real, imaginary, false, constructor);
         }
         // No overflow of sinh/cosh
-        return constructor.create(Math.cosh(real) * Math.cos(imaginary),
-                                  Math.sinh(real) * Math.sin(imaginary));
+        return constructor.create(Math.cosh(real) * Math.cos(imaginary), Math.sinh(real) * Math.sin(imaginary));
     }
 
     /**
@@ -2355,8 +2245,7 @@ public final class Complex implements Serializable  {
      * @param constructor Constructor.
      * @return The hyperbolic sine/cosine of the complex number.
      */
-    private static Complex coshsinh(double x, double real, double imaginary, boolean sinh,
-                                    ComplexConstructor constructor) {
+    private static Complex coshsinh(double x, double real, double imaginary, boolean sinh, ComplexConstructor constructor) {
         // Always require the cos and sin.
         double re = Math.cos(imaginary);
         double im = Math.sin(imaginary);
@@ -2442,7 +2331,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Tanh/">Tanh</a>
      */
     public Complex tanh() {
-        return tanh(real, imaginary, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2459,7 +2348,6 @@ public final class Complex implements Serializable  {
     private static Complex tanh(double real, double imaginary, ComplexConstructor constructor) {
         // Cache the absolute real value
         final double x = Math.abs(real);
-
         // Handle inf or nan.
         if (!isPosFinite(x) || !Double.isFinite(imaginary)) {
             if (isPosInfinite(x)) {
@@ -2468,11 +2356,8 @@ public final class Complex implements Serializable  {
                     // The identity sin(2a) = 2 sin(a) cos(a) is used for consistency
                     // with the computation below. Only the magnitude is important
                     // so drop the 2. When |y| is small sign(sin(2y)) = sign(y).
-                    final double sign = Math.abs(imaginary) < PI_OVER_2 ?
-                                        imaginary :
-                                        Math.sin(imaginary) * Math.cos(imaginary);
-                    return constructor.create(Math.copySign(1, real),
-                                              Math.copySign(0, sign));
+                    final double sign = Math.abs(imaginary) < PI_OVER_2 ? imaginary : Math.sin(imaginary) * Math.cos(imaginary);
+                    return constructor.create(Math.copySign(1, real), Math.copySign(0, sign));
                 }
                 // imaginary is infinite or NaN
                 return constructor.create(Math.copySign(1, real), Math.copySign(0, imaginary));
@@ -2485,13 +2370,10 @@ public final class Complex implements Serializable  {
             // (NaN + i 0), returns (NaN + i 0)
             // (NaN + i y), returns (NaN + i NaN) for non-zero y (including infinite)
             // (NaN + i NaN), returns (NaN + i NaN)
-            return constructor.create(real == 0 ? real : Double.NaN,
-                                      imaginary == 0 ? imaginary : Double.NaN);
+            return constructor.create(real == 0 ? real : Double.NaN, imaginary == 0 ? imaginary : Double.NaN);
         }
-
         // Finite components
         // tanh(x+iy) = (sinh(2x) + i sin(2y)) / (cosh(2x) + cos(2y))
-
         if (real == 0) {
             // Imaginary-only tanh(iy) = i tan(y)
             // Identity: sin 2y / (1 + cos 2y) = tan(y)
@@ -2501,7 +2383,6 @@ public final class Complex implements Serializable  {
             // Identity: sinh 2x / (1 + cosh 2x) = tanh(x)
             return constructor.create(Math.tanh(real), imaginary);
         }
-
         // The double angles can be avoided using the identities:
         // sinh(2x) = 2 sinh(x) cosh(x)
         // sin(2y) = 2 sin(y) cos(y)
@@ -2510,7 +2391,6 @@ public final class Complex implements Serializable  {
         // tanh(x+iy) = (sinh(x)cosh(x) + i sin(y)cos(y)) / (sinh^2(x) + cos^2(y))
         // To avoid a junction when swapping between the double angles and the identities
         // the identities are used in all cases.
-
         if (x > SAFE_EXP / 2) {
             // Potential overflow in sinh/cosh(2x).
             // Approximate sinh/cosh using exp^x.
@@ -2536,19 +2416,15 @@ public final class Complex implements Serializable  {
             }
             return constructor.create(re, im);
         }
-
         // No overflow of sinh(2x) and cosh(2x)
-
         // Note: This does not use the definitional formula but uses the identity:
         // tanh(x+iy) = (sinh(x)cosh(x) + i sin(y)cos(y)) / (sinh^2(x) + cos^2(y))
-
         final double sinhx = Math.sinh(real);
         final double coshx = Math.cosh(real);
         final double siny = Math.sin(imaginary);
         final double cosy = Math.cos(imaginary);
         final double divisor = sinhx * sinhx + cosy * cosy;
-        return constructor.create(sinhx * coshx / divisor,
-                                  siny * cosy / divisor);
+        return constructor.create(sinhx * coshx / divisor, siny * cosy / divisor);
     }
 
     /**
@@ -2588,12 +2464,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/ArcSinh/">ArcSinh</a>
      */
     public Complex asinh() {
-        // Define in terms of asin
-        // asinh(z) = -i asin(iz)
-        // Note: This is the opposite to the identity defined in the C99 standard:
-        // asin(z) = -i asinh(iz)
-        // Multiply this number by I, compute asin, then multiply by back
-        return asin(-imaginary, real, Complex::multiplyNegativeI);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2641,24 +2512,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/ArcCosh/">ArcCosh</a>
      */
     public Complex acosh() {
-        // Define in terms of acos
-        // acosh(z) = +-i acos(z)
-        // Note the special case:
-        // acos(+-0 + iNaN) = π/2 + iNaN
-        // acosh(0 + iNaN) = NaN + iπ/2
-        // will not appropriately multiply by I to maintain positive imaginary if
-        // acos() imaginary computes as NaN. So do this explicitly.
-        if (Double.isNaN(imaginary) && real == 0) {
-            return new Complex(Double.NaN, PI_OVER_2);
-        }
-        return acos(real, imaginary, (re, im) ->
-            // Set the sign appropriately for real >= 0
-            negative(im) ?
-                // Multiply by I
-                new Complex(-im, re) :
-                // Multiply by -I
-                new Complex(im, -re)
-        );
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2706,7 +2560,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/ArcTanh/">ArcTanh</a>
      */
     public Complex atanh() {
-        return atanh(real, imaginary, Complex::ofCartesian);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -2729,15 +2583,13 @@ public final class Complex implements Serializable  {
      * @param constructor Constructor.
      * @return The inverse hyperbolic tangent of the complex number.
      */
-    private static Complex atanh(final double real, final double imaginary,
-                                 final ComplexConstructor constructor) {
+    private static Complex atanh(final double real, final double imaginary, final ComplexConstructor constructor) {
         // Compute with positive values and determine sign at the end
         double x = Math.abs(real);
         double y = Math.abs(imaginary);
         // The result (without sign correction)
         double re;
         double im;
-
         // Handle C99 special cases
         if (Double.isNaN(x)) {
             if (isPosInfinite(y)) {
@@ -2758,16 +2610,13 @@ public final class Complex implements Serializable  {
             return NAN;
         } else {
             // x && y are finite or infinite.
-
             // Check the safe region.
             // The lower and upper bounds have been copied from boost::math::atanh.
             // They are different from the safe region for asin and acos.
             // x >= SAFE_UPPER: (1-x) == -x
             // x <= SAFE_LOWER: 1 - x^2 = 1
-
             if (inRegion(x, y, SAFE_LOWER, SAFE_UPPER)) {
                 // Normal computation within a safe region.
-
                 // minus x plus 1: (-x+1)
                 final double mxp1 = 1 - x;
                 final double yy = y * y;
@@ -2804,7 +2653,6 @@ public final class Complex implements Serializable  {
             } else {
                 // This section handles exception cases that would normally cause
                 // underflow or overflow in the main formulas.
-
                 // C99. G.7: Special case for imaginary only numbers
                 if (x == 0) {
                     if (imaginary == 0) {
@@ -2813,7 +2661,6 @@ public final class Complex implements Serializable  {
                     // atanh(iy) = i atan(y)
                     return constructor.create(real, Math.atan(imaginary));
                 }
-
                 // Real part:
                 // real = Math.log1p(4x / ((1-x)^2 + y^2))
                 // real = Math.log1p(4x / (1 - 2x + x^2 + y^2))
@@ -2863,7 +2710,6 @@ public final class Complex implements Serializable  {
                     final double mxp1 = 1 - x;
                     re = Math.log1p((4 * x) / (mxp1 * mxp1 + y * y));
                 }
-
                 // Imaginary part:
                 // imag = atan2(2y, (1-x)(1+x) - y^2)
                 // if x or y are large, then the formula:
@@ -2888,11 +2734,9 @@ public final class Complex implements Serializable  {
                 }
             }
         }
-
         re /= 4;
         im /= 2;
-        return constructor.create(changeSign(re, real),
-                                  changeSign(im, imaginary));
+        return constructor.create(changeSign(re, real), changeSign(im, imaginary));
     }
 
     /**
@@ -2907,21 +2751,15 @@ public final class Complex implements Serializable  {
     private static double x2y2m1(double x, double y) {
         // Hull et al used (x-1)*(x+1)+y*y.
         // From the paper on page 236:
-
         // If x == 1 there is no cancellation.
-
         // If x > 1, there is also no cancellation, but the argument is now accurate
         // only to within a factor of 1 + 3 EPSILSON (note that x – 1 is exact),
         // so that error = 3 EPSILON.
-
         // If x < 1, there can be serious cancellation:
-
         // If 4 y^2 < |x^2 – 1| the cancellation is not serious ... the argument is accurate
         // only to within a factor of 1 + 4 EPSILSON so that error = 4 EPSILON.
-
         // Otherwise there can be serious cancellation and the relative error in the real part
         // could be enormous.
-
         final double xx = x * x;
         final double yy = y * y;
         // Modify to use high precision before the threshold set by Hull et al.
@@ -2939,17 +2777,14 @@ public final class Complex implements Serializable  {
             // - The order is known to be 1 > |x| >= |y|
             // The squares are computed using a split multiply algorithm and
             // the summation using an extended precision summation algorithm.
-
             // Split x and y as one 26 bits number and one 27 bits number
             final double xHigh = splitHigh(x);
-            final double xLow  = x - xHigh;
+            final double xLow = x - xHigh;
             final double yHigh = splitHigh(y);
-            final double yLow  = y - yHigh;
-
+            final double yLow = y - yHigh;
             // Accurate split multiplication x * x and y * y
             final double x2Low = squareLow(xLow, xHigh, xx);
             final double y2Low = squareLow(yLow, yHigh, yy);
-
             return sumx2y2m1(xx, x2Low, yy, y2Low);
         }
         return (x - 1) * (x + 1) + yy;
@@ -3060,23 +2895,19 @@ public final class Complex implements Serializable  {
         // Let e and f be non-overlapping expansions of components of length m and n.
         // The following algorithm will produce a non-overlapping expansion h where the
         // sum h_i = e + f and components of h are in increasing order of magnitude.
-
         // Expansion-sum proceeds by a grow-expansion of the first part from one expansion
         // into the other, extending its length by 1. The process repeats for the next part
         // but the grow-expansion starts at the previous merge position + 1.
         // Thus expansion-sum requires mn two-sum operations to merge length m into length n
         // resulting in length m+n-1.
-
         // Variables numbered from 1 as per Figure 7 (p.12). The output expansion h is placed
         // into e increasing its length for each grow expansion.
-
         // We have two expansions for x^2 and y^2 and the whole number -1.
         // Expecting (x^2 + y^2) close to 1 we generate first the intermediate expansion
         // (x^2 - 1) moving the result away from 1 where there are sparse floating point
         // representations. This is then added to a similar magnitude y^2. Leaving the -1
         // until last suffers from 1 ulp rounding errors more often and the requirement
         // for a distillation sum to reduce rounding error frequency.
-
         // Note: Do not use the alternative fast-expansion-sum of the parts sorted by magnitude.
         // The parts can be ordered with a single comparison into:
         // [y2Low, (y2High|x2Low), x2High, -1]
@@ -3088,16 +2919,13 @@ public final class Complex implements Serializable  {
         // distillation two-sum pass over the final expansion as a cost of 1 fast-two-sum and
         // 3 two-sum operations! So we use the expansion sum with the same operations and
         // no branches.
-
         // q=running sum
         double q = x2Low - 1;
         double e1 = fastSumLow(-1, x2Low, q);
         double e3 = q + x2High;
         double e2 = sumLow(q, x2High, e3);
-
         final double f1 = y2Low;
         final double f2 = y2High;
-
         // Grow expansion of f1 into e
         q = f1 + e1;
         e1 = sumLow(f1, e1, q);
@@ -3105,7 +2933,6 @@ public final class Complex implements Serializable  {
         e2 = sumLow(q, e2, p);
         double e4 = p + e3;
         e3 = sumLow(p, e3, e4);
-
         // Grow expansion of f2 into e (only required to start at e2)
         q = f2 + e2;
         e2 = sumLow(f2, e2, q);
@@ -3113,7 +2940,6 @@ public final class Complex implements Serializable  {
         e3 = sumLow(q, e3, p);
         final double e5 = p + e4;
         e4 = sumLow(p, e4, e5);
-
         // Final summation:
         // The sum of the parts is within 1 ulp of the true expansion value e:
         // |e - sum| < ulp(sum).
@@ -3144,28 +2970,7 @@ public final class Complex implements Serializable  {
      * @see <a href="https://functions.wolfram.com/ElementaryFunctions/Root/">Root</a>
      */
     public List<Complex> nthRoot(int n) {
-        if (n == 0) {
-            throw new IllegalArgumentException("cannot compute zeroth root");
-        }
-
-        final List<Complex> result = new ArrayList<>();
-
-        // nth root of abs -- faster / more accurate to use a solver here?
-        final double nthRootOfAbs = Math.pow(abs(), 1.0 / n);
-
-        // Compute nth roots of complex number with k = 0, 1, ... n-1
-        final double nthPhi = arg() / n;
-        final double slice = 2 * Math.PI / n;
-        double innerPart = nthPhi;
-        for (int k = 0; k < Math.abs(n); k++) {
-            // inner part
-            final double realPart = nthRootOfAbs *  Math.cos(innerPart);
-            final double imaginaryPart = nthRootOfAbs *  Math.sin(innerPart);
-            result.add(ofCartesian(realPart, imaginaryPart));
-            innerPart += slice;
-        }
-
-        return result;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3220,15 +3025,7 @@ public final class Complex implements Serializable  {
      */
     @Override
     public boolean equals(Object other) {
-        if (this == other) {
-            return true;
-        }
-        if (other instanceof Complex) {
-            final Complex c = (Complex) other;
-            return equals(real, c.real) &&
-                equals(imaginary, c.imaginary);
-        }
-        return false;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3245,7 +3042,7 @@ public final class Complex implements Serializable  {
      */
     @Override
     public int hashCode() {
-        return 31 * (31 + Double.hashCode(real)) + Double.hashCode(imaginary);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3264,12 +3061,7 @@ public final class Complex implements Serializable  {
      */
     @Override
     public String toString() {
-        return new StringBuilder(TO_STRING_SIZE)
-            .append(FORMAT_START)
-            .append(real).append(FORMAT_SEP)
-            .append(imaginary)
-            .append(FORMAT_END)
-            .toString();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -3404,7 +3196,6 @@ public final class Complex implements Serializable  {
         final long bits = Math.max(x, y);
         // Get the unbiased exponent
         int exp = ((int) (bits >>> 52)) - EXPONENT_OFFSET;
-
         // No case to distinguish nan/inf
         // Handle sub-normal numbers
         if (exp == Double.MIN_EXPONENT - 1) {
@@ -3564,11 +3355,9 @@ public final class Complex implements Serializable  {
         // The next 11-bits are the biased exponent. The sign bit has been cleared.
         // Scaling factors are powers of two for exact scaling.
         // For clarity the values have been refactored to named constants.
-
         // The mask is used to remove the sign bit.
         final long xbits = Double.doubleToRawLongBits(x) & UNSIGN_MASK;
         final long ybits = Double.doubleToRawLongBits(y) & UNSIGN_MASK;
-
         // Order by magnitude: |a| >= |b|
         double a;
         double b;
@@ -3586,7 +3375,6 @@ public final class Complex implements Serializable  {
             ha = (int) (xbits >>> 32);
             hb = (int) (ybits >>> 32);
         }
-
         // Check if the smaller part is significant.
         // a^2 is computed in extended precision for an effective mantissa of 106-bits.
         // An exponent difference of 54 is where b^2 will not overlap a^2.
@@ -3596,7 +3384,6 @@ public final class Complex implements Serializable  {
             // No addition of a + b for sNaN.
             return Math.abs(a);
         }
-
         double rescale = 1.0;
         if (ha > EXP_500) {
             /* a > 2^500 */
@@ -3604,9 +3391,7 @@ public final class Complex implements Serializable  {
                 /* Inf or NaN */
                 // Check b is infinite for the IEEE754 result.
                 // No addition of a + b for sNaN.
-                return Math.abs(b) == Double.POSITIVE_INFINITY ?
-                    Double.POSITIVE_INFINITY :
-                    Math.abs(a);
+                return Math.abs(b) == Double.POSITIVE_INFINITY ? Double.POSITIVE_INFINITY : Math.abs(a);
             }
             /* scale a and b by 2^-600 */
             // Before scaling: a in [2^500, 2^1023].
@@ -3619,12 +3404,10 @@ public final class Complex implements Serializable  {
             // No special handling of sub-normals.
             // These do not matter when we do not manipulate the exponent bits
             // for scaling the split representation.
-
             // Intentional comparison with zero.
             if (b == 0) {
                 return Math.abs(a);
             }
-
             /* scale a and b by 2^600 */
             // Effective min exponent of a sub-normal = -1022 - 52 = -1074.
             // Before scaling: b in [2^-1074, 2^-501].
@@ -3634,7 +3417,6 @@ public final class Complex implements Serializable  {
             b *= TWO_POW_600;
             rescale = TWO_POW_NEG_600;
         }
-
         // High precision x^2 + y^2
         return Math.sqrt(x2y2(a, b)) * rescale;
     }
@@ -3664,7 +3446,6 @@ public final class Complex implements Serializable  {
         // than the fdlibm method with a maximum ULP error of approximately 0.86.
         //
         // See NUMBERS-143 for analysis.
-
         // Do a Dekker summation of double length products x*x and y*y
         // (10 multiply and 20 additions).
         final double xx = x * x;

@@ -14,12 +14,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 //  Copyright John Maddock 2006.
 //  Use, modification and distribution are subject to the
 //  Boost Software License, Version 1.0. (See accompanying file
 //  LICENSE_1_0.txt or copy at http://www.boost.org/LICENSE_1_0.txt)
-
 package org.apache.commons.numbers.gamma;
 
 import java.util.function.DoubleSupplier;
@@ -41,6 +39,7 @@ import org.apache.commons.numbers.fraction.GeneralizedContinuedFraction.Coeffici
  * Boost C++ beta functions</a>
  */
 final class BoostBeta {
+
     //
     // Code ported from Boost 1.77.0
     //
@@ -65,34 +64,58 @@ final class BoostBeta {
     //   series evaluation when n > max factorial given that n - k < 40.
     // - Changed convergence criteria for betaSmallBLargeASeries to stop when r has
     //   no effect on the sum. The Boost code uses machine epsilon (ignoring the policy eps).
-
-    /** Default epsilon value for relative error.
-     * This is equal to the Boost constant {@code boost::math::EPSILON}. */
+    /**
+     * Default epsilon value for relative error.
+     * This is equal to the Boost constant {@code boost::math::EPSILON}.
+     */
     private static final double EPSILON = 0x1.0p-52;
-    /** Approximate value for ln(Double.MAX_VALUE).
+
+    /**
+     * Approximate value for ln(Double.MAX_VALUE).
      * This is equal to the Boost constant {@code boost::math::tools::log_max_value<double>()}.
      * No term {@code x} should be used in {@code exp(x)} if {@code x > LOG_MAX_VALUE} to avoid
-     * overflow. */
+     * overflow.
+     */
     private static final int LOG_MAX_VALUE = 709;
-    /** Approximate value for ln(Double.MIN_VALUE).
+
+    /**
+     * Approximate value for ln(Double.MIN_VALUE).
      * This is equal to the Boost constant {@code boost::math::tools::log_min_value<double>()}.
      * No term {@code x} should be used in {@code exp(x)} if {@code x < LOG_MIN_VALUE} to avoid
-     * underflow to sub-normal or zero. */
+     * underflow to sub-normal or zero.
+     */
     private static final int LOG_MIN_VALUE = -708;
-    /** pi/2. */
+
+    /**
+     * pi/2.
+     */
     private static final double HALF_PI = Math.PI / 2;
-    /** The largest factorial that can be represented as a double.
-     * This is equal to the Boost constant {@code boost::math::max_factorial<double>::value}. */
+
+    /**
+     * The largest factorial that can be represented as a double.
+     * This is equal to the Boost constant {@code boost::math::max_factorial<double>::value}.
+     */
     private static final int MAX_FACTORIAL = 170;
-    /** Size of the table of Pn's.
-     * Equal to {@code Pn_size<double>} suitable for 16-20 digit accuracy. */
+
+    /**
+     * Size of the table of Pn's.
+     * Equal to {@code Pn_size<double>} suitable for 16-20 digit accuracy.
+     */
     private static final int PN_SIZE = 30;
-    /** 2^53. Used to scale sub-normal values. */
+
+    /**
+     * 2^53. Used to scale sub-normal values.
+     */
     private static final double TWO_POW_53 = 0x1.0p53;
-    /** 2^-53. Used to rescale values. */
+
+    /**
+     * 2^-53. Used to rescale values.
+     */
     private static final double TWO_POW_M53 = 0x1.0p-53;
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private BoostBeta() {
         // intentionally empty.
     }
@@ -106,55 +129,7 @@ final class BoostBeta {
      * @return beta value
      */
     static double beta(double p, double q) {
-        if (!(p > 0 && q > 0)) {
-            // Domain error
-            return Double.NaN;
-        }
-
-        final double c = p + q;
-
-        // Special cases:
-        if (c == p && q < EPSILON) {
-            return 1 / q;
-        } else if (c == q && p < EPSILON) {
-            return 1 / p;
-        }
-        if (q == 1) {
-            return 1 / p;
-        } else if (p == 1) {
-            return 1 / q;
-        } else if (c < EPSILON) {
-            return (c / p) / q;
-        }
-
-        // Create input a > b
-        final double a = p < q ? q : p;
-        final double b = p < q ? p : q;
-
-        // Lanczos calculation:
-        final double agh = a + BoostGamma.Lanczos.GMH;
-        final double bgh = b + BoostGamma.Lanczos.GMH;
-        final double cgh = c + BoostGamma.Lanczos.GMH;
-        double result = BoostGamma.Lanczos.lanczosSumExpGScaled(a) *
-                (BoostGamma.Lanczos.lanczosSumExpGScaled(b) / BoostGamma.Lanczos.lanczosSumExpGScaled(c));
-        final double ambh = a - 0.5f - b;
-        if (Math.abs(b * ambh) < cgh * 100 && a > 100) {
-            // Special case where the base of the power term is close to 1
-            // compute (1+x)^y instead:
-            result *= Math.exp(ambh * Math.log1p(-b / cgh));
-        } else {
-            result *= Math.pow(agh / cgh, ambh);
-        }
-
-        if (cgh > 1e10f) {
-            // this avoids possible overflow, but appears to be marginally less accurate:
-            result *= Math.pow((agh / cgh) * (bgh / cgh), b);
-        } else {
-            result *= Math.pow((agh * bgh) / (cgh * cgh), b);
-        }
-        result *= Math.sqrt(Math.E / bgh);
-
-        return result;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -169,48 +144,7 @@ final class BoostBeta {
      * @return ibeta derivative
      */
     static double ibetaDerivative(double a, double b, double x) {
-        //
-        // start with the usual error checks:
-        //
-        if (!(a > 0 && b > 0) || !(x >= 0 && x <= 1)) {
-            // Domain error
-            return Double.NaN;
-        }
-        //
-        // Now the corner cases:
-        //
-        if (x == 0) {
-            if (a > 1) {
-                return 0;
-            }
-            // a == 1 : return 1 / beta(a, b) == b
-            return a == 1 ? b : Double.POSITIVE_INFINITY;
-        } else if (x == 1) {
-            if (b > 1) {
-                return 0;
-            }
-            // b == 1 : return 1 / beta(a, b) == a
-            return b == 1 ? a : Double.POSITIVE_INFINITY;
-        }
-
-        // Update with extra edge cases
-        if (b == 1) {
-            // ibeta = x^a
-            return a * Math.pow(x, a - 1);
-        }
-        if (a == 1) {
-            // ibeta = 1 - (1-x)^b
-            if (x >= 0.5) {
-                return b * Math.pow(1 - x, b - 1);
-            }
-            return b * Math.exp(Math.log1p(-x) * (b - 1));
-        }
-
-        //
-        // Now the regular cases:
-        //
-        final double y = (1 - x) * x;
-        return ibetaPowerTerms(a, b, x, 1 - x, true, 1 / y);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -227,8 +161,7 @@ final class BoostBeta {
      * @param normalised true to divide by beta(a, b)
      * @return incomplete beta power terms
      */
-    private static double ibetaPowerTerms(double a, double b, double x,
-            double y, boolean normalised) {
+    private static double ibetaPowerTerms(double a, double b, double x, double y, boolean normalised) {
         return ibetaPowerTerms(a, b, x, y, normalised, 1);
     }
 
@@ -252,28 +185,22 @@ final class BoostBeta {
      * @param prefix Prefix to multiply by the result
      * @return incomplete beta power terms
      */
-    private static double ibetaPowerTerms(double a, double b, double x,
-            double y, boolean normalised, double prefix) {
+    private static double ibetaPowerTerms(double a, double b, double x, double y, boolean normalised, double prefix) {
         if (!normalised) {
             // can we do better here?
             return Math.pow(x, a) * Math.pow(y, b);
         }
-
         double result;
-
         final double c = a + b;
-
         // combine power terms with Lanczos approximation:
         final double agh = a + BoostGamma.Lanczos.GMH;
         final double bgh = b + BoostGamma.Lanczos.GMH;
         final double cgh = c + BoostGamma.Lanczos.GMH;
-        result = BoostGamma.Lanczos.lanczosSumExpGScaled(c) /
-                (BoostGamma.Lanczos.lanczosSumExpGScaled(a) * BoostGamma.Lanczos.lanczosSumExpGScaled(b));
+        result = BoostGamma.Lanczos.lanczosSumExpGScaled(c) / (BoostGamma.Lanczos.lanczosSumExpGScaled(a) * BoostGamma.Lanczos.lanczosSumExpGScaled(b));
         result *= prefix;
         // combine with the leftover terms from the Lanczos approximation:
         result *= Math.sqrt(bgh / Math.E);
         result *= Math.sqrt(agh / cgh);
-
         // l1 and l2 are the base of the exponents minus one:
         double l1 = (x * b - y * agh) / agh;
         double l2 = (y * a - x * bgh) / bgh;
@@ -392,7 +319,6 @@ final class BoostBeta {
                 result *= Math.pow(b1, a) * Math.pow(b2, b);
             }
         }
-
         return result;
     }
 
@@ -406,7 +332,7 @@ final class BoostBeta {
      * @return lower beta value
      */
     static double beta(double a, double b, double x) {
-        return betaIncompleteImp(a, b, x, Policy.getDefault(), false, false);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -420,7 +346,7 @@ final class BoostBeta {
      * @return lower beta value
      */
     static double beta(double a, double b, double x, Policy policy) {
-        return betaIncompleteImp(a, b, x, policy, false, false);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -433,7 +359,7 @@ final class BoostBeta {
      * @return upper beta value
      */
     static double betac(double a, double b, double x) {
-        return betaIncompleteImp(a, b, x, Policy.getDefault(), false, true);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -447,7 +373,7 @@ final class BoostBeta {
      * @return upper beta value
      */
     static double betac(double a, double b, double x, Policy policy) {
-        return betaIncompleteImp(a, b, x, policy, false, true);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -460,7 +386,7 @@ final class BoostBeta {
      * @return p
      */
     static double ibeta(double a, double b, double x) {
-        return betaIncompleteImp(a, b, x, Policy.getDefault(), true, false);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -474,7 +400,7 @@ final class BoostBeta {
      * @return p
      */
     static double ibeta(double a, double b, double x, Policy policy) {
-        return betaIncompleteImp(a, b, x, policy, true, false);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -487,7 +413,7 @@ final class BoostBeta {
      * @return q
      */
     static double ibetac(double a, double b, double x) {
-        return betaIncompleteImp(a, b, x, Policy.getDefault(), true, true);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -501,7 +427,7 @@ final class BoostBeta {
      * @return q
      */
     static double ibetac(double a, double b, double x, Policy policy) {
-        return betaIncompleteImp(a, b, x, policy, true, true);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -520,20 +446,17 @@ final class BoostBeta {
      * @param inv true to compute the complement value
      * @return incomplete beta value
      */
-    private static double betaIncompleteImp(double a, double b, double x,
-            Policy pol, boolean normalised, boolean inv) {
+    private static double betaIncompleteImp(double a, double b, double x, Policy pol, boolean normalised, boolean inv) {
         //
         // The incomplete beta function implementation:
         // This is just a big bunch of spaghetti code to divide up the
         // input range and select the right implementation method for
         // each domain:
         //
-
         if (!(x >= 0 && x <= 1)) {
             // Domain error
             return Double.NaN;
         }
-
         if (normalised) {
             if (!(a >= 0 && b >= 0)) {
                 // Domain error
@@ -557,7 +480,6 @@ final class BoostBeta {
                 return Double.NaN;
             }
         }
-
         if (x == 0) {
             if (inv) {
                 return normalised ? 1 : beta(a, b);
@@ -570,14 +492,12 @@ final class BoostBeta {
             }
             return 0;
         }
-
         if (a == 0.5f && b == 0.5f) {
             // We have an arcsine distribution:
             final double z = inv ? 1 - x : x;
             final double asin = Math.asin(Math.sqrt(z));
             return normalised ? asin / HALF_PI : 2 * asin;
         }
-
         boolean invert = inv;
         double y = 1 - x;
         if (a == 1) {
@@ -599,7 +519,6 @@ final class BoostBeta {
             if (a == 1) {
                 return invert ? y : x;
             }
-
             double p;
             if (y < 0.5) {
                 p = invert ? -Math.expm1(a * Math.log1p(-y)) : Math.exp(a * Math.log1p(-y));
@@ -611,7 +530,6 @@ final class BoostBeta {
             }
             return p;
         }
-
         double fract;
         if (Math.min(a, b) <= 1) {
             if (x > 0.5) {
@@ -691,7 +609,6 @@ final class BoostBeta {
                     x = y;
                     y = tmp;
                     invert = !invert;
-
                     if (y >= 0.3) {
                         if (invert) {
                             fract = -(normalised ? 1 : beta(a, b));
@@ -749,12 +666,10 @@ final class BoostBeta {
                 y = tmp;
                 invert = !invert;
             }
-
             if (b < 40) {
                 // Note: y != 1 check is required for non-zero x < epsilon
                 if (Math.rint(a) == a && Math.rint(b) == b && a < (Integer.MAX_VALUE - 100) && y != 1) {
                     // Here: a in [2, 2^31 - 102] && b in [2, 39]
-
                     // relate to the binomial distribution and use a finite sum:
                     final int k = (int) (a - 1);
                     final int n = (int) (b + k);
@@ -834,17 +749,13 @@ final class BoostBeta {
      */
     private static double ibetaSeries(double a, double b, double x, double s0, boolean normalised, Policy pol) {
         double result;
-
         if (normalised) {
             final double c = a + b;
-
             // incomplete beta power term, combined with the Lanczos approximation:
             final double agh = a + BoostGamma.Lanczos.GMH;
             final double bgh = b + BoostGamma.Lanczos.GMH;
             final double cgh = c + BoostGamma.Lanczos.GMH;
-            result = BoostGamma.Lanczos.lanczosSumExpGScaled(c) /
-                    (BoostGamma.Lanczos.lanczosSumExpGScaled(a) * BoostGamma.Lanczos.lanczosSumExpGScaled(b));
-
+            result = BoostGamma.Lanczos.lanczosSumExpGScaled(c) / (BoostGamma.Lanczos.lanczosSumExpGScaled(a) * BoostGamma.Lanczos.lanczosSumExpGScaled(b));
             final double l1 = Math.log(cgh / bgh) * (b - 0.5f);
             final double l2 = Math.log(x * cgh / agh) * a;
             //
@@ -872,12 +783,10 @@ final class BoostBeta {
         double rescale = 1.0;
         if (result < Double.MIN_NORMAL) {
             // Safeguard: series can't cope with denorms.
-
             // Update:
             // The entire series is only based on the magnitude of 'result'.
             // If the first term can be added to s0 (e.g. if s0 == 0) then
             // scale s0 and result, compute the series and then rescale.
-
             // Intentional floating-point equality check.
             if (s0 + result / a == s0) {
                 return s0;
@@ -886,29 +795,32 @@ final class BoostBeta {
             result *= TWO_POW_53;
             rescale = TWO_POW_M53;
         }
-
         final double eps = pol.getEps();
         final int maxIterations = pol.getMaxIterations();
-
         // Create effectively final 'result' for initialisation
         final double result1 = result;
         final DoubleSupplier gen = new DoubleSupplier() {
-            /** Next result term. */
+
+            /**
+             * Next result term.
+             */
             private double result = result1;
-            /** Pochhammer term. */
+
+            /**
+             * Pochhammer term.
+             */
             private final double poch = -b;
-            /** Iteration. */
+
+            /**
+             * Iteration.
+             */
             private int n;
 
             @Override
             public double getAsDouble() {
-                final double r = result / (a + n);
-                n++;
-                result *= (n + poch) * x / n;
-                return r;
+                throw new UnsupportedOperationException("STUB: not implemented");
             }
         };
-
         return BoostTools.sumSeries(gen, eps, maxIterations, s0) * rescale;
     }
 
@@ -931,7 +843,6 @@ final class BoostBeta {
         // (a)(a+1)(a+2)...(a+k-1)
         // _______________________
         // (b)(b+1)(b+2)...(b+k-1)
-
         // This is only called with small k, for large k
         // it is grossly inefficient, do not use outside it's
         // intended purpose!!!
@@ -955,7 +866,6 @@ final class BoostBeta {
      */
     private static double binomialCCdf(int n, int k, double x, double y) {
         double result = Math.pow(x, n);
-
         if (result > Double.MIN_NORMAL) {
             double term = result;
             for (int i = n - 1; i > k; --i) {
@@ -992,7 +902,6 @@ final class BoostBeta {
                 }
             }
         }
-
         return result;
     }
 
@@ -1014,13 +923,11 @@ final class BoostBeta {
         // This function can be called with the following extreme that will overflow:
         // binomial(2147483545 + 39, 38) ~ 7.84899e309
         // Guard this as the power functions are very likely to be zero with large n and k.
-
         final double binom = binomialCoefficient(n, k);
         if (!Double.isFinite(binom)) {
             // Product of the power functions will be zero with large n and k
             return 0;
         }
-
         // The power terms are below 1.
         // Multiply by the largest so that any sub-normal term is used last
         // This method is called where x^n is sub-normal so assume the other term is larger.
@@ -1042,57 +949,7 @@ final class BoostBeta {
      * @return {@code n choose k}.
      */
     static double binomialCoefficient(int n, int k) {
-        // Assume: n >= 0; 0 <= k <= n
-        // Use symmetry
-        final int m = Math.min(k, n - k);
-
-        // This function is typically called with m <= 3 so handle these special cases
-        if (m == 0) {
-            return 1;
-        }
-        if (m == 1) {
-            return n;
-        }
-        if (m == 2) {
-            return 0.5 * n * (n - 1);
-        }
-        if (m == 3) {
-            // Divide by 3 at the end to avoid using an 1/6 inexact initial multiplier.
-            return 0.5 * n * (n - 1) * (n - 2) / 3;
-        }
-
-        double result;
-        if (n <= MAX_FACTORIAL) {
-            // Use fast table lookup:
-            result = BoostGamma.uncheckedFactorial(n);
-            // Smaller m will have a more accurate factorial
-            result /= BoostGamma.uncheckedFactorial(m);
-            result /= BoostGamma.uncheckedFactorial(n - m);
-        } else {
-            // Updated:
-            // Do not use the beta function as per <boost/math/special_functions/binomial.hpp>,
-            // e.g. result = 1 / (m * beta(m, n - m + 1)) == gamma(n+1) / (m * gamma(m) * gamma(n-m+1))
-
-            // Use a summation as per BinomialCoefficientDouble which is more accurate
-            // than using the beta function. This is only used up to m = 39 so
-            // may overflow *only* on the final term (i.e. m << n when overflow can occur).
-
-            result = 1;
-            for (int i = 1; i < m; i++) {
-                result *= n - m + i;
-                result /= i;
-            }
-            // Final term may cause overflow.
-            if (result * n > Double.MAX_VALUE) {
-                result /= m;
-                result *= n;
-            } else {
-                result *= n;
-                result /= m;
-            }
-        }
-        // convert to nearest integer:
-        return Math.ceil(result - 0.5f);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1120,7 +977,6 @@ final class BoostBeta {
             sum += term;
         }
         prefix *= sum;
-
         return prefix;
     }
 
@@ -1137,8 +993,7 @@ final class BoostBeta {
      * @param normalised true to compute the regularised value
      * @return beta series
      */
-    private static double betaSmallBLargeASeries(double a, double b, double x, double y, double s0, double mult,
-            Policy pol, boolean normalised) {
+    private static double betaSmallBLargeASeries(double a, double b, double x, double y, double s0, double mult, Policy pol, boolean normalised) {
         //
         // This is DiDonato and Morris's BGRAT routine, see Eq's 9 through 9.6.
         //
@@ -1198,7 +1053,6 @@ final class BoostBeta {
         double lxp = 1;
         final double t4 = 4 * t * t;
         double b2n = b;
-
         for (int n = 1; n < PN_SIZE; ++n) {
             //
             // begin by evaluating the next Pn from Eq 9.4:
@@ -1254,36 +1108,7 @@ final class BoostBeta {
      * @return incomplete beta
      */
     static double ibetaFraction2(double a, double b, double x, double y, Policy pol, boolean normalised) {
-        final double result = ibetaPowerTerms(a, b, x, y, normalised);
-        if (result == 0) {
-            return result;
-        }
-
-        final double eps = pol.getEps();
-        final int maxIterations = pol.getMaxIterations();
-
-        final Supplier<Coefficient> gen = new Supplier<Coefficient>() {
-            /** Iteration. */
-            private int m;
-
-            @Override
-            public Coefficient get() {
-                double aN = (a + m - 1) * (a + b + m - 1) * m * (b - m) * x * x;
-                final double denom = a + 2 * m - 1;
-                aN /= denom * denom;
-
-                double bN = m;
-                bN += (m * (b - m) * x) / (a + 2 * m - 1);
-                bN += ((a + m) * (a * y - b * x + 1 + m * (2 - x))) / (a + 2 * m + 1);
-
-                ++m;
-                return Coefficient.of(aN, bN);
-            }
-        };
-
-        // Note: The first generated term a0 is discarded
-        final double fract = GeneralizedContinuedFraction.value(gen, eps, maxIterations);
-        return result / fract;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1310,45 +1135,6 @@ final class BoostBeta {
      * @return incomplete beta
      */
     static double ibetaFraction(double a, double b, double x, double y, Policy pol, boolean normalised) {
-        final double result = ibetaPowerTerms(a, b, x, y, normalised);
-        if (result == 0) {
-            return result;
-        }
-
-        final double eps = pol.getEps();
-        final int maxIterations = pol.getMaxIterations();
-
-        final Supplier<Coefficient> gen = new Supplier<Coefficient>() {
-            /** Iteration. */
-            private int n;
-
-            @Override
-            public Coefficient get() {
-                // https://functions.wolfram.com/GammaBetaErf/Beta3/10/0001/
-
-                final int m = n;
-                final int k = m / 2;
-                final double aN;
-                if ((m & 0x1) == 0) {
-                    // even
-                    // m = 2k
-                    aN = (k * (b - k) * x) /
-                        ((a + m - 1) * (a + m));
-                } else {
-                    // odd
-                    // k = (m - 1) / 2 due to integer truncation
-                    // m - 1 = 2k
-                    aN = -((a + k) * (a + b + k) * x) /
-                        ((a + m - 1) * (a + m));
-                }
-
-                n = m + 1;
-                return Coefficient.of(aN, 1);
-            }
-        };
-
-        // Note: The first generated term a0 is discarded
-        final double fract = GeneralizedContinuedFraction.value(gen, eps, maxIterations);
-        return (result / a) / fract;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

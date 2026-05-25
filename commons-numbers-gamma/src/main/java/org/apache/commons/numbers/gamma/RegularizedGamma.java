@@ -32,7 +32,10 @@ package org.apache.commons.numbers.gamma;
  * Boost C++ Incomplete Gamma functions</a>
  */
 public final class RegularizedGamma {
-    /** Private constructor. */
+
+    /**
+     * Private constructor.
+     */
     private RegularizedGamma() {
         // intentionally empty.
     }
@@ -44,8 +47,12 @@ public final class RegularizedGamma {
      * <p>\[ P(a,x) = 1 - Q(a,x) = \frac{\gamma(a,x)}{\Gamma(a)} = \frac{1}{\Gamma(a)} \int_0^x t^{a-1}\,e^{-t}\,dt \]
      */
     public static final class P {
-        /** Prevent instantiation. */
-        private P() {}
+
+        /**
+         * Prevent instantiation.
+         */
+        private P() {
+        }
 
         /**
          * Computes the lower regularized gamma function \( P(a, x) \).
@@ -55,9 +62,8 @@ public final class RegularizedGamma {
          * @return \( P(a, x) \).
          * @throws ArithmeticException if the continued fraction fails to converge.
          */
-        public static double value(double a,
-                                   double x) {
-            return BoostGamma.gammaP(a, x);
+        public static double value(double a, double x) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -70,11 +76,8 @@ public final class RegularizedGamma {
          * @return \( P(a, x) \).
          * @throws ArithmeticException if the series evaluation fails to converge.
          */
-        public static double value(double a,
-                                   double x,
-                                   double epsilon,
-                                   int maxIterations) {
-            return BoostGamma.gammaP(a, x, new Policy(epsilon, maxIterations));
+        public static double value(double a, double x, double epsilon, int maxIterations) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -89,9 +92,8 @@ public final class RegularizedGamma {
          * @return derivative of \( P(a,x) \) with respect to x.
          * @since 1.1
          */
-        public static double derivative(double a,
-                                        double x) {
-            return BoostGamma.gammaPDerivative(a, x);
+        public static double derivative(double a, double x) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 
@@ -102,8 +104,12 @@ public final class RegularizedGamma {
      * <p>\[ Q(a,x) = 1 - P(a,x) = \frac{\Gamma(a,x)}{\Gamma(a)} = \frac{1}{\Gamma(a)} \int_x^{\infty} t^{a-1}\,e^{-t}\,dt \]
      */
     public static final class Q {
-        /** Prevent instantiation. */
-        private Q() {}
+
+        /**
+         * Prevent instantiation.
+         */
+        private Q() {
+        }
 
         /**
          * Computes the upper regularized gamma function \( Q(a, x) \).
@@ -113,9 +119,8 @@ public final class RegularizedGamma {
          * @return \( Q(a, x) \).
          * @throws ArithmeticException if the series evaluation fails to converge.
          */
-        public static double value(double a,
-                                   double x) {
-            return BoostGamma.gammaQ(a, x);
+        public static double value(double a, double x) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -128,11 +133,8 @@ public final class RegularizedGamma {
          * @return \( Q(a, x) \).
          * @throws ArithmeticException if the series evaluation fails to converge.
          */
-        public static double value(final double a,
-                                   double x,
-                                   double epsilon,
-                                   int maxIterations) {
-            return BoostGamma.gammaQ(a, x, new Policy(epsilon, maxIterations));
+        public static double value(final double a, double x, double epsilon, int maxIterations) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
 
         /**
@@ -147,9 +149,8 @@ public final class RegularizedGamma {
          * @return derivative of \( Q(a,x) \) with respect to x.
          * @since 1.1
          */
-        public static double derivative(double a,
-                                        double x) {
-            return -BoostGamma.gammaPDerivative(a, x);
+        public static double derivative(double a, double x) {
+            throw new UnsupportedOperationException("STUB: not implemented");
         }
     }
 }

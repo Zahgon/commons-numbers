@@ -24,7 +24,9 @@ import org.apache.commons.numbers.core.Sum;
  */
 public final class CosAngle {
 
-    /** Private constructor. */
+    /**
+     * Private constructor.
+     */
     private CosAngle() {
         // intentionally empty.
     }
@@ -37,8 +39,7 @@ public final class CosAngle {
      * @return the cosine of the angle between the vectors.
      * @throws IllegalArgumentException if the sizes of the input arrays are different
      */
-    public static double value(double[] v1,
-                               double[] v2) {
-        return Sum.ofProducts(v1, v2).getAsDouble() / Norm.L2.of(v1) / Norm.L2.of(v2);
+    public static double value(double[] v1, double[] v2) {
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 }

@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.numbers.complex.streams;
 
 import org.apache.commons.numbers.complex.Complex;
@@ -23,17 +22,27 @@ import org.apache.commons.numbers.complex.Complex;
  * Static implementations of common {@link Complex} utilities functions.
  */
 public final class ComplexUtils {
-    /** Dimension X. */
+
+    /**
+     * Dimension X.
+     */
     private static final int DIM_X = 0;
-    /** Dimension Y. */
+
+    /**
+     * Dimension Y.
+     */
     private static final int DIM_Y = 1;
-    /** Dimension Z. */
+
+    /**
+     * Dimension Z.
+     */
     private static final int DIM_Z = 2;
 
     /**
      * Utility class.
      */
-    private ComplexUtils() {}
+    private ComplexUtils() {
+    }
 
     /**
      * Creates a complex number from the given polar representation.
@@ -60,10 +69,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code r} is negative
      */
     public static Complex polar2Complex(double r, double theta) {
-        if (r < 0) {
-            throw new NegativeModulusException(r);
-        }
-        return Complex.ofCartesian(r * Math.cos(theta), r * Math.sin(theta));
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -76,15 +82,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if any element in {@code r} is negative
      */
     public static Complex[] polar2Complex(double[] r, double[] theta) {
-        final int length = r.length;
-        final Complex[] c = new Complex[length];
-        for (int x = 0; x < length; x++) {
-            if (r[x] < 0) {
-                throw new NegativeModulusException(r[x]);
-            }
-            c[x] = Complex.ofCartesian(r[x] * Math.cos(theta[x]), r[x] * Math.sin(theta[x]));
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -97,12 +95,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if any element in {@code r} is negative
      */
     public static Complex[][] polar2Complex(double[][] r, double[][] theta) {
-        final int length = r.length;
-        final Complex[][] c = new Complex[length][];
-        for (int x = 0; x < length; x++) {
-            c[x] = polar2Complex(r[x], theta[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -115,12 +108,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if any element in {@code r} is negative
      */
     public static Complex[][][] polar2Complex(double[][][] r, double[][][] theta) {
-        final int length = r.length;
-        final Complex[][][] c = new Complex[length][][];
-        for (int x = 0; x < length; x++) {
-            c[x] = polar2Complex(r[x], theta[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -132,7 +120,7 @@ public final class ComplexUtils {
      * @return {@code Complex}.
      */
     public static Complex extractComplexFromRealArray(double[] real, int index) {
-        return Complex.ofCartesian(real[index], 0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -144,7 +132,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex extractComplexFromRealArray(float[] real, int index) {
-        return Complex.ofCartesian(real[index], 0);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -156,7 +144,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex extractComplexFromImaginaryArray(double[] imaginary, int index) {
-        return Complex.ofCartesian(0, imaginary[index]);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -168,7 +156,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex extractComplexFromImaginaryArray(float[] imaginary, int index) {
-        return Complex.ofCartesian(0, imaginary[index]);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -180,7 +168,7 @@ public final class ComplexUtils {
      * @return {@code double}.
      */
     public static double extractRealFromComplexArray(Complex[] complex, int index) {
-        return complex[index].getReal();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -192,7 +180,7 @@ public final class ComplexUtils {
      * @return {@code float}.
      */
     public static float extractRealFloatFromComplexArray(Complex[] complex, int index) {
-        return (float) complex[index].getReal();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -204,7 +192,7 @@ public final class ComplexUtils {
      * @return {@code double}.
      */
     public static double extractImaginaryFromComplexArray(Complex[] complex, int index) {
-        return complex[index].getImaginary();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -216,7 +204,7 @@ public final class ComplexUtils {
      * @return {@code float}.
      */
     public static float extractImaginaryFloatFromComplexArray(Complex[] complex, int index) {
-        return (float) complex[index].getImaginary();
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -229,7 +217,7 @@ public final class ComplexUtils {
      * @return {@code Complex}.
      */
     public static Complex extractComplexFromInterleavedArray(double[] d, int index) {
-        return Complex.ofCartesian(d[index * 2], d[index * 2 + 1]);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -242,7 +230,7 @@ public final class ComplexUtils {
      * @return {@code Complex}.
      */
     public static Complex extractComplexFromInterleavedArray(float[] f, int index) {
-        return Complex.ofCartesian(f[index * 2], f[index * 2 + 1]);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -254,7 +242,7 @@ public final class ComplexUtils {
      * @return size 2 array.
      */
     public static double[] extractInterleavedFromComplexArray(Complex[] complex, int index) {
-        return new double[] {complex[index].getReal(), complex[index].getImaginary()};
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -266,7 +254,7 @@ public final class ComplexUtils {
      * @return size 2 {@code float[]}.
      */
     public static float[] extractInterleavedFloatFromComplexArray(Complex[] complex, int index) {
-        return new float[] {(float) complex[index].getReal(), (float) complex[index].getImaginary()};
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -276,13 +264,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex[] real2Complex(double[] real) {
-        int index = 0;
-        final Complex[] c = new Complex[real.length];
-        for (final double d : real) {
-            c[index] = Complex.ofCartesian(d, 0);
-            index++;
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -292,13 +274,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex[] real2Complex(float[] real) {
-        int index = 0;
-        final Complex[] c = new Complex[real.length];
-        for (final float d : real) {
-            c[index] = Complex.ofCartesian(d, 0);
-            index++;
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -309,12 +285,7 @@ public final class ComplexUtils {
      * @return 2D {@code Complex} array
      */
     public static Complex[][] real2Complex(double[][] d) {
-        final int w = d.length;
-        final Complex[][] c = new Complex[w][];
-        for (int n = 0; n < w; n++) {
-            c[n] = ComplexUtils.real2Complex(d[n]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -325,12 +296,7 @@ public final class ComplexUtils {
      * @return 2D {@code Complex} array
      */
     public static Complex[][] real2Complex(float[][] d) {
-        final int w = d.length;
-        final Complex[][] c = new Complex[w][];
-        for (int n = 0; n < w; n++) {
-            c[n] = ComplexUtils.real2Complex(d[n]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -341,12 +307,7 @@ public final class ComplexUtils {
      * @return 3D {@code Complex} array
      */
     public static Complex[][][] real2Complex(double[][][] d) {
-        final int w = d.length;
-        final Complex[][][] c = new Complex[w][][];
-        for (int x = 0; x < w; x++) {
-            c[x] = ComplexUtils.real2Complex(d[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -357,12 +318,7 @@ public final class ComplexUtils {
      * @return 3D {@code Complex} array
      */
     public static Complex[][][] real2Complex(float[][][] d) {
-        final int w = d.length;
-        final Complex[][][] c = new Complex[w][][];
-        for (int x = 0; x < w; x++) {
-            c[x] = ComplexUtils.real2Complex(d[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -373,12 +329,7 @@ public final class ComplexUtils {
      * @return 4D {@code Complex} array
      */
     public static Complex[][][][] real2Complex(double[][][][] d) {
-        final int w = d.length;
-        final Complex[][][][] c = new Complex[w][][][];
-        for (int x = 0; x < w; x++) {
-            c[x] = ComplexUtils.real2Complex(d[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -389,13 +340,7 @@ public final class ComplexUtils {
      * @return array of the real component
      */
     public static double[] complex2Real(Complex[] c) {
-        int index = 0;
-        final double[] d = new double[c.length];
-        for (final Complex cc : c) {
-            d[index] = cc.getReal();
-            index++;
-        }
-        return d;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -406,13 +351,7 @@ public final class ComplexUtils {
      * @return {@code float[]} array of the real component
      */
     public static float[] complex2RealFloat(Complex[] c) {
-        int index = 0;
-        final float[] f = new float[c.length];
-        for (final Complex cc : c) {
-            f[index] = (float) cc.getReal();
-            index++;
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -423,12 +362,7 @@ public final class ComplexUtils {
      * @return {@code double[][]} of real component
      */
     public static double[][] complex2Real(Complex[][] c) {
-        final int length = c.length;
-        final double[][] d = new double[length][];
-        for (int n = 0; n < length; n++) {
-            d[n] = complex2Real(c[n]);
-        }
-        return d;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -439,12 +373,7 @@ public final class ComplexUtils {
      * @return {@code float[][]} of real component
      */
     public static float[][] complex2RealFloat(Complex[][] c) {
-        final int length = c.length;
-        final float[][] f = new float[length][];
-        for (int n = 0; n < length; n++) {
-            f[n] = complex2RealFloat(c[n]);
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -455,12 +384,7 @@ public final class ComplexUtils {
      * @return array of real component
      */
     public static double[][][] complex2Real(Complex[][][] c) {
-        final int length = c.length;
-        final double[][][] d = new double[length][][];
-        for (int n = 0; n < length; n++) {
-            d[n] = complex2Real(c[n]);
-        }
-        return d;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -471,12 +395,7 @@ public final class ComplexUtils {
      * @return {@code float[][][]} of real component
      */
     public static float[][][] complex2RealFloat(Complex[][][] c) {
-        final int length = c.length;
-        final float[][][] f = new float[length][][];
-        for (int n = 0; n < length; n++) {
-            f[n] = complex2RealFloat(c[n]);
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -487,12 +406,7 @@ public final class ComplexUtils {
      * @return array of real component
      */
     public static double[][][][] complex2Real(Complex[][][][] c) {
-        final int length = c.length;
-        final double[][][][] d = new double[length][][][];
-        for (int n = 0; n < length; n++) {
-            d[n] = complex2Real(c[n]);
-        }
-        return d;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -503,12 +417,7 @@ public final class ComplexUtils {
      * @return {@code float[][][][]} of real component
      */
     public static float[][][][] complex2RealFloat(Complex[][][][] c) {
-        final int length = c.length;
-        final float[][][][] f = new float[length][][][];
-        for (int n = 0; n < length; n++) {
-            f[n] = complex2RealFloat(c[n]);
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -519,13 +428,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex[] imaginary2Complex(double[] imaginary) {
-        int index = 0;
-        final Complex[] c = new Complex[imaginary.length];
-        for (final double d : imaginary) {
-            c[index] = Complex.ofCartesian(0, d);
-            index++;
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -535,13 +438,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex[] imaginary2Complex(float[] imaginary) {
-        int index = 0;
-        final Complex[] c = new Complex[imaginary.length];
-        for (final float d : imaginary) {
-            c[index] = Complex.ofCartesian(0, d);
-            index++;
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -552,12 +449,7 @@ public final class ComplexUtils {
      * @return 2D {@code Complex} array
      */
     public static Complex[][] imaginary2Complex(double[][] i) {
-        final int w = i.length;
-        final Complex[][] c = new Complex[w][];
-        for (int n = 0; n < w; n++) {
-            c[n] = ComplexUtils.imaginary2Complex(i[n]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -568,12 +460,7 @@ public final class ComplexUtils {
      * @return 3D {@code Complex} array
      */
     public static Complex[][][] imaginary2Complex(double[][][] i) {
-        final int w = i.length;
-        final Complex[][][] c = new Complex[w][][];
-        for (int n = 0; n < w; n++) {
-            c[n] = ComplexUtils.imaginary2Complex(i[n]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -584,12 +471,7 @@ public final class ComplexUtils {
      * @return 4D {@code Complex} array
      */
     public static Complex[][][][] imaginary2Complex(double[][][][] i) {
-        final int w = i.length;
-        final Complex[][][][] c = new Complex[w][][][];
-        for (int n = 0; n < w; n++) {
-            c[n] = ComplexUtils.imaginary2Complex(i[n]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -600,13 +482,7 @@ public final class ComplexUtils {
      * @return array of the imaginary component
      */
     public static double[] complex2Imaginary(Complex[] c) {
-        int index = 0;
-        final double[] i = new double[c.length];
-        for (final Complex cc : c) {
-            i[index] = cc.getImaginary();
-            index++;
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -617,13 +493,7 @@ public final class ComplexUtils {
      * @return {@code float[]} array of the imaginary component
      */
     public static float[] complex2ImaginaryFloat(Complex[] c) {
-        int index = 0;
-        final float[] f = new float[c.length];
-        for (final Complex cc : c) {
-            f[index] = (float) cc.getImaginary();
-            index++;
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -634,12 +504,7 @@ public final class ComplexUtils {
      * @return {@code double[][]} of imaginary component
      */
     public static double[][] complex2Imaginary(Complex[][] c) {
-        final int length = c.length;
-        final double[][] i = new double[length][];
-        for (int n = 0; n < length; n++) {
-            i[n] = complex2Imaginary(c[n]);
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -650,12 +515,7 @@ public final class ComplexUtils {
      * @return {@code float[][]} of imaginary component
      */
     public static float[][] complex2ImaginaryFloat(Complex[][] c) {
-        final int length = c.length;
-        final float[][] f = new float[length][];
-        for (int n = 0; n < length; n++) {
-            f[n] = complex2ImaginaryFloat(c[n]);
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -666,12 +526,7 @@ public final class ComplexUtils {
      * @return 3D {@code Complex} array
      */
     public static double[][][] complex2Imaginary(Complex[][][] c) {
-        final int length = c.length;
-        final double[][][] i = new double[length][][];
-        for (int n = 0; n < length; n++) {
-            i[n] = complex2Imaginary(c[n]);
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -682,12 +537,7 @@ public final class ComplexUtils {
      * @return {@code float[][][]} of imaginary component
      */
     public static float[][][] complex2ImaginaryFloat(Complex[][][] c) {
-        final int length = c.length;
-        final float[][][] f = new float[length][][];
-        for (int n = 0; n < length; n++) {
-            f[n] = complex2ImaginaryFloat(c[n]);
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -698,12 +548,7 @@ public final class ComplexUtils {
      * @return 4D {@code Complex} array
      */
     public static double[][][][] complex2Imaginary(Complex[][][][] c) {
-        final int length = c.length;
-        final double[][][][] i = new double[length][][][];
-        for (int n = 0; n < length; n++) {
-            i[n] = complex2Imaginary(c[n]);
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -714,16 +559,10 @@ public final class ComplexUtils {
      * @return {@code float[][][][]} of imaginary component
      */
     public static float[][][][] complex2ImaginaryFloat(Complex[][][][] c) {
-        final int length = c.length;
-        final float[][][][] f = new float[length][][][];
-        for (int n = 0; n < length; n++) {
-            f[n] = complex2ImaginaryFloat(c[n]);
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // INTERLEAVED METHODS
-
     /**
      * Converts a complex interleaved {@code double[]} array to a
      * {@code Complex[]} array.
@@ -732,12 +571,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex[] interleaved2Complex(double[] interleaved) {
-        final int length = interleaved.length / 2;
-        final Complex[] c = new Complex[length];
-        for (int n = 0; n < length; n++) {
-            c[n] = Complex.ofCartesian(interleaved[n * 2], interleaved[n * 2 + 1]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -748,12 +582,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex[] interleaved2Complex(float[] interleaved) {
-        final int length = interleaved.length / 2;
-        final Complex[] c = new Complex[length];
-        for (int n = 0; n < length; n++) {
-            c[n] = Complex.ofCartesian(interleaved[n * 2], interleaved[n * 2 + 1]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -765,16 +594,7 @@ public final class ComplexUtils {
      *         imaginary values
      */
     public static double[] complex2Interleaved(Complex[] c) {
-        int index = 0;
-        final double[] i = new double[c.length * 2];
-        for (final Complex cc : c) {
-            final int real = index * 2;
-            final int imag = index * 2 + 1;
-            i[real] = cc.getReal();
-            i[imag] = cc.getImaginary();
-            index++;
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -786,16 +606,7 @@ public final class ComplexUtils {
      *         imaginary values
      */
     public static float[] complex2InterleavedFloat(Complex[] c) {
-        int index = 0;
-        final float[] f = new float[c.length * 2];
-        for (final Complex cc : c) {
-            final int real = index * 2;
-            final int imag = index * 2 + 1;
-            f[real] = (float) cc.getReal();
-            f[imag] = (float) cc.getImaginary();
-            index++;
-        }
-        return f;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -809,30 +620,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not 0 or 1
      */
     public static double[][] complex2Interleaved(Complex[][] c, int interleavedDim) {
-        if (interleavedDim > 1 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = c.length;
-        final int h = c[0].length;
-        double[][] i;
-        if (interleavedDim == 0) {
-            i = new double[2 * w][h];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    i[x * 2][y] = c[x][y].getReal();
-                    i[x * 2 + 1][y] = c[x][y].getImaginary();
-                }
-            }
-        } else {
-            i = new double[w][2 * h];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    i[x][y * 2] = c[x][y].getReal();
-                    i[x][y * 2 + 1] = c[x][y].getImaginary();
-                }
-            }
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -845,7 +633,7 @@ public final class ComplexUtils {
      *         imaginary values
      */
     public static double[][] complex2Interleaved(Complex[][] c) {
-        return complex2Interleaved(c, 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -859,45 +647,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not 0, 1, or 2
      */
     public static double[][][] complex2Interleaved(Complex[][][] c, int interleavedDim) {
-        if (interleavedDim > 2 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = c.length;
-        final int h = c[0].length;
-        final int d = c[0][0].length;
-        double[][][] i;
-        if (interleavedDim == 0) {
-            i = new double[2 * w][h][d];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        i[x * 2][y][z] = c[x][y][z].getReal();
-                        i[x * 2 + 1][y][z] = c[x][y][z].getImaginary();
-                    }
-                }
-            }
-        } else if (interleavedDim == 1) {
-            i = new double[w][2 * h][d];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        i[x][y * 2][z] = c[x][y][z].getReal();
-                        i[x][y * 2 + 1][z] = c[x][y][z].getImaginary();
-                    }
-                }
-            }
-        } else {
-            i = new double[w][h][2 * d];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        i[x][y][z * 2] = c[x][y][z].getReal();
-                        i[x][y][z * 2 + 1] = c[x][y][z].getImaginary();
-                    }
-                }
-            }
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -911,64 +661,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not in the range {@code [0, 3]}
      */
     public static double[][][][] complex2Interleaved(Complex[][][][] c, int interleavedDim) {
-        if (interleavedDim > 3 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = c.length;
-        final int h = c[0].length;
-        final int d = c[0][0].length;
-        final int v = c[0][0][0].length;
-        double[][][][] i;
-        if (interleavedDim == DIM_X) {
-            i = new double[2 * w][h][d][v];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        for (int t = 0; t < v; t++) {
-                            i[x * 2][y][z][t] = c[x][y][z][t].getReal();
-                            i[x * 2 + 1][y][z][t] = c[x][y][z][t].getImaginary();
-                        }
-                    }
-                }
-            }
-        } else if (interleavedDim == DIM_Y) {
-            i = new double[w][2 * h][d][v];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        for (int t = 0; t < v; t++) {
-                            i[x][y * 2][z][t] = c[x][y][z][t].getReal();
-                            i[x][y * 2 + 1][z][t] = c[x][y][z][t].getImaginary();
-                        }
-                    }
-                }
-            }
-        } else if (interleavedDim == DIM_Z) {
-            i = new double[w][h][2 * d][v];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        for (int t = 0; t < v; t++) {
-                            i[x][y][z * 2][t] = c[x][y][z][t].getReal();
-                            i[x][y][z * 2 + 1][t] = c[x][y][z][t].getImaginary();
-                        }
-                    }
-                }
-            }
-        } else {
-            i = new double[w][h][d][2 * v];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        for (int t = 0; t < v; t++) {
-                            i[x][y][z][t * 2] = c[x][y][z][t].getReal();
-                            i[x][y][z][t * 2 + 1] = c[x][y][z][t].getImaginary();
-                        }
-                    }
-                }
-            }
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -981,7 +674,7 @@ public final class ComplexUtils {
      *         imaginary values
      */
     public static double[][][] complex2Interleaved(Complex[][][] c) {
-        return complex2Interleaved(c, 2);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -994,7 +687,7 @@ public final class ComplexUtils {
      *         imaginary values
      */
     public static double[][][][] complex2Interleaved(Complex[][][][] c) {
-        return complex2Interleaved(c, 3);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1008,30 +701,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not 0 or 1
      */
     public static float[][] complex2InterleavedFloat(Complex[][] c, int interleavedDim) {
-        if (interleavedDim > 1 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = c.length;
-        final int h = c[0].length;
-        float[][] i;
-        if (interleavedDim == 0) {
-            i = new float[2 * w][h];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    i[x * 2][y] = (float) c[x][y].getReal();
-                    i[x * 2 + 1][y] = (float) c[x][y].getImaginary();
-                }
-            }
-        } else {
-            i = new float[w][2 * h];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    i[x][y * 2] = (float) c[x][y].getReal();
-                    i[x][y * 2 + 1] = (float) c[x][y].getImaginary();
-                }
-            }
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1045,7 +715,7 @@ public final class ComplexUtils {
      *         imaginary values
      */
     public static float[][] complex2InterleavedFloat(Complex[][] c) {
-        return complex2InterleavedFloat(c, 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1059,45 +729,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not 0, 1, or 2
      */
     public static float[][][] complex2InterleavedFloat(Complex[][][] c, int interleavedDim) {
-        if (interleavedDim > 2 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = c.length;
-        final int h = c[0].length;
-        final int d = c[0][0].length;
-        float[][][] i;
-        if (interleavedDim == 0) {
-            i = new float[2 * w][h][d];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        i[x * 2][y][z] = (float) c[x][y][z].getReal();
-                        i[x * 2 + 1][y][z] = (float) c[x][y][z].getImaginary();
-                    }
-                }
-            }
-        } else if (interleavedDim == 1) {
-            i = new float[w][2 * h][d];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        i[x][y * 2][z] = (float) c[x][y][z].getReal();
-                        i[x][y * 2 + 1][z] = (float) c[x][y][z].getImaginary();
-                    }
-                }
-            }
-        } else {
-            i = new float[w][h][2 * d];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        i[x][y][z * 2] = (float) c[x][y][z].getReal();
-                        i[x][y][z * 2 + 1] = (float) c[x][y][z].getImaginary();
-                    }
-                }
-            }
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1111,7 +743,7 @@ public final class ComplexUtils {
      *         imaginary values
      */
     public static float[][][] complex2InterleavedFloat(Complex[][][] c) {
-        return complex2InterleavedFloat(c, 2);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1124,28 +756,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not 0 or 1
      */
     public static Complex[][] interleaved2Complex(double[][] i, int interleavedDim) {
-        if (interleavedDim > 1 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = i.length;
-        final int h = i[0].length;
-        Complex[][] c;
-        if (interleavedDim == 0) {
-            c = new Complex[w / 2][h];
-            for (int x = 0; x < w / 2; x++) {
-                for (int y = 0; y < h; y++) {
-                    c[x][y] = Complex.ofCartesian(i[x * 2][y], i[x * 2 + 1][y]);
-                }
-            }
-        } else {
-            c = new Complex[w][h / 2];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h / 2; y++) {
-                    c[x][y] = Complex.ofCartesian(i[x][y * 2], i[x][y * 2 + 1]);
-                }
-            }
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1157,7 +768,7 @@ public final class ComplexUtils {
      * @return 2D {@code Complex} array
      */
     public static Complex[][] interleaved2Complex(double[][] d) {
-        return interleaved2Complex(d, 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1170,42 +781,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not 0, 1, or 2
      */
     public static Complex[][][] interleaved2Complex(double[][][] i, int interleavedDim) {
-        if (interleavedDim > 2 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = i.length;
-        final int h = i[0].length;
-        final int d = i[0][0].length;
-        Complex[][][] c;
-        if (interleavedDim == DIM_X) {
-            c = new Complex[w / 2][h][d];
-            for (int x = 0; x < w / 2; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        c[x][y][z] = Complex.ofCartesian(i[x * 2][y][z], i[x * 2 + 1][y][z]);
-                    }
-                }
-            }
-        } else if (interleavedDim == DIM_Y) {
-            c = new Complex[w][h / 2][d];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h / 2; y++) {
-                    for (int z = 0; z < d; z++) {
-                        c[x][y][z] = Complex.ofCartesian(i[x][y * 2][z], i[x][y * 2 + 1][z]);
-                    }
-                }
-            }
-        } else {
-            c = new Complex[w][h][d / 2];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d / 2; z++) {
-                        c[x][y][z] = Complex.ofCartesian(i[x][y][z * 2], i[x][y][z * 2 + 1]);
-                    }
-                }
-            }
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1218,60 +794,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not in the range {@code [0, 3]}
      */
     public static Complex[][][][] interleaved2Complex(double[][][][] i, int interleavedDim) {
-        if (interleavedDim > 3 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = i.length;
-        final int h = i[0].length;
-        final int d = i[0][0].length;
-        final int v = i[0][0][0].length;
-        Complex[][][][] c;
-        if (interleavedDim == 0) {
-            c = new Complex[w / 2][h][d][v];
-            for (int x = 0; x < w / 2; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        for (int t = 0; t < v; t++) {
-                            c[x][y][z][t] = Complex.ofCartesian(i[x * 2][y][z][t], i[x * 2 + 1][y][z][t]);
-                        }
-                    }
-                }
-            }
-        } else if (interleavedDim == 1) {
-            c = new Complex[w][h / 2][d][v];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h / 2; y++) {
-                    for (int z = 0; z < d; z++) {
-                        for (int t = 0; t < v; t++) {
-                            c[x][y][z][t] = Complex.ofCartesian(i[x][y * 2][z][t], i[x][y * 2 + 1][z][t]);
-                        }
-                    }
-                }
-            }
-        } else if (interleavedDim == 2) {
-            c = new Complex[w][h][d / 2][v];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d / 2; z++) {
-                        for (int t = 0; t < v; t++) {
-                            c[x][y][z][t] = Complex.ofCartesian(i[x][y][z * 2][t], i[x][y][z * 2 + 1][t]);
-                        }
-                    }
-                }
-            }
-        } else {
-            c = new Complex[w][h][d][v / 2];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        for (int t = 0; t < v / 2; t++) {
-                            c[x][y][z][t] = Complex.ofCartesian(i[x][y][z][t * 2], i[x][y][z][t * 2 + 1]);
-                        }
-                    }
-                }
-            }
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1283,7 +806,7 @@ public final class ComplexUtils {
      * @return 3D {@code Complex} array
      */
     public static Complex[][][] interleaved2Complex(double[][][] d) {
-        return interleaved2Complex(d, 2);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1296,28 +819,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not 0 or 1
      */
     public static Complex[][] interleaved2Complex(float[][] i, int interleavedDim) {
-        if (interleavedDim > 1 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = i.length;
-        final int h = i[0].length;
-        Complex[][] c;
-        if (interleavedDim == 0) {
-            c = new Complex[w / 2][h];
-            for (int x = 0; x < w / 2; x++) {
-                for (int y = 0; y < h; y++) {
-                    c[x][y] = Complex.ofCartesian(i[x * 2][y], i[x * 2 + 1][y]);
-                }
-            }
-        } else {
-            c = new Complex[w][h / 2];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h / 2; y++) {
-                    c[x][y] = Complex.ofCartesian(i[x][y * 2], i[x][y * 2 + 1]);
-                }
-            }
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1329,7 +831,7 @@ public final class ComplexUtils {
      * @return 2D {@code Complex} array
      */
     public static Complex[][] interleaved2Complex(float[][] d) {
-        return interleaved2Complex(d, 1);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1342,42 +844,7 @@ public final class ComplexUtils {
      * @throws IllegalArgumentException if {@code interleavedDim} is not 0, 1, or 2
      */
     public static Complex[][][] interleaved2Complex(float[][][] i, int interleavedDim) {
-        if (interleavedDim > 2 || interleavedDim < 0) {
-            throw new IndexOutOfRangeException(interleavedDim);
-        }
-        final int w = i.length;
-        final int h = i[0].length;
-        final int d = i[0][0].length;
-        Complex[][][] c;
-        if (interleavedDim == 0) {
-            c = new Complex[w / 2][h][d];
-            for (int x = 0; x < w / 2; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d; z++) {
-                        c[x][y][z] = Complex.ofCartesian(i[x * 2][y][z], i[x * 2 + 1][y][z]);
-                    }
-                }
-            }
-        } else if (interleavedDim == 1) {
-            c = new Complex[w][h / 2][d];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h / 2; y++) {
-                    for (int z = 0; z < d; z++) {
-                        c[x][y][z] = Complex.ofCartesian(i[x][y * 2][z], i[x][y * 2 + 1][z]);
-                    }
-                }
-            }
-        } else {
-            c = new Complex[w][h][d / 2];
-            for (int x = 0; x < w; x++) {
-                for (int y = 0; y < h; y++) {
-                    for (int z = 0; z < d / 2; z++) {
-                        c[x][y][z] = Complex.ofCartesian(i[x][y][z * 2], i[x][y][z * 2 + 1]);
-                    }
-                }
-            }
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1389,11 +856,10 @@ public final class ComplexUtils {
      * @return 3D {@code Complex} array
      */
     public static Complex[][][] interleaved2Complex(float[][][] d) {
-        return interleaved2Complex(d, 2);
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // SPLIT METHODS
-
     /**
      * Converts a split complex array {@code double[] r, double[] i} to a
      * {@code Complex[]} array.
@@ -1403,12 +869,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex[] split2Complex(double[] real, double[] imag) {
-        final int length = real.length;
-        final Complex[] c = new Complex[length];
-        for (int n = 0; n < length; n++) {
-            c[n] = Complex.ofCartesian(real[n], imag[n]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1420,12 +881,7 @@ public final class ComplexUtils {
      * @return 2D {@code Complex} array
      */
     public static Complex[][] split2Complex(double[][] real, double[][] imag) {
-        final int length = real.length;
-        final Complex[][] c = new Complex[length][];
-        for (int x = 0; x < length; x++) {
-            c[x] = split2Complex(real[x], imag[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1437,12 +893,7 @@ public final class ComplexUtils {
      * @return 3D {@code Complex} array
      */
     public static Complex[][][] split2Complex(double[][][] real, double[][][] imag) {
-        final int length = real.length;
-        final Complex[][][] c = new Complex[length][][];
-        for (int x = 0; x < length; x++) {
-            c[x] = split2Complex(real[x], imag[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1454,12 +905,7 @@ public final class ComplexUtils {
      * @return 4D {@code Complex} array
      */
     public static Complex[][][][] split2Complex(double[][][][] real, double[][][][] imag) {
-        final int length = real.length;
-        final Complex[][][][] c = new Complex[length][][][];
-        for (int x = 0; x < length; x++) {
-            c[x] = split2Complex(real[x], imag[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1471,12 +917,7 @@ public final class ComplexUtils {
      * @return {@code Complex} array
      */
     public static Complex[] split2Complex(float[] real, float[] imag) {
-        final int length = real.length;
-        final Complex[] c = new Complex[length];
-        for (int n = 0; n < length; n++) {
-            c[n] = Complex.ofCartesian(real[n], imag[n]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1488,12 +929,7 @@ public final class ComplexUtils {
      * @return 2D {@code Complex} array
      */
     public static Complex[][] split2Complex(float[][] real, float[][] imag) {
-        final int length = real.length;
-        final Complex[][] c = new Complex[length][];
-        for (int x = 0; x < length; x++) {
-            c[x] = split2Complex(real[x], imag[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1505,16 +941,10 @@ public final class ComplexUtils {
      * @return 3D {@code Complex} array
      */
     public static Complex[][][] split2Complex(float[][][] real, float[][][] imag) {
-        final int length = real.length;
-        final Complex[][][] c = new Complex[length][][];
-        for (int x = 0; x < length; x++) {
-            c[x] = split2Complex(real[x], imag[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     // MISC
-
     /**
      * Initializes a {@code Complex[]} array to zero, to avoid
      * NullPointerExceptions.
@@ -1523,11 +953,7 @@ public final class ComplexUtils {
      * @return c
      */
     public static Complex[] initialize(Complex[] c) {
-        final int length = c.length;
-        for (int x = 0; x < length; x++) {
-            c[x] = Complex.ZERO;
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1538,11 +964,7 @@ public final class ComplexUtils {
      * @return c
      */
     public static Complex[][] initialize(Complex[][] c) {
-        final int length = c.length;
-        for (int x = 0; x < length; x++) {
-            c[x] = initialize(c[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1553,11 +975,7 @@ public final class ComplexUtils {
      * @return c
      */
     public static Complex[][][] initialize(Complex[][][] c) {
-        final int length = c.length;
-        for (int x = 0; x < length; x++) {
-            c[x] = initialize(c[x]);
-        }
-        return c;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1568,12 +986,7 @@ public final class ComplexUtils {
      * @return {@code double[]}
      */
     public static double[] abs(Complex[] c) {
-        final int length = c.length;
-        final double[] i = new double[length];
-        for (int x = 0; x < length; x++) {
-            i[x] = c[x].abs();
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
@@ -1584,19 +997,17 @@ public final class ComplexUtils {
      * @return {@code double[]} array
      */
     public static double[] arg(Complex[] c) {
-        final int length = c.length;
-        final double[] i = new double[length];
-        for (int x = 0; x < length; x++) {
-            i[x] = c[x].arg();
-        }
-        return i;
+        throw new UnsupportedOperationException("STUB: not implemented");
     }
 
     /**
      * Exception to be throw when a negative value is passed as the modulus.
      */
     private static class NegativeModulusException extends IllegalArgumentException {
-        /** Serializable version identifier. */
+
+        /**
+         * Serializable version identifier.
+         */
         private static final long serialVersionUID = 20181205L;
 
         /**
@@ -1611,7 +1022,10 @@ public final class ComplexUtils {
      * Exception to be throw when an out-of-range index value is passed.
      */
     private static class IndexOutOfRangeException extends IllegalArgumentException {
-        /** Serializable version identifier. */
+
+        /**
+         * Serializable version identifier.
+         */
         private static final long serialVersionUID = 20181205L;
 
         /**
